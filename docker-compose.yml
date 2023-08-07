@@ -1,0 +1,33 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nestjs-container
+    ports:
+      - 3001:3000
+    depends_on:
+      - postgres
+    working_dir: /app
+    volumes:
+      - ./:/app
+    networks:
+      - nestjs-network-tcdb
+  postgres:
+    image: postgres:15.2
+    container_name: postgres-database
+    ports:
+      - 5434:5432
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: vuong2001
+      POSTGRES_DB: tcdb
+    volumes:
+      - postgres-tcdb:/var/lib/postgresql/data
+    networks:
+      - nestjs-network-tcdb
+volumes:
+  postgres-tcdb:
+networks:
+  nestjs-network-tcdb:
