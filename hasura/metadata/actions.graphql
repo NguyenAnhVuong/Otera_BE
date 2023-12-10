@@ -1,0 +1,55 @@
+type Mutation {
+  userRegister(
+    input: UserRegisterInput!
+  ): UserRegisterOutput
+}
+
+input UserRegisterInput {
+  name: String!
+  birthday: date!
+  email: String!
+  password: String!
+  role: String
+}
+
+type SampleOutput {
+  userDetailId: Int
+  name: String
+  email: String
+  birthday: date
+  role: String
+  refreshToken: String
+  familyId: Int
+  id: Int
+  createdAt: date
+  updatedAt: date
+}
+
+type UserRegisterOutput {
+  statusCode: Int
+  data: UserRegisterOutputData
+  errorMessage: String
+  errorCode: String
+  timestamp: String
+}
+
+type UserRegisterOutputData {
+  userDetailId: Int
+  name: String
+  email: String
+  birthday: date
+  role: String
+  refreshToken: String
+  familyId: Int
+  id: Int
+  createdAt: date
+  updatedAt: date
+}
+
+type ResonseOutput {
+  statusCode: Int
+  errorMessage: String
+  errorCode: String
+  timestamp: String
+}
+

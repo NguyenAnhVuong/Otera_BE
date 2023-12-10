@@ -1,0 +1,16 @@
+actions:
+  - name: userRegister
+    definition:
+      kind: synchronous
+      handler: '{{ACTION_BASE_URL}}/api/user/register'
+      forward_client_headers: true
+custom_types:
+  enums: []
+  input_objects:
+    - name: UserRegisterInput
+  objects:
+    - name: SampleOutput
+    - name: UserRegisterOutput
+    - name: UserRegisterOutputData
+    - name: ResonseOutput
+  scalars: []

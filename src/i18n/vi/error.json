@@ -1,0 +1,8 @@
+{
+  "ACCOUNT_NOT_EXISTS": "Tài khoản không tồn tại",
+  "ACCOUNT_EXISTS": "Tài khoản đã tồn tại",
+  "PASSWORD_INCORRECT": "Mật khẩu không chính xác",
+  "REFRESH_TOKEN_NOT_EXISTS": "Refresh token không tồn tại",
+  "UNAUTHORIZED": "Không có quyền truy cập",
+  "INVALID_PARAM": "Thông số không hợp lệ"
+}

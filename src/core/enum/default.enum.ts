@@ -1,3 +1,9 @@
+export enum EEnvironment {
+  DEVELOPMENT = 'development',
+  STAGING = 'staging',
+  PRODUCTION = 'production',
+}
+
 export enum ERole {
   SYSTEM = 'SYSTEM',
   FAMILY_ADMIN = 'FAMILY_ADMIN',
@@ -10,6 +16,12 @@ export enum EGender {
   MALE = 0,
   FEMALE = 1,
   OTHER = 2,
+}
+
+export enum EAppLanguage {
+  VI = 'vi',
+  JA = 'ja',
+  EN = 'en',
 }
 
 export enum EStatus {

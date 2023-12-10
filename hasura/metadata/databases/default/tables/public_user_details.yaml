@@ -1,0 +1,18 @@
+table:
+  name: user_details
+  schema: public
+object_relationships:
+  - name: deceased
+    using:
+      foreign_key_constraint_on:
+        column: user_detail_id
+        table:
+          name: deceased
+          schema: public
+  - name: user
+    using:
+      foreign_key_constraint_on:
+        column: user_detail_id
+        table:
+          name: users
+          schema: public

@@ -1,0 +1,13 @@
+table:
+  name: images
+  schema: public
+object_relationships:
+  - name: deceased
+    using:
+      foreign_key_constraint_on: deceased_id
+  - name: event
+    using:
+      foreign_key_constraint_on: event_id
+  - name: temple
+    using:
+      foreign_key_constraint_on: temple_id

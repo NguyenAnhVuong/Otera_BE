@@ -1,0 +1,8 @@
+{
+  "ACCOUNT_NOT_EXISTS": "Account not exists",
+  "ACCOUNT_EXISTS": "Account exists",
+  "PASSWORD_INCORRECT": "Password incorrect",
+  "REFRESH_TOKEN_NOT_EXISTS": "Refresh token not exists",
+  "UNAUTHORIZED": "Unauthorized",
+  "INVALID_PARAM": "Invalid param"
+}
