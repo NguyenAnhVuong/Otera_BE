@@ -1,12 +1,10 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import { Request } from 'express';
-import { ERole } from 'src/core/enum/default.enum';
+import { Body, Controller, Post } from '@nestjs/common';
+import { HasuraBody } from 'src/core/decorator/hasuraBody.decorator';
 import { Public } from 'src/core/decorator/public.decorator';
-import { Roles } from 'src/core/decorator/roles.decorator';
+import { VRefreshToken } from './dto/refresh-token.dto';
 import { VUserLoginDto } from './dto/user-login.dto';
 import { VUserRegisterDto } from './dto/user-register.dto';
 import { UserService } from './user.service';
-import { VRefreshToken } from './dto/refresh-token.dto';
 
 @Controller('user')
 export class UserController {
@@ -14,8 +12,8 @@ export class UserController {
 
   @Public()
   @Post('/register')
-  userRegister(@Body() userLogin: VUserRegisterDto) {
-    return this.userService.userRegister(userLogin);
+  userRegister(@HasuraBody('input') body: VUserRegisterDto) {
+    return this.userService.userRegister(body);
   }
 
   @Public()

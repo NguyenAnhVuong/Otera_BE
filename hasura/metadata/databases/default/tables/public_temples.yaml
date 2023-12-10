@@ -1,0 +1,25 @@
+table:
+  name: temples
+  schema: public
+array_relationships:
+  - name: deceaseds
+    using:
+      foreign_key_constraint_on:
+        column: temple_id
+        table:
+          name: deceased
+          schema: public
+  - name: family_temples
+    using:
+      foreign_key_constraint_on:
+        column: temple_id
+        table:
+          name: family_temples
+          schema: public
+  - name: images
+    using:
+      foreign_key_constraint_on:
+        column: temple_id
+        table:
+          name: images
+          schema: public

@@ -1,33 +1,57 @@
+version: "3.6"
 services:
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: nestjs-container
-    ports:
-      - 3001:3000
-    depends_on:
-      - postgres
-    working_dir: /app
-    volumes:
-      - ./:/app
-    networks:
-      - nestjs-network-tcdb
   postgres:
-    image: postgres:15.2
+    image: postgres:15
     container_name: postgres-database
     ports:
-      - 5434:5432
+      - '${DB_POSTGRESQL_PORT}:5432'
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRESQL_DB: ${DB_POSTGRESQL_DB}
+      POSTGRESQL_USER: ${DB_POSTGRESQL_USER}
+      POSTGRES_PASSWORD: ${DB_POSTGRESQL_PASSWORD}
+  graphql-engine:
+    image: hasura/graphql-engine:v2.35.0
+    ports:
+      - "${HASURA_HOST_PORT}:8080"
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: vuong2001
-      POSTGRES_DB: tcdb
-    volumes:
-      - postgres-tcdb:/var/lib/postgresql/data
-    networks:
-      - nestjs-network-tcdb
+      ## postgres database to store Hasura metadata
+      HASURA_GRAPHQL_METADATA_DATABASE_URL: ${DOCKER_DATABASE_URL}
+      ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
+      PG_DATABASE_URL: ${DOCKER_DATABASE_URL}
+      ## enable the console served by server
+      HASURA_GRAPHQL_ENABLE_CONSOLE: ${HASURA_GRAPHQL_ENABLE_CONSOLE} # set to "false" to disable console
+      ## enable debugging mode. It is recommended to disable this in production
+      HASURA_GRAPHQL_DEV_MODE: ${HASURA_GRAPHQL_DEV_MODE}
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: ${HASURA_GRAPHQL_ENABLED_LOG_TYPES}
+      ## uncomment next line to run console offline (i.e load console assets from server instead of CDN)
+      # HASURA_GRAPHQL_CONSOLE_ASSETS_DIR: /srv/console-assets
+      ## uncomment next line to set an admin secret
+      # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_METADATA_DEFAULTS: ${HASURA_GRAPHQL_METADATA_DEFAULTS}
+      ACTION_BASE_URL: ${ACTION_BASE_URL}
+      MY_WEBHOOK_URL: ${MY_WEBHOOK_URL}
+    depends_on:
+      data-connector-agent:
+        condition: service_healthy
+  data-connector-agent:
+    image: hasura/graphql-data-connector:v2.35.0
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      QUARKUS_LOG_LEVEL: ${QUARKUS_LOG_LEVEL} # FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+      ## https://quarkus.io/guides/opentelemetry#configuration-reference
+      QUARKUS_OPENTELEMETRY_ENABLED: ${QUARKUS_OPENTELEMETRY_ENABLED}
+      ## QUARKUS_OPENTELEMETRY_TRACER_EXPORTER_OTLP_ENDPOINT: http://jaeger:4317
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/v1/athena/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
 volumes:
-  postgres-tcdb:
-networks:
-  nestjs-network-tcdb:
+  db_data:
