@@ -13,6 +13,7 @@ import { VCreateFamilyDto } from './dto/create-family.dto';
 import { FamilyService } from './family.service';
 import { UserData } from 'src/core/decorator/user.decorator';
 import { IUserData } from 'src/core/interface/default.interface';
+import { HasuraBody } from '@core/decorator/hasuraBody.decorator';
 
 @Controller('family')
 export class FamilyController {
@@ -22,7 +23,7 @@ export class FamilyController {
   @Roles([ERole.PUBLIC_USER])
   @UseInterceptors(FileInterceptor('avatar'))
   async createFamily(
-    @Body() familyParams: VCreateFamilyDto,
+    @HasuraBody('input') familyParams: VCreateFamilyDto,
     @UploadedFile() avatar: Express.Multer.File,
     @UserData() userData: IUserData,
   ): Promise<Family> {

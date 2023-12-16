@@ -1,26 +1,21 @@
+import { HasuraBody } from '@core/decorator/hasuraBody.decorator';
+import { HasuraBodyPaging } from '@core/decorator/hasuraBodyPaging.decorator';
 import {
-  Body,
   Controller,
-  Get,
   Post,
   UploadedFiles,
   UseInterceptors,
-  Query,
-  Param,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { ERole } from 'src/core/enum/default.enum';
-import { Roles } from 'src/core/decorator/roles.decorator';
-import { VCreateTempleDto } from './dto/create-temple.dto';
-import { TempleService } from './temple.service';
-import { UserData } from 'src/core/decorator/user.decorator';
-import {
-  IPaginationQuery,
-  IUserData,
-} from 'src/core/interface/default.interface';
 import { Public } from 'src/core/decorator/public.decorator';
-import { QueryPaging } from 'src/core/decorator/queryPaging.decorator';
+import { Roles } from 'src/core/decorator/roles.decorator';
+import { UserData } from 'src/core/decorator/user.decorator';
+import { ERole } from 'src/core/enum/default.enum';
+import { IUserData } from 'src/core/interface/default.interface';
+import { VCreateTempleDto } from './dto/create-temple.dto';
+import { VGetTempleByIdDto } from './dto/get-temple-by-id.dto';
+import { VGetTemplesDto } from './dto/get-temples.dto';
+import { TempleService } from './temple.service';
 
 @Controller('temple')
 export class TempleController {
@@ -30,7 +25,7 @@ export class TempleController {
   @Roles([ERole.PUBLIC_USER])
   @UseInterceptors(FilesInterceptor('images[]'))
   async createTemple(
-    @Body() newTemple: VCreateTempleDto,
+    @HasuraBody('input') newTemple: VCreateTempleDto,
     @UploadedFiles() images: Express.Multer.File[],
     @UserData() userData: IUserData,
   ) {
@@ -45,18 +40,15 @@ export class TempleController {
     );
   }
 
-  @Get('all')
+  @Post('all')
   @Public()
-  async getTemples(
-    @QueryPaging() query: IPaginationQuery,
-    @Query('keyword') keyword: string,
-  ) {
-    return await this.templeService.getTemples(query, keyword);
+  async getTemples(@HasuraBodyPaging('query') query: VGetTemplesDto) {
+    return await this.templeService.getTemples(query);
   }
 
-  @Get(':id')
+  @Post('detail')
   @Public()
-  async getTempleById(@Param('id', ParseIntPipe) id: number) {
-    return await this.templeService.getTempleById(id);
+  async getTempleById(@HasuraBody('query') query: VGetTempleByIdDto) {
+    return await this.templeService.getTempleById(query.id);
   }
 }

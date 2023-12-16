@@ -16,6 +16,7 @@ import { UserService } from '../user/user.service';
 import { ERole } from 'src/core/enum/default.enum';
 import { IPaginationQuery } from 'src/core/interface/default.interface';
 import { returnPagingData } from 'src/helper/utils';
+import { VGetTemplesDto } from './dto/get-temples.dto';
 
 @Injectable()
 export class TempleService {
@@ -76,8 +77,8 @@ export class TempleService {
     });
   }
 
-  async getTemples(query: IPaginationQuery, keyword: string) {
-    const { skip, take } = query;
+  async getTemples(query: VGetTemplesDto) {
+    const { skip, take, keyword } = query;
     const [items, totalItems] = await this.templeRepository.findAndCount({
       where: {
         name: Like(`%${keyword}%`),
