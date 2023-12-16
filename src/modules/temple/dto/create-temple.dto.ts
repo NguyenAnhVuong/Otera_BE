@@ -23,5 +23,5 @@ export class VCreateTempleDto {
 
   @IsString()
   @IsOptional()
-  website: string | null;
+  website?: string;
 }

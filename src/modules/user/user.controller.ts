@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Controller, Post } from '@nestjs/common';
 import { HasuraBody } from 'src/core/decorator/hasuraBody.decorator';
 import { Public } from 'src/core/decorator/public.decorator';
 import { VRefreshToken } from './dto/refresh-token.dto';
@@ -12,19 +12,19 @@ export class UserController {
 
   @Public()
   @Post('/register')
-  userRegister(@HasuraBody('input') body: VUserRegisterDto) {
-    return this.userService.userRegister(body);
+  userRegister(@HasuraBody('input') userRegister: VUserRegisterDto) {
+    return this.userService.userRegister(userRegister);
   }
 
   @Public()
   @Post('/login')
-  userLogin(@Body() userLogin: VUserLoginDto) {
+  userLogin(@HasuraBody('input') userLogin: VUserLoginDto) {
     return this.userService.userLogin(userLogin);
   }
 
   @Public()
   @Post('/refresh-token')
-  refreshToken(@Body() body: VRefreshToken) {
+  refreshToken(@HasuraBody('input') body: VRefreshToken) {
     return this.userService.refreshToken(body);
   }
 }
