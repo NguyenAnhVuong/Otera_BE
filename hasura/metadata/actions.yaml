@@ -1,16 +1,99 @@
 actions:
+  - name: getTempleById
+    definition:
+      kind: ""
+      handler: '{{ACTION_BASE_URL}}/api/temple/detail'
+      forward_client_headers: true
+  - name: getTemples
+    definition:
+      kind: ""
+      handler: '{{ACTION_BASE_URL}}/api/temple/all'
+      forward_client_headers: true
+  - name: refreshToken
+    definition:
+      kind: synchronous
+      handler: '{{ACTION_BASE_URL}}/api/user/refresh-token'
+      forward_client_headers: true
+  - name: userLogin
+    definition:
+      kind: synchronous
+      handler: '{{ACTION_BASE_URL}}/api/user/login'
+      forward_client_headers: true
   - name: userRegister
     definition:
       kind: synchronous
       handler: '{{ACTION_BASE_URL}}/api/user/register'
       forward_client_headers: true
 custom_types:
-  enums: []
+  enums:
+    - name: ERole
+      values:
+        - description: null
+          is_deprecated: null
+          value: SYSTEM
+        - description: null
+          is_deprecated: null
+          value: FAMILY_ADMIN
+        - description: null
+          is_deprecated: null
+          value: FAMILY_MEMBER
+        - description: null
+          is_deprecated: null
+          value: TEMPLE_ADMIN
+        - description: null
+          is_deprecated: null
+          value: PUBLIC_USER
+    - name: EPriority
+      values:
+        - description: null
+          is_deprecated: null
+          value: LOW
+        - description: null
+          is_deprecated: null
+          value: MEDIUM
+        - description: null
+          is_deprecated: null
+          value: HIGH
+    - name: EPlan
+      values:
+        - description: null
+          is_deprecated: null
+          value: FREE
+        - description: null
+          is_deprecated: null
+          value: PREMIUM
+        - description: null
+          is_deprecated: null
+          value: ENTERPRISE
+    - name: EStatus
+      values:
+        - description: null
+          is_deprecated: null
+          value: INACTIVE
+        - description: null
+          is_deprecated: null
+          value: ACTIVE
   input_objects:
     - name: UserRegisterInput
+    - name: UserLoginInput
+    - name: RefreshTokenInput
+    - name: GetTemplesInput
+    - name: GetTempleByIdInput
   objects:
     - name: SampleOutput
+    - name: ResponseFormat
     - name: UserRegisterOutput
     - name: UserRegisterOutputData
-    - name: ResonseOutput
+    - name: AuthUser
+    - name: UserLoginOutput
+    - name: UserLoginOutputData
+    - name: RefreshTokenOutput
+    - name: RefreshTokenOutputData
+    - name: PaginationFormat
+    - name: Temple
+    - name: GetTemplesOutputData
+    - name: GetTemplesOutput
+    - name: Image
+    - name: GetTempleByIdOutputData
+    - name: GetTempleByIdOutput
   scalars: []

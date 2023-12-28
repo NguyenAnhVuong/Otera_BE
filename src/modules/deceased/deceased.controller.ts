@@ -12,6 +12,7 @@ import { DeceasedService } from './deceased.service';
 import { VCreateDeceasedDto } from './dto/create-deceased.dto';
 import { IUserData } from 'src/core/interface/default.interface';
 import { UserData } from 'src/core/decorator/user.decorator';
+import { HasuraBody } from '@core/decorator/hasuraBody.decorator';
 
 @Controller('deceased')
 export class DeceasedController {
@@ -21,7 +22,7 @@ export class DeceasedController {
   @Roles([ERole.TEMPLE_ADMIN, ERole.FAMILY_ADMIN])
   @UseInterceptors(FilesInterceptor('images'))
   async createDeceased(
-    @Body() deceasedParams: VCreateDeceasedDto,
+    @HasuraBody('input') deceasedParams: VCreateDeceasedDto,
     @UploadedFiles() images: Express.Multer.File[],
     @UserData() userData: IUserData,
   ) {

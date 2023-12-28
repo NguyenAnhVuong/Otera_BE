@@ -111,6 +111,7 @@ export class UserService {
       where: {
         refreshToken: body.refreshToken,
       },
+      relations: ['userDetail'],
     });
 
     if (!user) {
@@ -123,9 +124,8 @@ export class UserService {
     const authUserData: IResponseAuthUser = {
       id: user.id,
       email: user.email,
-      ...(user.userDetail.avatar && {
-        avatar: user.userDetail.avatar,
-      }),
+      avatar:
+        user.userDetail.avatar || 'http://localhost:3008/avatar-default.png',
       name: user.userDetail.name,
       role: user.role,
     };

@@ -1,7 +1,56 @@
+type Query {
+  getTempleById(
+    query: GetTempleByIdInput!
+  ): GetTempleByIdOutput
+}
+
+type Query {
+  getTemples(
+    query: GetTemplesInput!
+  ): GetTemplesOutput
+}
+
+type Mutation {
+  refreshToken(
+    input: RefreshTokenInput!
+  ): RefreshTokenOutput
+}
+
+type Mutation {
+  userLogin(
+    input: UserLoginInput!
+  ): UserLoginOutput
+}
+
 type Mutation {
   userRegister(
     input: UserRegisterInput!
   ): UserRegisterOutput
+}
+
+enum ERole {
+  SYSTEM
+  FAMILY_ADMIN
+  FAMILY_MEMBER
+  TEMPLE_ADMIN
+  PUBLIC_USER
+}
+
+enum EPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum EPlan {
+  FREE
+  PREMIUM
+  ENTERPRISE
+}
+
+enum EStatus {
+  INACTIVE
+  ACTIVE
 }
 
 input UserRegisterInput {
@@ -9,7 +58,26 @@ input UserRegisterInput {
   birthday: date!
   email: String!
   password: String!
-  role: String
+  role: ERole
+}
+
+input UserLoginInput {
+  email: String!
+  password: String!
+}
+
+input RefreshTokenInput {
+  refreshToken: String!
+}
+
+input GetTemplesInput {
+  keyword: String
+  page: Int
+  take: Int
+}
+
+input GetTempleByIdInput {
+  id: Int
 }
 
 type SampleOutput {
@@ -23,6 +91,13 @@ type SampleOutput {
   id: Int
   createdAt: date
   updatedAt: date
+}
+
+type ResponseFormat {
+  statusCode: Int
+  errorMessage: String
+  errorCode: String
+  timestamp: String
 }
 
 type UserRegisterOutput {
@@ -46,8 +121,116 @@ type UserRegisterOutputData {
   updatedAt: date
 }
 
-type ResonseOutput {
+type AuthUser {
+  id: Int!
+  name: String!
+  avatar: String!
+  email: String!
+  role: ERole
+}
+
+type UserLoginOutput {
   statusCode: Int
+  data: UserLoginOutputData
+  errorMessage: String
+  errorCode: String
+  timestamp: String
+}
+
+type UserLoginOutputData {
+  accessToken: String!
+  refreshToken: String!
+  user: AuthUser!
+}
+
+type RefreshTokenOutput {
+  statusCode: Int
+  data: RefreshTokenOutputData
+  errorMessage: String
+  errorCode: String
+  timestamp: String
+}
+
+type RefreshTokenOutputData {
+  accessToken: String!
+  refreshToken: String!
+}
+
+type PaginationFormat {
+  totalItems: Int
+  page: Int
+  totalPages: Int
+  take: Int
+}
+
+type Temple {
+  id: Int!
+  name: String!
+  avatar: String!
+  address: String!
+  description: String!
+  phone: String
+  email: String
+  website: String
+  priority: EPriority!
+  priorityExpired: String
+  plan: EPlan!
+  planExpired: String
+  status: EStatus!
+  adminId: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type GetTemplesOutputData {
+  data: [Temple]
+  totalItems: Int
+  page: Int
+  totalPages: Int
+  take: Int
+}
+
+type GetTemplesOutput {
+  statusCode: Int
+  data: GetTemplesOutputData
+  errorMessage: String
+  errorCode: String
+  timestamp: String
+}
+
+type Image {
+  id: Int!
+  deceasedId: Int
+  templeId: Int
+  eventId: Int
+  image: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type GetTempleByIdOutputData {
+  id: Int!
+  name: String!
+  avatar: String!
+  address: String!
+  description: String!
+  phone: String
+  email: String
+  website: String
+  priority: EPriority!
+  priorityExpired: String
+  plan: EPlan!
+  planExpired: String
+  status: EStatus!
+  adminId: Int!
+  createdAt: String!
+  updatedAt: String!
+  images: [Image]
+}
+
+type GetTempleByIdOutput {
+  statusCode: Int
+  data: GetTempleByIdOutputData
   errorMessage: String
   errorCode: String
   timestamp: String
