@@ -14,16 +14,25 @@ actions:
       kind: synchronous
       handler: '{{ACTION_BASE_URL}}/api/user/refresh-token'
       forward_client_headers: true
+    permissions:
+      - role: anonymous
   - name: userLogin
     definition:
       kind: synchronous
       handler: '{{ACTION_BASE_URL}}/api/user/login'
+      forward_client_headers: true
+  - name: userLogout
+    definition:
+      kind: synchronous
+      handler: '{{ACTION_BASE_URL}}/api/user/logout'
       forward_client_headers: true
   - name: userRegister
     definition:
       kind: synchronous
       handler: '{{ACTION_BASE_URL}}/api/user/register'
       forward_client_headers: true
+    permissions:
+      - role: anonymous
 custom_types:
   enums:
     - name: ERole
@@ -96,4 +105,5 @@ custom_types:
     - name: Image
     - name: GetTempleByIdOutputData
     - name: GetTempleByIdOutput
+    - name: UserLogoutOutput
   scalars: []
