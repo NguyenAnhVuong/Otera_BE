@@ -11,7 +11,6 @@ export interface IResponseAuthUser {
 export interface IResponseAuth {
   user: IResponseAuthUser;
   accessToken: string;
-  refreshToken: string;
 }
 
 export interface IJwtPayload {
@@ -24,5 +23,4 @@ export interface IJwtPayload {
 
 export interface IResponseRefreshToken {
   accessToken: string;
-  refreshToken: string;
 }

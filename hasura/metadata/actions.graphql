@@ -11,15 +11,17 @@ type Query {
 }
 
 type Mutation {
-  refreshToken(
-    input: RefreshTokenInput!
-  ): RefreshTokenOutput
+  refreshToken: RefreshTokenOutput
 }
 
 type Mutation {
   userLogin(
     input: UserLoginInput!
   ): UserLoginOutput
+}
+
+type Mutation {
+  userLogout: UserLogoutOutput
 }
 
 type Mutation {
@@ -139,7 +141,6 @@ type UserLoginOutput {
 
 type UserLoginOutputData {
   accessToken: String!
-  refreshToken: String!
   user: AuthUser!
 }
 
@@ -153,7 +154,6 @@ type RefreshTokenOutput {
 
 type RefreshTokenOutputData {
   accessToken: String!
-  refreshToken: String!
 }
 
 type PaginationFormat {
@@ -231,6 +231,14 @@ type GetTempleByIdOutputData {
 type GetTempleByIdOutput {
   statusCode: Int
   data: GetTempleByIdOutputData
+  errorMessage: String
+  errorCode: String
+  timestamp: String
+}
+
+type UserLogoutOutput {
+  statusCode: Int
+  data: Boolean
   errorMessage: String
   errorCode: String
   timestamp: String

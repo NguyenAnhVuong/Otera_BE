@@ -1,7 +1,11 @@
-import { Controller, Post } from '@nestjs/common';
+import { Roles } from '@core/decorator/roles.decorator';
+import { UserData } from '@core/decorator/user.decorator';
+import { ERole } from '@core/enum';
+import { IUserData } from '@core/interface/default.interface';
+import { Controller, Post, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { HasuraBody } from 'src/core/decorator/hasuraBody.decorator';
 import { Public } from 'src/core/decorator/public.decorator';
-import { VRefreshToken } from './dto/refresh-token.dto';
 import { VUserLoginDto } from './dto/user-login.dto';
 import { VUserRegisterDto } from './dto/user-register.dto';
 import { UserService } from './user.service';
@@ -18,13 +22,29 @@ export class UserController {
 
   @Public()
   @Post('/login')
-  userLogin(@HasuraBody('input') userLogin: VUserLoginDto) {
-    return this.userService.userLogin(userLogin);
+  userLogin(
+    @HasuraBody('input') userLogin: VUserLoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.userService.userLogin(userLogin, response);
   }
 
   @Public()
   @Post('/refresh-token')
-  refreshToken(@HasuraBody('input') body: VRefreshToken) {
-    return this.userService.refreshToken(body);
+  refreshToken(
+    @Req() request: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const { refreshToken } = request.cookies;
+    return this.userService.refreshToken(refreshToken, response);
+  }
+
+  @Roles(Object.values(ERole))
+  @Post('/logout')
+  userLogout(
+    @UserData() userData: IUserData,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    return this.userService.userLogout(userData, response);
   }
 }

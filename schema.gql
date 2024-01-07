@@ -1,0 +1,101 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type UserDetail {
+  id: Float!
+  avatar: String!
+  name: String!
+  phone: String
+  birthday: DateTime!
+  address: String
+  gender: EGender!
+  citizenNumber: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum EGender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+type User {
+  id: Int!
+  email: String!
+  password: String!
+  role: ERole!
+  refreshToken: String
+  familyId: Int
+  userDetailId: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  userDetail: UserDetail!
+}
+
+enum ERole {
+  SYSTEM
+  FAMILY_ADMIN
+  FAMILY_MEMBER
+  TEMPLE_ADMIN
+  PUBLIC_USER
+}
+
+type UserRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: User!
+}
+
+type Test {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type Test2 {
+  """Example field (placeholder)"""
+  statusCode: Int!
+
+  """Example field (placeholder)"""
+  errorMessage: String
+
+  """Example field (placeholder)"""
+  errorCode: String
+
+  """Example field (placeholder)"""
+  timestamp: String!
+
+  """Example field (placeholder)"""
+  data: Test!
+}
+
+type Query {
+  getUser: UserRes!
+  test123(id: Int!): Test2!
+}
+
+type Mutation {
+  createTest(createTestInput: CreateTestInput!): Test!
+  updateTest(updateTestInput: UpdateTestInput!): Test!
+  removeTest(id: Int!): Test!
+}
+
+input CreateTestInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateTestInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}

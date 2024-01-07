@@ -6,7 +6,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtAuthGuard } from './core/global/auth/guards/jwt-auth.guard';
 import { RolesGuard } from './core/global/auth/guards/roles.guard';
-
 import { ConstanceModule } from '@core/global/constance/constance.module';
 import { I18nCustomModule } from '@core/global/i18nCustom/i18nCustom.module';
 import { HttpExceptionFilter } from '@helper/httpException.filter';
@@ -19,6 +18,10 @@ import { DeceasedModule } from './modules/deceased/deceased.module';
 import { FamilyModule } from './modules/family/family.module';
 import { TempleModule } from './modules/temple/temple.module';
 import { UserModule } from './modules/user/user.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { TestModule } from '@modules/test/test.module';
+import { GraphQLRolesGuard } from '@core/global/auth/guards/graphQLRoles.guard';
 
 @Module({
   imports: [
@@ -27,6 +30,10 @@ import { UserModule } from './modules/user/user.module';
     }),
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: 'schema.gql',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -52,6 +59,7 @@ import { UserModule } from './modules/user/user.module';
     FamilyModule,
     DeceasedModule,
     CloudinaryModule,
+    TestModule,
   ],
   controllers: [AppController],
   providers: [
@@ -67,6 +75,10 @@ import { UserModule } from './modules/user/user.module';
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: GraphQLRolesGuard,
     },
     {
       provide: APP_INTERCEPTOR,

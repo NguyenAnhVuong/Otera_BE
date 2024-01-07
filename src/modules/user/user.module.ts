@@ -8,6 +8,7 @@ import { JwtStrategy } from 'src/core/global/auth/strategy/jwt.strategy';
 import { UserDetailModule } from '../user-detail/user-detail.module';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { UserResolver } from './user.resolver';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { UserService } from './user.service';
     UserDetailModule,
   ],
   controllers: [UserController],
-  providers: [UserService, JwtStrategy],
+  providers: [UserService, UserResolver, JwtStrategy],
   exports: [UserService],
 })
 export class UserModule {}
