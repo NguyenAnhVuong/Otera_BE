@@ -74,6 +74,7 @@ input RefreshTokenInput {
 
 input GetTemplesInput {
   keyword: String
+  familyId: Int
   page: Int
   take: Int
 }
@@ -129,6 +130,7 @@ type AuthUser {
   avatar: String!
   email: String!
   role: ERole
+  familyId: Int
 }
 
 type UserLoginOutput {

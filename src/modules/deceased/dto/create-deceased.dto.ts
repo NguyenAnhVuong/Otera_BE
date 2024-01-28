@@ -20,11 +20,6 @@ export class VCreateDeceasedDto {
   @Type(() => Number)
   templeId: number;
 
-  @IsNumber()
-  @IsNotEmpty()
-  @Type(() => Number)
-  familyId: number;
-
   @IsString()
   @IsNotEmpty()
   name: string;

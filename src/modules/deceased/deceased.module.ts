@@ -6,6 +6,7 @@ import { DeceasedController } from './deceased.controller';
 import { Deceased } from 'src/core/database/entity/deceased.entity';
 import { ImageModule } from '../image/image.module';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
+import { FamilyTempleModule } from '@modules/family-temple/family-temple.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
     UserDetailModule,
     CloudinaryModule,
     ImageModule,
+    FamilyTempleModule,
   ],
   controllers: [DeceasedController],
   providers: [DeceasedService],

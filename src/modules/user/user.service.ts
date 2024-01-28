@@ -103,6 +103,7 @@ export class UserService {
       avatar: user.userDetail.avatar,
       name: user.userDetail.name,
       role: user.role,
+      familyId: user.familyId,
     };
 
     return await this.returnResponseAuthUser(authUserData, response);
@@ -132,6 +133,7 @@ export class UserService {
       avatar: user.userDetail.avatar,
       name: user.userDetail.name,
       role: user.role,
+      familyId: user.familyId,
     };
 
     const data = await this.returnResponseAuthUser(authUserData, response);
@@ -151,6 +153,7 @@ export class UserService {
       avatar: authUserData.avatar,
       name: authUserData.name,
       role: authUserData.role,
+      fid: authUserData.familyId,
     };
 
     const refreshToken = await this.jwtService.signAsync(payload, {

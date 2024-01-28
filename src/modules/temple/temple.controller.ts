@@ -1,6 +1,7 @@
 import { HasuraBody } from '@core/decorator/hasuraBody.decorator';
 import { HasuraBodyPaging } from '@core/decorator/hasuraBodyPaging.decorator';
 import {
+  Body,
   Controller,
   Post,
   UploadedFiles,
@@ -25,7 +26,7 @@ export class TempleController {
   @Roles([ERole.PUBLIC_USER])
   @UseInterceptors(FilesInterceptor('images[]'))
   async createTemple(
-    @HasuraBody('input') newTemple: VCreateTempleDto,
+    @Body() newTemple: VCreateTempleDto,
     @UploadedFiles() images: Express.Multer.File[],
     @UserData() userData: IUserData,
   ) {
