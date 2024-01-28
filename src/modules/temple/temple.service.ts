@@ -1,21 +1,20 @@
-import { ImageService } from './../image/image.service';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Image } from 'src/core/database/entity/image.entity';
 import { Temple } from 'src/core/database/entity/temple.entity';
+import { ERole } from 'src/core/enum/default.enum';
+import { returnPagingData } from 'src/helper/utils';
 import {
   DataSource,
   DeepPartial,
   EntityManager,
-  Like,
+  ILike,
   Repository,
 } from 'typeorm';
-import { VCreateTempleDto } from './dto/create-temple.dto';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { Image } from 'src/core/database/entity/image.entity';
 import { UserService } from '../user/user.service';
-import { ERole } from 'src/core/enum/default.enum';
-import { IPaginationQuery } from 'src/core/interface/default.interface';
-import { returnPagingData } from 'src/helper/utils';
+import { ImageService } from './../image/image.service';
+import { VCreateTempleDto } from './dto/create-temple.dto';
 import { VGetTemplesDto } from './dto/get-temples.dto';
 
 @Injectable()
@@ -78,10 +77,15 @@ export class TempleService {
   }
 
   async getTemples(query: VGetTemplesDto) {
-    const { skip, take, keyword } = query;
+    const { skip, take, keyword, familyId } = query;
     const [items, totalItems] = await this.templeRepository.findAndCount({
       where: {
-        name: Like(`%${keyword}%`),
+        name: ILike(`%${keyword}%`),
+        ...(familyId && {
+          familyTemples: {
+            familyId,
+          },
+        }),
       },
       skip,
       take,

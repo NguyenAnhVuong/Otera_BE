@@ -10,6 +10,15 @@ export class FamilyTempleService {
     private familyTempleRepository: Repository<FamilyTemple>,
   ) {}
 
+  async checkFamilyInTemple(familyId: number, templeId: number) {
+    return await this.familyTempleRepository.findOne({
+      where: {
+        familyId,
+        templeId,
+      },
+    });
+  }
+
   async createFamilyTemple(
     familyTempleParams: DeepPartial<FamilyTemple>,
     entityManager?: EntityManager,

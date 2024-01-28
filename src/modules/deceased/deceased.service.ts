@@ -1,5 +1,5 @@
 import { CloudinaryService } from './../cloudinary/cloudinary.service';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Deceased } from 'src/core/database/entity/deceased.entity';
 import { Repository, DataSource, EntityManager, DeepPartial } from 'typeorm';
@@ -7,6 +7,9 @@ import { VCreateDeceasedDto } from './dto/create-deceased.dto';
 import { UserDetail } from 'src/core/database/entity/userDetail.entity';
 import { UserDetailService } from '../user-detail/user-detail.service';
 import { ImageService } from '../image/image.service';
+import { IUserData } from '@core/interface/default.interface';
+import { FamilyTempleService } from '@modules/family-temple/family-temple.service';
+import { ErrorMessage } from '@core/enum';
 
 @Injectable()
 export class DeceasedService {
@@ -20,14 +23,29 @@ export class DeceasedService {
 
     private readonly imageService: ImageService,
 
+    private readonly familyTempleService: FamilyTempleService,
+
     private readonly dataSource: DataSource,
   ) {}
   async createDeceased(
     deceasedParams: VCreateDeceasedDto,
     avatar: Express.Multer.File,
     images: Express.Multer.File[],
-    creatorId: number,
+    userData: IUserData,
   ) {
+    const { fid, id } = userData;
+    const familyTemple = await this.familyTempleService.checkFamilyInTemple(
+      fid,
+      deceasedParams.templeId,
+    );
+
+    if (!familyTemple) {
+      throw new HttpException(
+        ErrorMessage.FAMILY_NOT_IN_TEMPLE,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     return await this.dataSource.transaction(async (manager: EntityManager) => {
       const uploadedAvatar = await this.cloudinaryService.uploadImage(avatar);
 
@@ -39,7 +57,6 @@ export class DeceasedService {
         citizenNumber,
         dateOfDeath,
         templeId,
-        familyId,
       } = deceasedParams;
 
       const userDetailParams: DeepPartial<UserDetail> = {
@@ -59,9 +76,9 @@ export class DeceasedService {
       const newDeceasedParams: DeepPartial<Deceased> = {
         dateOfDeath,
         templeId,
-        familyId,
+        familyId: fid,
         userDetailId: userDetail.id,
-        creatorId,
+        creatorId: id,
       };
 
       const deceasedRepository = manager.getRepository(Deceased);

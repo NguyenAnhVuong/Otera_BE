@@ -6,6 +6,7 @@ export interface IResponseAuthUser {
   avatar?: string;
   email: string;
   role: ERole;
+  familyId?: number;
 }
 
 export interface IResponseAuth {
@@ -19,6 +20,7 @@ export interface IJwtPayload {
   avatar: string;
   name: string;
   role: ERole;
+  fid?: number;
 }
 
 export interface IResponseRefreshToken {
