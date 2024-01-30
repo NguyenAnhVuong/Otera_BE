@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { I18nJsonLoader, I18nModule } from 'nestjs-i18n';
+import { HeaderResolver, I18nJsonLoader, I18nModule } from 'nestjs-i18n';
 import { I18nCustomService } from './i18nCustom.service';
 
 @Global()
@@ -14,6 +14,12 @@ import { I18nCustomService } from './i18nCustom.service';
         path: `${process.cwd()}/src/i18n`,
         watch: true,
       },
+      resolvers: [
+        {
+          use: HeaderResolver,
+          options: ['Accept-Language'],
+        },
+      ],
     }),
   ],
 })

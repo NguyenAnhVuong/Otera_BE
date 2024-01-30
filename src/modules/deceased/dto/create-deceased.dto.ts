@@ -1,6 +1,5 @@
 import { Type } from 'class-transformer';
 import {
-  IsDate,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -10,10 +9,10 @@ import {
 import { EGender } from 'src/core/enum/default.enum';
 
 export class VCreateDeceasedDto {
-  @IsDate()
+  @IsString()
   @IsNotEmpty()
-  @Type(() => Date)
-  dateOfDeath: Date;
+  @Type(() => String)
+  dateOfDeath: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -24,10 +23,10 @@ export class VCreateDeceasedDto {
   @IsNotEmpty()
   name: string;
 
-  @IsDate()
+  @IsString()
   @IsNotEmpty()
-  @Type(() => Date)
-  birthday: Date;
+  @Type(() => String)
+  birthday: string;
 
   @IsString()
   @IsOptional()
@@ -35,10 +34,13 @@ export class VCreateDeceasedDto {
 
   @IsEnum(EGender)
   @IsNotEmpty()
-  @Type(() => Number)
   gender: EGender;
 
   @IsString()
   @IsOptional()
   citizenNumber: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
 }

@@ -1,7 +1,7 @@
 export enum EEnvironment {
-  DEVELOPMENT = 'development',
-  STAGING = 'staging',
-  PRODUCTION = 'production',
+  DEVELOPMENT = 'DEVELOPMENT',
+  STAGING = 'STAGING',
+  PRODUCTION = 'PRODUCTION',
 }
 
 export enum ERole {
@@ -13,31 +13,31 @@ export enum ERole {
 }
 
 export enum EGender {
-  MALE = 0,
-  FEMALE = 1,
-  OTHER = 2,
+  MALE = 'MALE',
+  FEMALE = 'FEMALE',
+  OTHER = 'OTHER',
 }
 
 export enum EAppLanguage {
-  VI = 'vi',
-  JA = 'ja',
-  EN = 'en',
+  vi = 'vi',
+  ja = 'ja',
+  en = 'en',
 }
 
 export enum EStatus {
-  INACTIVE = 0,
-  ACTIVE = 1,
+  INACTIVE = 'INACTIVE',
+  ACTIVE = 'ACTIVE',
 }
 
 export enum EPriority {
-  LOW = 0,
-  MEDIUM = 1,
-  HIGH = 2,
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
 }
 
 export enum EPlan {
-  FREE = 0,
-  PREMIUM = 1,
+  FREE = 'FREE',
+  PREMIUM = 'PREMIUM',
 }
 
 export enum EBookingStatus {

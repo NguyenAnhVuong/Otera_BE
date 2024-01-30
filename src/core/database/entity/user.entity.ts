@@ -4,12 +4,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UserDetail } from './userDetail.entity';
 import { Family } from './family.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Review } from './review.entity';
 
 registerEnumType(ERole, {
   name: 'ERole',
@@ -38,40 +40,43 @@ export class User {
   @Field(() => ERole, { defaultValue: ERole.PUBLIC_USER })
   role: ERole;
 
-  @Column({ name: 'refresh_token', type: 'text', nullable: true })
+  @Column({ name: 'refreshToken', type: 'text', nullable: true })
   @Field(() => String, { nullable: true })
   refreshToken: string | null;
 
-  @Column({ name: 'family_id', type: 'int', nullable: true })
+  @Column({ name: 'familyId', type: 'int', nullable: true })
   @Field(() => Int, { nullable: true })
   familyId: number | null;
 
-  @Column({ name: 'user_detail_id', type: 'int', nullable: true })
+  @Column({ name: 'userDetailId', type: 'int', nullable: true })
   @Field(() => Int, { nullable: true })
   userDetailId: number | null;
 
   @Column({
-    name: 'created_at',
+    name: 'createdAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => String)
   createdAt: Date;
 
   @Column({
-    name: 'updated_at',
+    name: 'updatedAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => String)
   updatedAt: Date;
 
   @OneToOne(() => UserDetail, (userDetail) => userDetail.user)
-  @JoinColumn({ name: 'user_detail_id' })
+  @JoinColumn({ name: 'userDetailId' })
   @Field(() => UserDetail)
   userDetail: UserDetail;
 
   @ManyToOne(() => Family, (family) => family.users)
-  @JoinColumn({ name: 'family_id' })
+  @JoinColumn({ name: 'familyId' })
   family: Family;
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
 }

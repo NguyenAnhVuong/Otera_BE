@@ -8,47 +8,59 @@ import {
 import { Deceased } from './deceased.entity';
 import { Temple } from './temple.entity';
 import { Event } from './event.entity';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @Entity('images')
+@ObjectType()
 export class Image {
   @PrimaryGeneratedColumn()
+  @Field(() => Int)
   id: number;
 
-  @Column({ name: 'deceased_id', type: 'int', nullable: true })
+  @Column({ name: 'deceasedId', type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
   deceasedId: number | null;
 
-  @Column({ name: 'temple_id', type: 'int', nullable: true })
+  @Column({ name: 'templeId', type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
   templeId: number | null;
 
-  @Column({ name: 'event_id', type: 'int', nullable: true })
+  @Column({ name: 'eventId', type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
   eventId: number | null;
 
   @Column({ name: 'image', type: 'varchar', length: 255 })
+  @Field(() => String)
   image: string;
 
   @Column({
-    name: 'created_at',
+    name: 'createdAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   createdAt: Date;
 
   @Column({
-    name: 'updated_at',
+    name: 'updatedAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   updatedAt: Date;
 
   @ManyToOne(() => Deceased, (deceased) => deceased.images)
-  @JoinColumn({ name: 'deceased_id' })
+  @JoinColumn({ name: 'deceasedId' })
+  @Field(() => Deceased)
   deceased: Deceased;
 
   @ManyToOne(() => Temple, (temple) => temple.images)
-  @JoinColumn({ name: 'temple_id' })
+  @JoinColumn({ name: 'templeId' })
+  @Field(() => Temple)
   temple: Temple;
 
   @ManyToOne(() => Event, (event) => event.images)
-  @JoinColumn({ name: 'event_id' })
+  @JoinColumn({ name: 'eventId' })
+  @Field(() => Event)
   event: Event;
 }

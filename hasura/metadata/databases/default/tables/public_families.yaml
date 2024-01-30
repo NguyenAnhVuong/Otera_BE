@@ -5,21 +5,21 @@ array_relationships:
   - name: deceaseds
     using:
       foreign_key_constraint_on:
-        column: family_id
+        column: familyId
         table:
-          name: deceased
+          name: deceaseds
           schema: public
-  - name: family_temples
+  - name: familyTemples
     using:
       foreign_key_constraint_on:
-        column: family_id
+        column: familyId
         table:
-          name: family_temples
+          name: familyTemples
           schema: public
   - name: users
     using:
       foreign_key_constraint_on:
-        column: family_id
+        column: familyId
         table:
           name: users
           schema: public

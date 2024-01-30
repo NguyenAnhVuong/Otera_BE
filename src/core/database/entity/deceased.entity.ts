@@ -11,63 +11,86 @@ import { Image } from './image.entity';
 import { Temple } from './temple.entity';
 import { Family } from './family.entity';
 import { UserDetail } from './userDetail.entity';
+import { Field, ObjectType } from '@nestjs/graphql';
 
-@Entity('deceased')
+@Entity('deceaseds')
+@ObjectType()
 export class Deceased {
   @PrimaryGeneratedColumn()
+  @Field(() => Number)
   id: number;
 
-  @Column({ name: 'date_of_death', type: 'date' })
-  dateOfDeath: Date;
+  @Column({ name: 'dateOfDeath', type: 'varchar', length: 10 })
+  @Field(() => String)
+  dateOfDeath: string;
 
   @Column({
-    name: 'user_detail_id',
+    name: 'description',
+    type: 'varchar',
+    length: 5000,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  description: string | null;
+
+  @Column({
+    name: 'userDetailId',
     type: 'int',
     nullable: true,
   })
+  @Field(() => Number, { nullable: true })
   userDetailId: number;
 
   @Column({
-    name: 'temple_id',
+    name: 'templeId',
     type: 'int',
   })
+  @Field(() => Number)
   templeId: number;
 
   @Column({
-    name: 'family_id',
+    name: 'familyId',
     type: 'int',
   })
+  @Field(() => Number)
   familyId: number;
 
-  @Column({ name: 'creator_id', type: 'int' })
+  @Column({ name: 'creatorId', type: 'int' })
+  @Field(() => Number)
   creatorId: number;
 
   @Column({
-    name: 'created_at',
+    name: 'createdAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   createdAt: Date;
 
   @Column({
-    name: 'updated_at',
+    name: 'updatedAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   updatedAt: Date;
 
   @ManyToOne(() => Temple, (temple) => temple.deceaseds)
-  @JoinColumn({ name: 'temple_id' })
+  @JoinColumn({ name: 'templeId' })
+  @Field(() => Temple)
   temple: Temple;
 
   @ManyToOne(() => Family, (family) => family.deceaseds)
-  @JoinColumn({ name: 'family_id' })
+  @JoinColumn({ name: 'familyId' })
+  @Field(() => Family)
   family: Family;
 
   @OneToMany(() => Image, (image) => image.deceased)
+  @Field(() => [Image])
   images: Image[];
 
   @OneToOne(() => UserDetail, (userDetail) => userDetail.deceased)
-  @JoinColumn({ name: 'user_detail_id' })
+  @JoinColumn({ name: 'userDetailId' })
+  @Field(() => UserDetail)
   userDetail: UserDetail;
 }

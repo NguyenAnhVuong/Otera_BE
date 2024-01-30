@@ -1,21 +1,21 @@
 table:
-  name: deceased
+  name: deceaseds
   schema: public
 object_relationships:
   - name: family
     using:
-      foreign_key_constraint_on: family_id
+      foreign_key_constraint_on: familyId
   - name: temple
     using:
-      foreign_key_constraint_on: temple_id
-  - name: user_detail
+      foreign_key_constraint_on: templeId
+  - name: userDetail
     using:
-      foreign_key_constraint_on: user_detail_id
+      foreign_key_constraint_on: userDetailId
 array_relationships:
   - name: images
     using:
       foreign_key_constraint_on:
-        column: deceased_id
+        column: deceasedId
         table:
           name: images
           schema: public

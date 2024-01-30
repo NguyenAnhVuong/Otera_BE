@@ -53,6 +53,7 @@ export class UserService {
       const userDetail = {
         name: userRegister.name,
         birthday: userRegister.birthday,
+        gender: userRegister.gender,
       };
       const newUserDetail = await this.userDetailService.createUserDetail(
         userDetail,

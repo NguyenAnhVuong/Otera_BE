@@ -2,21 +2,26 @@ import { Type } from 'class-transformer';
 import {
   IsDate,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
-import { ERole } from 'src/core/enum/default.enum';
+import { EGender, ERole } from 'src/core/enum/default.enum';
 
 export class VUserRegisterDto {
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @IsDate()
+  @IsEnum(EGender)
   @IsNotEmpty()
-  @Type(() => Date)
-  birthday: Date;
+  gender: EGender;
+
+  @IsString()
+  @IsNotEmpty()
+  @Type(() => String)
+  birthday: string;
 
   @IsEmail()
   @IsNotEmpty()

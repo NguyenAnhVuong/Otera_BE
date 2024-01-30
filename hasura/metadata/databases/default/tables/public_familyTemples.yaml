@@ -1,10 +1,10 @@
 table:
-  name: reviews
+  name: familyTemples
   schema: public
 object_relationships:
+  - name: family
+    using:
+      foreign_key_constraint_on: familyId
   - name: temple
     using:
       foreign_key_constraint_on: templeId
-  - name: user
-    using:
-      foreign_key_constraint_on: userId
