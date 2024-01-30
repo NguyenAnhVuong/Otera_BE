@@ -16,7 +16,7 @@ export class I18nCustomService {
 
   async translate(key: string, args: object) {
     return (await this.i18n.translate(key, {
-      lang: this.constanceService.getFallbackLanguage() || EAppLanguage.VI,
+      lang: this.constanceService.getFallbackLanguage() || EAppLanguage.vi,
       args,
     })) as Promise<string | object | HttpStatus>;
   }

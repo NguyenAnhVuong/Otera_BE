@@ -47,7 +47,6 @@ enum EPriority {
 enum EPlan {
   FREE
   PREMIUM
-  ENTERPRISE
 }
 
 enum EStatus {
@@ -55,9 +54,16 @@ enum EStatus {
   ACTIVE
 }
 
+enum EGender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 input UserRegisterInput {
   name: String!
-  birthday: date!
+  gender: EGender!
+  birthday: String!
   email: String!
   password: String!
   role: ERole
@@ -87,13 +93,13 @@ type SampleOutput {
   userDetailId: Int
   name: String
   email: String
-  birthday: date
+  birthday: String
   role: String
   refreshToken: String
   familyId: Int
   id: Int
-  createdAt: date
-  updatedAt: date
+  createdAt: String
+  updatedAt: String
 }
 
 type ResponseFormat {
@@ -115,13 +121,13 @@ type UserRegisterOutputData {
   userDetailId: Int
   name: String
   email: String
-  birthday: date
+  birthday: String
   role: String
   refreshToken: String
   familyId: Int
   id: Int
-  createdAt: date
-  updatedAt: date
+  createdAt: String
+  updatedAt: String
 }
 
 type AuthUser {
@@ -185,7 +191,7 @@ type Temple {
 }
 
 type GetTemplesOutputData {
-  data: [Temple]
+  data: [TempleAction]
   totalItems: Int
   page: Int
   totalPages: Int
@@ -198,16 +204,6 @@ type GetTemplesOutput {
   errorMessage: String
   errorCode: String
   timestamp: String
-}
-
-type Image {
-  id: Int!
-  deceasedId: Int
-  templeId: Int
-  eventId: Int
-  image: String!
-  createdAt: String!
-  updatedAt: String!
 }
 
 type GetTempleByIdOutputData {
@@ -227,7 +223,7 @@ type GetTempleByIdOutputData {
   adminId: Int!
   createdAt: String!
   updatedAt: String!
-  images: [Image]
+  images: [ImageAction]
 }
 
 type GetTempleByIdOutput {
@@ -244,5 +240,34 @@ type UserLogoutOutput {
   errorMessage: String
   errorCode: String
   timestamp: String
+}
+
+type TempleAction {
+  id: Int!
+  name: String!
+  avatar: String!
+  address: String!
+  description: String!
+  phone: String
+  email: String
+  website: String
+  priority: EPriority!
+  priorityExpired: String
+  plan: EPlan!
+  planExpired: String
+  status: EStatus!
+  adminId: Int!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type ImageAction {
+  id: Int!
+  deceasedId: Int
+  templeId: Int
+  eventId: Int
+  image: String!
+  createdAt: String!
+  updatedAt: String!
 }
 

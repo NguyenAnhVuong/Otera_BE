@@ -2,24 +2,186 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type UserDetail {
-  id: Float!
-  avatar: String!
+type Family {
+  id: Int!
+  adminId: Int!
   name: String!
-  phone: String
-  birthday: DateTime!
-  address: String
-  gender: EGender!
-  citizenNumber: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  description: String!
+  address: String!
+  phone: String!
+  avatar: String!
+  status: EStatus!
+  createdAt: String!
+  updatedAt: String!
+  users: [User!]!
+  deceaseds: [Deceased!]!
+  familyTemples: [FamilyTemple!]!
+}
+
+enum EStatus {
+  INACTIVE
+  ACTIVE
+}
+
+type FamilyTemple {
+  id: Int!
+  familyId: Int
+  templeId: Int
+  createdAt: String!
+  updatedAt: String!
+  family: Family!
+  temple: Temple!
+}
+
+type Review {
+  id: Int!
+  userId: Int!
+  templeId: Int
+  eventId: Int
+  content: String!
+  rating: Int!
+  createdAt: String!
+  updatedAt: String!
+  temple: Temple!
   user: User!
+}
+
+type Temple {
+  id: Int!
+  name: String!
+  avatar: String!
+  address: String!
+  phone: String
+  email: String
+  website: String
+  priority: EPriority!
+  priorityExpired: DateTime
+  plan: EPlan!
+  planExpired: DateTime
+  status: EStatus!
+  adminId: Int!
+  createdAt: String!
+  updatedAt: String!
+  deceaseds: [Deceased!]!
+  familyTemples: [FamilyTemple!]!
+  images: [Image!]!
+  reviews: [Review!]!
+}
+
+enum EPriority {
+  LOW
+  MEDIUM
+  HIGH
 }
 
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+enum EPlan {
+  FREE
+  PREMIUM
+}
+
+type EventParticipant {
+  id: Int!
+  eventId: Int!
+  userId: Int!
+  bookingStatus: EBookingStatus!
+  createdAt: String!
+  updatedAt: String!
+  event: Event!
+}
+
+enum EBookingStatus {
+  BOOKING
+  APPROVED
+  CANCEL
+}
+
+type EventParticipantType {
+  id: Int!
+  eventId: Int!
+  role: ERole!
+  createdAt: String!
+  updatedAt: String!
+  event: Event!
+}
+
+enum ERole {
+  SYSTEM
+  FAMILY_ADMIN
+  FAMILY_MEMBER
+  TEMPLE_ADMIN
+  PUBLIC_USER
+}
+
+type Event {
+  id: Int!
+  templeId: Int
+  name: String!
+  avatar: String!
+  description: String!
+  startDateEvent: String!
+  endDateEvent: String!
+  startDateBooking: String!
+  endDateBooking: String!
+  address: String!
+  phone: String!
+  email: String!
+  priority: EPriority!
+  priorityExpired: DateTime
+  createdAt: String!
+  updatedAt: String!
+  eventParticipants: [EventParticipant!]!
+  images: [Image!]!
+  eventParticipantTypes: [EventParticipantType!]!
+}
+
+type Image {
+  id: Int!
+  deceasedId: Int
+  templeId: Int
+  eventId: Int
+  image: String!
+  createdAt: String!
+  updatedAt: String!
+  deceased: Deceased!
+  temple: Temple!
+  event: Event!
+}
+
+type Deceased {
+  id: Float!
+  dateOfDeath: String!
+  description: String
+  userDetailId: Float
+  templeId: Float!
+  familyId: Float!
+  creatorId: Float!
+  createdAt: String!
+  updatedAt: String!
+  temple: Temple!
+  family: Family!
+  images: [Image!]!
+  userDetail: UserDetail!
+}
+
+type UserDetail {
+  id: Float!
+  avatar: String!
+  name: String!
+  phone: String
+  birthday: String!
+  address: String
+  gender: EGender!
+  citizenNumber: String
+  createdAt: String!
+  updatedAt: String!
+  user: User!
+  deceased: Deceased!
+}
 
 enum EGender {
   MALE
@@ -35,17 +197,25 @@ type User {
   refreshToken: String
   familyId: Int
   userDetailId: Int
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  createdAt: String!
+  updatedAt: String!
   userDetail: UserDetail!
 }
 
-enum ERole {
-  SYSTEM
-  FAMILY_ADMIN
-  FAMILY_MEMBER
-  TEMPLE_ADMIN
-  PUBLIC_USER
+type ListDeceasedRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: [Deceased!]!
+}
+
+type DeceasedRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Deceased!
 }
 
 type UserRes {
@@ -80,6 +250,8 @@ type Test2 {
 
 type Query {
   getUser: UserRes!
+  getListDeceased(familyId: Int!): ListDeceasedRes!
+  getDeceased(id: Int!): DeceasedRes!
   test123(id: Int!): Test2!
 }
 

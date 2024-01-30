@@ -2,17 +2,24 @@ table:
   name: events
   schema: public
 array_relationships:
-  - name: event_paticipants
+  - name: eventParticipantTypes
     using:
       foreign_key_constraint_on:
-        column: event_id
+        column: eventId
         table:
-          name: event_paticipants
+          name: eventParticipantTypes
+          schema: public
+  - name: eventPaticipants
+    using:
+      foreign_key_constraint_on:
+        column: eventId
+        table:
+          name: eventPaticipants
           schema: public
   - name: images
     using:
       foreign_key_constraint_on:
-        column: event_id
+        column: eventId
         table:
           name: images
           schema: public

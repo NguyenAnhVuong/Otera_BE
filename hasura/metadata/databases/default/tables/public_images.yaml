@@ -4,10 +4,10 @@ table:
 object_relationships:
   - name: deceased
     using:
-      foreign_key_constraint_on: deceased_id
+      foreign_key_constraint_on: deceasedId
   - name: event
     using:
-      foreign_key_constraint_on: event_id
+      foreign_key_constraint_on: eventId
   - name: temple
     using:
-      foreign_key_constraint_on: temple_id
+      foreign_key_constraint_on: templeId

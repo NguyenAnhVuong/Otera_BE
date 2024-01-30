@@ -57,6 +57,7 @@ export class DeceasedService {
         citizenNumber,
         dateOfDeath,
         templeId,
+        description,
       } = deceasedParams;
 
       const userDetailParams: DeepPartial<UserDetail> = {
@@ -79,6 +80,7 @@ export class DeceasedService {
         familyId: fid,
         userDetailId: userDetail.id,
         creatorId: id,
+        description,
       };
 
       const deceasedRepository = manager.getRepository(Deceased);
@@ -94,6 +96,25 @@ export class DeceasedService {
       await this.imageService.createImages(imagesParams, manager);
 
       return deceased;
+    });
+  }
+
+  async getListDeceasedByFamilyId(familyId: number) {
+    return await this.deceasedRepository.find({
+      where: {
+        familyId,
+      },
+      relations: ['images', 'userDetail'],
+    });
+  }
+
+  getDeceasedByIdAndFamilyId(id: number, familyId: number) {
+    return this.deceasedRepository.findOne({
+      where: {
+        id,
+        familyId,
+      },
+      relations: ['images', 'userDetail'],
     });
   }
 }

@@ -7,40 +7,52 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Event } from './event.entity';
+import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 
-@Entity('event_paticipants')
+registerEnumType(EBookingStatus, {
+  name: 'EBookingStatus',
+});
+@Entity('eventPaticipants')
+@ObjectType()
 export class EventParticipant {
   @PrimaryGeneratedColumn()
+  @Field(() => Int)
   id: number;
 
-  @Column({ name: 'event_id', type: 'int' })
+  @Column({ name: 'eventId', type: 'int' })
+  @Field(() => Int)
   eventId: number;
 
-  @Column({ name: 'user_id', type: 'int' })
+  @Column({ name: 'userId', type: 'int' })
+  @Field(() => Int)
   userId: number;
 
   @Column({
-    name: 'booking_status',
+    name: 'bookingStatus',
     type: 'enum',
     enum: EBookingStatus,
   })
+  @Field(() => EBookingStatus)
   bookingStatus: EBookingStatus;
 
   @Column({
-    name: 'created_at',
+    name: 'createdAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   createdAt: Date;
 
   @Column({
-    name: 'updated_at',
+    name: 'updatedAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   updatedAt: Date;
 
   @ManyToOne(() => Event, (event) => event.eventParticipants)
-  @JoinColumn({ name: 'event_id' })
+  @JoinColumn({ name: 'eventId' })
+  @Field(() => Event)
   event: Event;
 }

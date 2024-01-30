@@ -7,37 +7,46 @@ import {
 } from 'typeorm';
 import { Family } from './family.entity';
 import { Temple } from './temple.entity';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
-@Entity('family_temples')
+@Entity('familyTemples')
+@ObjectType()
 export class FamilyTemple {
   @PrimaryGeneratedColumn()
+  @Field(() => Int)
   id: number;
 
-  @Column({ name: 'family_id', type: 'int', nullable: true })
+  @Column({ name: 'familyId', type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
   familyId: number | null;
 
-  @Column({ name: 'temple_id', type: 'int', nullable: true })
+  @Column({ name: 'templeId', type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
   templeId: number | null;
 
   @Column({
-    name: 'created_at',
+    name: 'createdAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   createdAt: Date;
 
   @Column({
-    name: 'updated_at',
+    name: 'updatedAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   updatedAt: Date;
 
   @ManyToOne(() => Family, (family) => family.familyTemples)
-  @JoinColumn({ name: 'family_id' })
+  @JoinColumn({ name: 'familyId' })
+  @Field(() => Family)
   family: Family;
 
   @ManyToOne(() => Temple, (temple) => temple.familyTemples)
-  @JoinColumn({ name: 'temple_id' })
+  @JoinColumn({ name: 'templeId' })
+  @Field(() => Temple)
   temple: Temple;
 }

@@ -15,7 +15,7 @@ export class ConstanceService {
     this.environment =
       configService.get<EEnvironment>(EConfiguration.ENVIRONMENT) ??
       EEnvironment.DEVELOPMENT;
-    this.fallbackLanguage = EAppLanguage.VI;
+    this.fallbackLanguage = EAppLanguage.vi;
   }
 
   // getKeyCacheRedis(): IKeyRedisCache {

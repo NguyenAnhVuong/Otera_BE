@@ -1,28 +1,47 @@
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ERole } from 'src/core/enum/default.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Event } from './event.entity';
 
-@Entity('event_participant_types')
+@Entity('eventParticipantTypes')
+@ObjectType()
 export class EventParticipantType {
   @PrimaryGeneratedColumn()
+  @Field(() => Int)
   id: number;
 
-  @Column({ name: 'event_id', type: 'int' })
+  @Column({ name: 'eventId', type: 'int' })
+  @Field(() => Int)
   eventId: number;
 
   @Column({ name: 'role', type: 'enum', enum: ERole })
+  @Field(() => ERole)
   role: ERole;
 
   @Column({
-    name: 'created_at',
+    name: 'createdAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   createdAt: Date;
 
   @Column({
-    name: 'updated_at',
+    name: 'updatedAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
+  @Field(() => String)
   updatedAt: Date;
+
+  @ManyToOne(() => Event, (event) => event.eventParticipantTypes)
+  @JoinColumn({ name: 'eventId' })
+  @Field(() => Event)
+  event: Event;
 }

@@ -41,6 +41,7 @@ export class FamilyService {
         adminId,
         {
           role: ERole.FAMILY_ADMIN,
+          familyId: newFamily.id,
         },
         manager,
       );

@@ -9,7 +9,7 @@ registerEnumType(EGender, {
   name: 'EGender',
 });
 
-@Entity('user_details')
+@Entity('userDetails')
 @ObjectType()
 export class UserDetail {
   @PrimaryGeneratedColumn()
@@ -33,9 +33,13 @@ export class UserDetail {
   @Field(() => String, { nullable: true })
   phone: string | null;
 
-  @Column({ name: 'birthday', type: 'date' })
-  @Field(() => Date)
-  birthday: Date;
+  @Column({
+    name: 'birthday',
+    type: 'varchar',
+    length: 10,
+  })
+  @Field(() => String)
+  birthday: string;
 
   @Column({ name: 'address', type: 'varchar', length: 500, nullable: true })
   @Field(() => String, { nullable: true })
@@ -45,13 +49,12 @@ export class UserDetail {
     name: 'gender',
     type: 'enum',
     enum: EGender,
-    default: EGender.MALE,
   })
-  @Field(() => EGender, { defaultValue: EGender.MALE })
+  @Field(() => EGender)
   gender: EGender;
 
   @Column({
-    name: 'citizen_number',
+    name: 'citizenNumber',
     type: 'varchar',
     length: 100,
     nullable: true,
@@ -60,19 +63,19 @@ export class UserDetail {
   citizenNumber: string | null;
 
   @Column({
-    name: 'created_at',
+    name: 'createdAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => String)
   createdAt: Date;
 
   @Column({
-    name: 'updated_at',
+    name: 'updatedAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => String)
   updatedAt: Date;
 
   @OneToOne(() => User, (user) => user.userDetail)
@@ -80,5 +83,6 @@ export class UserDetail {
   user: User;
 
   @OneToOne(() => Deceased, (deceased) => deceased.userDetail)
+  @Field(() => Deceased)
   deceased: Deceased;
 }

@@ -7,6 +7,7 @@ import { Deceased } from 'src/core/database/entity/deceased.entity';
 import { ImageModule } from '../image/image.module';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { FamilyTempleModule } from '@modules/family-temple/family-temple.module';
+import { DeceasedResolver } from './deceased.resolver';
 
 @Module({
   imports: [
@@ -17,6 +18,6 @@ import { FamilyTempleModule } from '@modules/family-temple/family-temple.module'
     FamilyTempleModule,
   ],
   controllers: [DeceasedController],
-  providers: [DeceasedService],
+  providers: [DeceasedService, DeceasedResolver],
 })
 export class DeceasedModule {}
