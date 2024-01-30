@@ -40,9 +40,9 @@ export class Family {
     name: 'status',
     type: 'enum',
     enum: EStatus,
-    default: EStatus.ACTIVE,
+    default: EStatus.APPROVED,
   })
-  @Field(() => EStatus, { defaultValue: EStatus.ACTIVE })
+  @Field(() => EStatus, { defaultValue: EStatus.APPROVED })
   status: EStatus;
 
   @Column({

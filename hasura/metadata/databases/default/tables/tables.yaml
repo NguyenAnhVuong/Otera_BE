@@ -1,3 +1,4 @@
+- "!include public_deathAnniversaries.yaml"
 - "!include public_deceaseds.yaml"
 - "!include public_eventParticipantTypes.yaml"
 - "!include public_eventPaticipants.yaml"

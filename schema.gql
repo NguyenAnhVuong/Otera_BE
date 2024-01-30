@@ -19,8 +19,9 @@ type Family {
 }
 
 enum EStatus {
-  INACTIVE
-  ACTIVE
+  REJECTED
+  PENDING
+  APPROVED
 }
 
 type FamilyTemple {
@@ -46,6 +47,26 @@ type Review {
   user: User!
 }
 
+type DeathAnniversary {
+  id: Int!
+  deceasedId: Int!
+  templeId: Int!
+  desiredStartTime: String!
+  desiredEndTime: String!
+  actualStartTime: String
+  actualEndTime: String
+  status: EStatus!
+  creatorId: Int!
+  note: String
+  isDeleted: Boolean!
+  isLiveStream: Boolean!
+  createdAt: String!
+  updatedAt: String!
+  deceased: Deceased!
+  temple: Temple!
+  user: User!
+}
+
 type Temple {
   id: Int!
   name: String!
@@ -66,6 +87,7 @@ type Temple {
   familyTemples: [FamilyTemple!]!
   images: [Image!]!
   reviews: [Review!]!
+  deathAnniversaries: [DeathAnniversary!]!
 }
 
 enum EPriority {
@@ -153,23 +175,24 @@ type Image {
 }
 
 type Deceased {
-  id: Float!
+  id: Int!
   dateOfDeath: String!
   description: String
-  userDetailId: Float
-  templeId: Float!
-  familyId: Float!
-  creatorId: Float!
+  userDetailId: Int
+  templeId: Int!
+  familyId: Int!
+  creatorId: Int!
   createdAt: String!
   updatedAt: String!
   temple: Temple!
   family: Family!
   images: [Image!]!
   userDetail: UserDetail!
+  deathAnniversaries: [DeathAnniversary!]!
 }
 
 type UserDetail {
-  id: Float!
+  id: Int!
   avatar: String!
   name: String!
   phone: String
@@ -248,6 +271,14 @@ type Test2 {
   data: Test!
 }
 
+type DeathAnniversaryRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: DeathAnniversary!
+}
+
 type Query {
   getUser: UserRes!
   getListDeceased(familyId: Int!): ListDeceasedRes!
@@ -259,6 +290,7 @@ type Mutation {
   createTest(createTestInput: CreateTestInput!): Test!
   updateTest(updateTestInput: UpdateTestInput!): Test!
   removeTest(id: Int!): Test!
+  createDeathAnniversary(createDeathAnniversaryInput: CreateDeathAnniversaryInput!): DeathAnniversaryRes!
 }
 
 input CreateTestInput {
@@ -270,4 +302,12 @@ input UpdateTestInput {
   """Example field (placeholder)"""
   exampleField: Int
   id: Int!
+}
+
+input CreateDeathAnniversaryInput {
+  deceasedId: Int!
+  desiredStartTime: String!
+  desiredEndTime: String!
+  note: String!
+  isLiveStream: Boolean!
 }

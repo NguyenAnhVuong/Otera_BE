@@ -22,6 +22,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TestModule } from '@modules/test/test.module';
 import { GraphQLRolesGuard } from '@core/global/auth/guards/graphQLRoles.guard';
+import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { GraphQLRolesGuard } from '@core/global/auth/guards/graphQLRoles.guard';
     DeceasedModule,
     CloudinaryModule,
     TestModule,
+    DeathAnniversaryModule,
   ],
   controllers: [AppController],
   providers: [

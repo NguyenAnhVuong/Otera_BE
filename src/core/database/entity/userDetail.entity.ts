@@ -2,7 +2,7 @@ import { EGender } from 'src/core/enum/default.enum';
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from './user.entity';
 import { Deceased } from './deceased.entity';
-import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import 'dotenv/config.js';
 
 registerEnumType(EGender, {
@@ -13,7 +13,7 @@ registerEnumType(EGender, {
 @ObjectType()
 export class UserDetail {
   @PrimaryGeneratedColumn()
-  @Field(() => Number)
+  @Field(() => Int)
   id: number;
 
   @Column({

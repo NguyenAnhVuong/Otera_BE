@@ -5,6 +5,7 @@ import { Image } from './image.entity';
 import { Deceased } from './deceased.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Review } from './review.entity';
+import { DeathAnniversary } from './deathAnniversary.entity';
 
 registerEnumType(EPriority, {
   name: 'EPriority',
@@ -74,9 +75,9 @@ export class Temple {
     name: 'status',
     type: 'enum',
     enum: EStatus,
-    default: EStatus.ACTIVE,
+    default: EStatus.APPROVED,
   })
-  @Field(() => EStatus, { defaultValue: EStatus.ACTIVE })
+  @Field(() => EStatus, { defaultValue: EStatus.APPROVED })
   status: EStatus;
 
   @Column({ name: 'adminId', type: 'int' })
@@ -114,4 +115,11 @@ export class Temple {
   @OneToMany(() => Review, (review) => review.temple)
   @Field(() => [Review])
   reviews: Review[];
+
+  @OneToMany(
+    () => DeathAnniversary,
+    (deathAnniversary) => deathAnniversary.temple,
+  )
+  @Field(() => [DeathAnniversary])
+  deathAnniversaries: DeathAnniversary[];
 }

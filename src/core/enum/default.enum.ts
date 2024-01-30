@@ -25,8 +25,9 @@ export enum EAppLanguage {
 }
 
 export enum EStatus {
-  INACTIVE = 'INACTIVE',
-  ACTIVE = 'ACTIVE',
+  REJECTED = 'REJECTED',
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
 }
 
 export enum EPriority {

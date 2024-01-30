@@ -5,5 +5,6 @@
   "REFRESH_TOKEN_NOT_EXISTS": "Refresh token không tồn tại",
   "UNAUTHORIZED": "Không có quyền truy cập",
   "INVALID_PARAM": "Thông số không hợp lệ",
-  "FAMILY_NOT_IN_TEMPLE": "Gia đình không thuộc đền thờ"
+  "FAMILY_NOT_IN_TEMPLE": "Gia đình không thuộc đền thờ",
+  "DECEASED_NOT_IN_FAMILY": "Người đã mất không thuộc gia đình"
 }

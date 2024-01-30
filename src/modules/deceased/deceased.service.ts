@@ -108,13 +108,30 @@ export class DeceasedService {
     });
   }
 
-  getDeceasedByIdAndFamilyId(id: number, familyId: number) {
-    return this.deceasedRepository.findOne({
+  async getDeceasedByIdAndFamilyId(id: number, familyId: number) {
+    return await this.deceasedRepository.findOne({
       where: {
         id,
         familyId,
       },
       relations: ['images', 'userDetail'],
     });
+  }
+
+  async checkDeceasedInFamily(deceasedId: number, familyId: number) {
+    const deceased = await this.deceasedRepository.findOne({
+      where: {
+        id: deceasedId,
+        familyId,
+      },
+    });
+
+    if (!deceased) {
+      throw new HttpException(
+        ErrorMessage.DECEASED_NOT_IN_FAMILY,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return deceased;
   }
 }
