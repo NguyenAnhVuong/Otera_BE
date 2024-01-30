@@ -75,10 +75,13 @@ custom_types:
       values:
         - description: null
           is_deprecated: null
-          value: INACTIVE
+          value: REJECTED
         - description: null
           is_deprecated: null
-          value: ACTIVE
+          value: PENDING
+        - description: null
+          is_deprecated: null
+          value: APPROVED
     - name: EGender
       values:
         - description: null

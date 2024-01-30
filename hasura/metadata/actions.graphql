@@ -50,8 +50,9 @@ enum EPlan {
 }
 
 enum EStatus {
-  INACTIVE
-  ACTIVE
+  REJECTED
+  PENDING
+  APPROVED
 }
 
 enum EGender {

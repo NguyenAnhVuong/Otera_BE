@@ -11,13 +11,14 @@ import { Image } from './image.entity';
 import { Temple } from './temple.entity';
 import { Family } from './family.entity';
 import { UserDetail } from './userDetail.entity';
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { DeathAnniversary } from './deathAnniversary.entity';
 
 @Entity('deceaseds')
 @ObjectType()
 export class Deceased {
   @PrimaryGeneratedColumn()
-  @Field(() => Number)
+  @Field(() => Int)
   id: number;
 
   @Column({ name: 'dateOfDeath', type: 'varchar', length: 10 })
@@ -38,25 +39,25 @@ export class Deceased {
     type: 'int',
     nullable: true,
   })
-  @Field(() => Number, { nullable: true })
+  @Field(() => Int, { nullable: true })
   userDetailId: number;
 
   @Column({
     name: 'templeId',
     type: 'int',
   })
-  @Field(() => Number)
+  @Field(() => Int)
   templeId: number;
 
   @Column({
     name: 'familyId',
     type: 'int',
   })
-  @Field(() => Number)
+  @Field(() => Int)
   familyId: number;
 
   @Column({ name: 'creatorId', type: 'int' })
-  @Field(() => Number)
+  @Field(() => Int)
   creatorId: number;
 
   @Column({
@@ -93,4 +94,11 @@ export class Deceased {
   @JoinColumn({ name: 'userDetailId' })
   @Field(() => UserDetail)
   userDetail: UserDetail;
+
+  @OneToMany(
+    () => DeathAnniversary,
+    (deathAnniversary) => deathAnniversary.deceased,
+  )
+  @Field(() => [DeathAnniversary])
+  deathAnniversaries: DeathAnniversary[];
 }

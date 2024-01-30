@@ -12,6 +12,7 @@ import { UserDetail } from './userDetail.entity';
 import { Family } from './family.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Review } from './review.entity';
+import { DeathAnniversary } from './deathAnniversary.entity';
 
 registerEnumType(ERole, {
   name: 'ERole',
@@ -79,4 +80,10 @@ export class User {
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
+
+  @OneToMany(
+    () => DeathAnniversary,
+    (deathAnniversary) => deathAnniversary.user,
+  )
+  deathAnniversaries: DeathAnniversary[];
 }

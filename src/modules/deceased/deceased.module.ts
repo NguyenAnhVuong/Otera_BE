@@ -19,5 +19,6 @@ import { DeceasedResolver } from './deceased.resolver';
   ],
   controllers: [DeceasedController],
   providers: [DeceasedService, DeceasedResolver],
+  exports: [DeceasedService],
 })
 export class DeceasedModule {}
