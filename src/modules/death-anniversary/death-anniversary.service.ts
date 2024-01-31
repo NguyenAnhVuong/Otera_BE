@@ -1,10 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { CreateDeathAnniversaryInput } from './dto/create-death-anniversary.input';
+import { DeathAnniversary } from '@core/database/entity/deathAnniversary.entity';
+import { EStatus } from '@core/enum';
 import { IUserData } from '@core/interface/default.interface';
 import { DeceasedService } from '@modules/deceased/deceased.service';
+import { TempleService } from '@modules/temple/temple.service';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, Repository } from 'typeorm';
-import { DeathAnniversary } from '@core/database/entity/deathAnniversary.entity';
+import { DeepPartial, LessThan, MoreThan, Repository } from 'typeorm';
+import { CreateDeathAnniversaryInput } from './dto/create-death-anniversary.input';
+import { GetDeathAnniversariesInput } from './dto/death-anniversary.input';
+import { UpdateStatusDeathAnniversaryInput } from './dto/update-status-death-anniversary.input';
 
 @Injectable()
 export class DeathAnniversaryService {
@@ -12,6 +16,7 @@ export class DeathAnniversaryService {
     private readonly deceasedService: DeceasedService,
     @InjectRepository(DeathAnniversary)
     private readonly deathAnniversaryRepository: Repository<DeathAnniversary>,
+    private readonly templeService: TempleService,
   ) {}
 
   async createDeathAnniversary(
@@ -30,8 +35,48 @@ export class DeathAnniversaryService {
       ...createDeathAnniversaryInput,
       templeId,
       creatorId,
+      familyId,
     };
 
     return await this.deathAnniversaryRepository.save(newDeathAnniversary);
+  }
+
+  async getDeathAnniversaries(
+    deathAnniversaryQuery: GetDeathAnniversariesInput,
+    userData: IUserData,
+  ) {
+    const { isEnd, isStart, isPending } = deathAnniversaryQuery;
+    const { id: adminId, fid: familyId } = userData;
+    const temple = await this.templeService.getTempleById(adminId);
+    return await this.deathAnniversaryRepository.find({
+      where: {
+        ...(familyId ? { familyId } : { templeId: temple.id }),
+        ...(isEnd && {
+          actualEndTime: LessThan(new Date()),
+        }),
+        ...(isStart && {
+          actualStartTime: LessThan(new Date()),
+          actualEndTime: MoreThan(new Date()),
+        }),
+        ...(isPending && { status: EStatus.PENDING }),
+      },
+      relations: ['deceased', 'deceased.userDetail'],
+    });
+  }
+
+  async updateStatusDeathAnniversary(
+    updateStatusDeathAnniversaryInput: UpdateStatusDeathAnniversaryInput,
+  ) {
+    const { id, status, actualStartTime, actualEndTime, linkLiveStream } =
+      updateStatusDeathAnniversaryInput;
+    return await this.deathAnniversaryRepository.update(
+      { id },
+      {
+        status,
+        linkLiveStream,
+        ...(actualStartTime && { actualStartTime }),
+        ...(actualEndTime && { actualEndTime }),
+      },
+    );
   }
 }

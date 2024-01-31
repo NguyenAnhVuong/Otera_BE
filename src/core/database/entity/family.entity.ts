@@ -4,6 +4,7 @@ import { User } from './user.entity';
 import { FamilyTemple } from './familyTemple.entity';
 import { Deceased } from './deceased.entity';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { DeathAnniversary } from './deathAnniversary.entity';
 
 @Entity('families')
 @ObjectType()
@@ -50,7 +51,7 @@ export class Family {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   createdAt: Date;
 
   @Column({
@@ -58,7 +59,7 @@ export class Family {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   updatedAt: Date;
 
   @OneToMany(() => User, (user) => user.family)
@@ -72,4 +73,11 @@ export class Family {
   @OneToMany(() => FamilyTemple, (familyTemple) => familyTemple.family)
   @Field(() => [FamilyTemple])
   familyTemples: FamilyTemple[];
+
+  @OneToMany(
+    () => DeathAnniversary,
+    (deathAnniversary) => deathAnniversary.family,
+  )
+  @Field(() => [DeathAnniversary])
+  deathAnniversaries: DeathAnniversary[];
 }

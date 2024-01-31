@@ -6,5 +6,6 @@
   "UNAUTHORIZED": "Không có quyền truy cập",
   "INVALID_PARAM": "Thông số không hợp lệ",
   "FAMILY_NOT_IN_TEMPLE": "Gia đình không thuộc đền thờ",
-  "DECEASED_NOT_IN_FAMILY": "Người đã mất không thuộc gia đình"
+  "DECEASED_NOT_IN_FAMILY": "Người đã mất không thuộc gia đình",
+  "TEMPLE_NOT_EXIST": "Chùa không tồn tại"
 }

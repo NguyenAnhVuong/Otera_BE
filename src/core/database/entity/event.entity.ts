@@ -74,7 +74,7 @@ export class Event {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   createdAt: Date;
 
   @Column({
@@ -82,7 +82,7 @@ export class Event {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   updatedAt: Date;
 
   @OneToMany(

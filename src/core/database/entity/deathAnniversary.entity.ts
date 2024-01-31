@@ -10,6 +10,7 @@ import {
 import { Deceased } from './deceased.entity';
 import { Temple } from './temple.entity';
 import { User } from './user.entity';
+import { Family } from './family.entity';
 
 @Entity('deathAnniversaries')
 @ObjectType()
@@ -22,24 +23,28 @@ export class DeathAnniversary {
   @Field(() => Int)
   deceasedId: number;
 
+  @Column({ name: 'familyId', type: 'int' })
+  @Field(() => Int)
+  familyId: number;
+
   @Column({ name: 'templeId', type: 'int' })
   @Field(() => Int)
   templeId: number;
 
   @Column({ name: 'desiredStartTime', type: 'timestamp' })
-  @Field(() => String)
+  @Field(() => Date)
   desiredStartTime: Date;
 
   @Column({ name: 'desiredEndTime', type: 'timestamp' })
-  @Field(() => String)
+  @Field(() => Date)
   desiredEndTime: Date;
 
   @Column({ name: 'actualStartTime', type: 'timestamp', nullable: true })
-  @Field(() => String, { nullable: true })
+  @Field(() => Date, { nullable: true })
   actualStartTime: Date | null;
 
   @Column({ name: 'actualEndTime', type: 'timestamp', nullable: true })
-  @Field(() => String, { nullable: true })
+  @Field(() => Date, { nullable: true })
   actualEndTime: Date | null;
 
   @Column({
@@ -68,11 +73,20 @@ export class DeathAnniversary {
   isLiveStream: boolean;
 
   @Column({
+    name: 'linkLiveStream',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  linkLiveStream: string | null;
+
+  @Column({
     name: 'createdAt',
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   createdAt: Date;
 
   @Column({
@@ -80,7 +94,7 @@ export class DeathAnniversary {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   updatedAt: Date;
 
   @ManyToOne(() => Deceased, (deceased) => deceased.deathAnniversaries)
@@ -97,4 +111,9 @@ export class DeathAnniversary {
   @JoinColumn({ name: 'creatorId' })
   @Field(() => User)
   user: User;
+
+  @ManyToOne(() => Family, (family) => family.deathAnniversaries)
+  @JoinColumn({ name: 'familyId' })
+  @Field(() => Family)
+  family: Family;
 }

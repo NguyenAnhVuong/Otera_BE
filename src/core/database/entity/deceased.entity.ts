@@ -21,7 +21,7 @@ export class Deceased {
   @Field(() => Int)
   id: number;
 
-  @Column({ name: 'dateOfDeath', type: 'varchar', length: 10 })
+  @Column({ name: 'dateOfDeath', type: 'varchar', length: 100 })
   @Field(() => String)
   dateOfDeath: string;
 
@@ -65,7 +65,7 @@ export class Deceased {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   createdAt: Date;
 
   @Column({
@@ -73,7 +73,7 @@ export class Deceased {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   updatedAt: Date;
 
   @ManyToOne(() => Temple, (temple) => temple.deceaseds)

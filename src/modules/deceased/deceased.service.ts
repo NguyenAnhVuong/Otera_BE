@@ -10,6 +10,7 @@ import { ImageService } from '../image/image.service';
 import { IUserData } from '@core/interface/default.interface';
 import { FamilyTempleService } from '@modules/family-temple/family-temple.service';
 import { ErrorMessage } from '@core/enum';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class DeceasedService {
@@ -63,7 +64,7 @@ export class DeceasedService {
       const userDetailParams: DeepPartial<UserDetail> = {
         avatar: uploadedAvatar.url,
         name,
-        birthday,
+        birthday: dayjs(birthday).format('YYYY-MM-DD'),
         address,
         gender,
         citizenNumber,
@@ -75,7 +76,7 @@ export class DeceasedService {
       );
 
       const newDeceasedParams: DeepPartial<Deceased> = {
-        dateOfDeath,
+        dateOfDeath: dayjs(dateOfDeath).format('YYYY-MM-DD'),
         templeId,
         familyId: fid,
         userDetailId: userDetail.id,
