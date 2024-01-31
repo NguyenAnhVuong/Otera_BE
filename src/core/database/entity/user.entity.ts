@@ -13,6 +13,7 @@ import { Family } from './family.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Review } from './review.entity';
 import { DeathAnniversary } from './deathAnniversary.entity';
+import { Temple } from './temple.entity';
 
 registerEnumType(ERole, {
   name: 'ERole',
@@ -58,7 +59,7 @@ export class User {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   createdAt: Date;
 
   @Column({
@@ -66,8 +67,12 @@ export class User {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   updatedAt: Date;
+
+  @OneToOne(() => Temple, (temple) => temple.admin)
+  @Field(() => Temple)
+  temple: Temple;
 
   @OneToOne(() => UserDetail, (userDetail) => userDetail.user)
   @JoinColumn({ name: 'userDetailId' })

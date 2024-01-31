@@ -2,6 +2,13 @@ table:
   name: families
   schema: public
 array_relationships:
+  - name: deathAnniversaries
+    using:
+      foreign_key_constraint_on:
+        column: familyId
+        table:
+          name: deathAnniversaries
+          schema: public
   - name: deceaseds
     using:
       foreign_key_constraint_on:

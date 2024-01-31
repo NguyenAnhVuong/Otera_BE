@@ -6,5 +6,6 @@
   "UNAUTHORIZED": "Unauthorized",
   "INVALID_PARAM": "Invalid param",
   "FAMILY_NOT_IN_TEMPLE": "Family not in temple",
-  "DECEASED_NOT_IN_FAMILY": "Deceased not in family"
+  "DECEASED_NOT_IN_FAMILY": "Deceased not in family",
+  "TEMPLE_NOT_EXIST": "Temple not exist"
 }

@@ -38,7 +38,7 @@ export class Image {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   createdAt: Date;
 
   @Column({
@@ -46,7 +46,7 @@ export class Image {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   updatedAt: Date;
 
   @ManyToOne(() => Deceased, (deceased) => deceased.images)

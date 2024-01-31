@@ -19,18 +19,18 @@ export class CreateDeathAnniversaryInput {
 
   @IsDate()
   @Type(() => Date)
-  @Field(() => String)
+  @Field(() => Date)
   @IsNotEmpty()
   desiredStartTime: Date;
 
   @IsDate()
   @Type(() => Date)
-  @Field(() => String)
+  @Field(() => Date)
   @IsNotEmpty()
   desiredEndTime: Date;
 
   @IsString()
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   @IsOptional()
   note?: string;
 

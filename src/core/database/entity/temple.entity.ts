@@ -1,11 +1,19 @@
 import { EPlan, EPriority, EStatus } from 'src/core/enum/default.enum';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { FamilyTemple } from './familyTemple.entity';
 import { Image } from './image.entity';
 import { Deceased } from './deceased.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Review } from './review.entity';
 import { DeathAnniversary } from './deathAnniversary.entity';
+import { User } from './user.entity';
 
 registerEnumType(EPriority, {
   name: 'EPriority',
@@ -89,7 +97,7 @@ export class Temple {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   createdAt: Date;
 
   @Column({
@@ -97,8 +105,13 @@ export class Temple {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   updatedAt: Date;
+
+  @OneToOne(() => User, (user) => user.temple)
+  @JoinColumn({ name: 'adminId' })
+  @Field(() => User)
+  admin: User;
 
   @OneToMany(() => Deceased, (deceased) => deceased.temple)
   @Field(() => [Deceased])

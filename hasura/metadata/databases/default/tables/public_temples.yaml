@@ -1,7 +1,18 @@
 table:
   name: temples
   schema: public
+object_relationships:
+  - name: user
+    using:
+      foreign_key_constraint_on: adminId
 array_relationships:
+  - name: deathAnniversaries
+    using:
+      foreign_key_constraint_on:
+        column: templeId
+        table:
+          name: deathAnniversaries
+          schema: public
   - name: deceaseds
     using:
       foreign_key_constraint_on:

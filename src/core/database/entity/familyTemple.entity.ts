@@ -29,7 +29,7 @@ export class FamilyTemple {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   createdAt: Date;
 
   @Column({
@@ -37,7 +37,7 @@ export class FamilyTemple {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   updatedAt: Date;
 
   @ManyToOne(() => Family, (family) => family.familyTemples)

@@ -40,7 +40,7 @@ export class EventParticipant {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   createdAt: Date;
 
   @Column({
@@ -48,7 +48,7 @@ export class EventParticipant {
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  @Field(() => String)
+  @Field(() => Date)
   updatedAt: Date;
 
   @ManyToOne(() => Event, (event) => event.eventParticipants)

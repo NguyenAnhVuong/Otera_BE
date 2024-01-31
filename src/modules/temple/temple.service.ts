@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Image } from 'src/core/database/entity/image.entity';
 import { Temple } from 'src/core/database/entity/temple.entity';
@@ -16,6 +16,7 @@ import { UserService } from '../user/user.service';
 import { ImageService } from './../image/image.service';
 import { VCreateTempleDto } from './dto/create-temple.dto';
 import { VGetTemplesDto } from './dto/get-temples.dto';
+import { ErrorMessage } from '@core/enum';
 
 @Injectable()
 export class TempleService {
@@ -74,6 +75,20 @@ export class TempleService {
       where: { id },
       relations: ['images'],
     });
+  }
+
+  async getTempleByAdminId(adminId: number): Promise<Temple> {
+    const temple = await this.templeRepository.findOne({
+      where: { adminId },
+    });
+
+    if (!temple) {
+      throw new HttpException(
+        ErrorMessage.TEMPLE_NOT_EXIST,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return temple;
   }
 
   async getTemples(query: VGetTemplesDto) {
