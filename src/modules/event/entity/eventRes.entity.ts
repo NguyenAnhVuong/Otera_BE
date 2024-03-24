@@ -4,6 +4,6 @@ import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
 export class EventRes extends GQLResponse {
-  @Field(() => Event)
+  @Field(() => Event, { nullable: true })
   data: Event;
 }

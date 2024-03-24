@@ -156,6 +156,7 @@ type Event {
   eventParticipants: [EventParticipant!]!
   images: [Image!]!
   eventParticipantTypes: [EventParticipantType!]!
+  user: User!
 }
 
 type Image {
@@ -318,14 +319,6 @@ type CreateRes {
   data: Boolean!
 }
 
-type EventRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: Event!
-}
-
 type AffectedResult {
   affected: Int!
 }
@@ -336,6 +329,30 @@ type UpdateRes {
   errorCode: String
   timestamp: String!
   data: AffectedResult
+}
+
+type EventRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Event
+}
+
+type EventsPagingData {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [Event!]!
+}
+
+type EventsRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: EventsPagingData!
 }
 
 type Test {
@@ -367,6 +384,8 @@ type Query {
   getDeceased(id: Int!): DeceasedRes!
   test123(id: Int!): Test2!
   getDeathAnniversaries(getDeathAnniversariesInput: GetDeathAnniversariesInput!): DeathAnniversariesRes!
+  templeGetEvents(page: Int, take: Int, skip: Int, upcoming: Boolean, ended: Boolean, priority: Boolean): EventsRes!
+  getEventById(id: Int!): EventRes!
 }
 
 input GetDeathAnniversariesInput {
