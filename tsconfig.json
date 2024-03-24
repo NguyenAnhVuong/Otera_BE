@@ -18,15 +18,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@core/*": [
-        "src/core/*"
-      ],
-      "@modules/*": [
-        "src/modules/*"
-      ],
-      "@helper/*": [
-        "src/helper/*"
-      ]
-    },
+      "@core/*": ["src/core/*"],
+      "@modules/*": ["src/modules/*"],
+      "@helper/*": ["src/helper/*"]
+    }
   }
 }

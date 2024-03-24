@@ -1,10 +1,18 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { EPriority } from 'src/core/enum/default.enum';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { EventParticipant } from './eventParticipant.entity';
 import { EventParticipantType } from './eventParticipantType.entity';
 import { Image } from './image.entity';
 import 'dotenv/config.js';
+import { User } from './user.entity';
 
 @Entity('events')
 @ObjectType()
@@ -125,4 +133,9 @@ export class Event {
   )
   @Field(() => [EventParticipantType])
   eventParticipantTypes: EventParticipantType[];
+
+  @ManyToOne(() => User, (user) => user.events)
+  @JoinColumn({ name: 'creatorId' })
+  @Field(() => User)
+  user: User;
 }

@@ -15,6 +15,7 @@ import { Review } from './review.entity';
 import { Temple } from './temple.entity';
 import { TempleMember } from './templeMember.entity';
 import { UserDetail } from './userDetail.entity';
+import { Event } from './event.entity';
 
 registerEnumType(ERole, {
   name: 'ERole',
@@ -94,4 +95,7 @@ export class User {
 
   @OneToOne(() => TempleMember, (templeMember) => templeMember.user)
   templeMember: TempleMember;
+
+  @OneToMany(() => Event, (event) => event.user)
+  events: Event[];
 }

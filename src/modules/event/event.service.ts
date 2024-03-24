@@ -7,6 +7,8 @@ import { Event } from '@core/database/entity/event.entity';
 import { EventParticipantTypeService } from '@modules/event-participant-type/event-participant-type.service';
 import { ImageService } from '@modules/image/image.service';
 import { VUpdateEventInput } from './dto/update-event.input';
+import { TempleGetEventArgs } from './dto/temple-get-event.args';
+import { returnPagingData } from '@helper/utils';
 
 @Injectable()
 export class EventService {
@@ -20,6 +22,23 @@ export class EventService {
 
     private readonly dataSource: DataSource,
   ) {}
+
+  async templeGetEvents(userData: IUserData, args: TempleGetEventArgs) {
+    const { tid: templeId } = userData;
+    const { upcoming, ended, priority, take, skip } = args;
+
+    const [events, count] = await this.eventRepository.findAndCount({
+      where: { templeId, isDeleted: false },
+      take,
+      skip,
+      order: {
+        ...(upcoming && { startDateEvent: 'ASC' }),
+        ...(ended && { endDateEvent: 'DESC' }),
+        ...(priority && { priority: 'DESC' }),
+      },
+    });
+    return returnPagingData(events, count, args);
+  }
 
   async createEvent(userData: IUserData, createEventInput: VCreateEventInput) {
     const { id: userId, tid: templeId } = userData;
@@ -40,7 +59,7 @@ export class EventService {
       templeId,
       avatar: createEventInput.avatar,
     };
-    console.log('newEvent', newEvent);
+
     return this.dataSource.transaction(async (entityManager: EntityManager) => {
       const createdEvent = await entityManager
         .getRepository(Event)
@@ -78,9 +97,9 @@ export class EventService {
       ? entityManager.getRepository(Event)
       : this.eventRepository;
 
-    return eventRepository.findOne({
+    return await eventRepository.findOne({
       where: { id, isDeleted: false },
-      relations: ['eventParticipantTypes', 'eventParticipants'],
+      relations: ['eventParticipantTypes', 'eventParticipants', 'images'],
     });
   }
 
