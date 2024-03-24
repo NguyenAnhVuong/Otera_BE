@@ -1,3 +1,4 @@
+import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { ERole } from 'src/core/enum/default.enum';
 import {
   Column,
@@ -8,12 +9,12 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserDetail } from './userDetail.entity';
-import { Family } from './family.entity';
-import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
-import { Review } from './review.entity';
 import { DeathAnniversary } from './deathAnniversary.entity';
+import { Family } from './family.entity';
+import { Review } from './review.entity';
 import { Temple } from './temple.entity';
+import { TempleMember } from './templeMember.entity';
+import { UserDetail } from './userDetail.entity';
 
 registerEnumType(ERole, {
   name: 'ERole',
@@ -30,7 +31,6 @@ export class User {
   email: string;
 
   @Column({ name: 'password', type: 'varchar', length: 100 })
-  @Field(() => String)
   password: string;
 
   @Column({
@@ -91,4 +91,7 @@ export class User {
     (deathAnniversary) => deathAnniversary.user,
   )
   deathAnniversaries: DeathAnniversary[];
+
+  @OneToOne(() => TempleMember, (templeMember) => templeMember.user)
+  templeMember: TempleMember;
 }

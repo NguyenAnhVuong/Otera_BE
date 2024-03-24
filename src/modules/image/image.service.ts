@@ -16,8 +16,19 @@ export class ImageService {
   ): Promise<Image[]> {
     const imageRepository =
       entityManager?.getRepository(Image) || this.imageRepository;
-    return Promise.all(
-      imageParams.map(async (image) => await imageRepository.save(image)),
-    );
+    return await imageRepository.save(imageParams);
+  }
+
+  async updateImageByEventId(
+    eventId: number,
+    imageParams: DeepPartial<Image>[],
+    entityManager?: EntityManager,
+  ): Promise<boolean> {
+    const imageRepository =
+      entityManager?.getRepository(Image) || this.imageRepository;
+
+    await imageRepository.delete({ eventId });
+    await imageRepository.save(imageParams);
+    return true;
   }
 }

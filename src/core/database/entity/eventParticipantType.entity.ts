@@ -24,6 +24,10 @@ export class EventParticipantType {
   @Field(() => ERole)
   role: ERole;
 
+  @Column({ name: 'isDeleted', type: 'boolean', default: false })
+  @Field(() => Boolean)
+  isDeleted: boolean;
+
   @Column({
     name: 'createdAt',
     type: 'timestamp',

@@ -49,26 +49,28 @@ export class UserService {
 
     userRegister.password = hashPassword;
     userRegister.role = ERole.PUBLIC_USER;
-    return this.dataSource.transaction(async (entityManager: EntityManager) => {
-      const userDetail = {
-        name: userRegister.name,
-        birthday: userRegister.birthday,
-        gender: userRegister.gender,
-      };
-      const newUserDetail = await this.userDetailService.createUserDetail(
-        userDetail,
-        entityManager,
-      );
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const userDetail = {
+          name: userRegister.name,
+          birthday: userRegister.birthday,
+          gender: userRegister.gender,
+        };
+        const newUserDetail = await this.userDetailService.createUserDetail(
+          userDetail,
+          entityManager,
+        );
 
-      const userRepository = entityManager.getRepository(User);
-      const newUser = await userRepository.save({
-        userDetailId: newUserDetail.id,
-        ...userRegister,
-      });
-      delete newUser.password;
+        const userRepository = entityManager.getRepository(User);
+        const newUser = await userRepository.save({
+          userDetailId: newUserDetail.id,
+          ...userRegister,
+        });
+        delete newUser.password;
 
-      return newUser;
-    });
+        return newUser;
+      },
+    );
   }
 
   async userLogin(
@@ -79,7 +81,7 @@ export class UserService {
       where: {
         email: userLogin.email,
       },
-      relations: ['userDetail'],
+      relations: ['userDetail', 'temple', 'templeMember'],
     });
 
     if (!user) {
@@ -98,6 +100,16 @@ export class UserService {
       );
     }
 
+    let templeId = null;
+
+    if (user.templeMember) {
+      templeId = user.templeMember.templeId;
+    }
+
+    if (user.temple) {
+      templeId = user.temple.id;
+    }
+
     const authUserData: IResponseAuthUser = {
       id: user.id,
       email: user.email,
@@ -105,6 +117,7 @@ export class UserService {
       name: user.userDetail.name,
       role: user.role,
       familyId: user.familyId,
+      templeId,
     };
 
     return await this.returnResponseAuthUser(authUserData, response);
@@ -114,11 +127,18 @@ export class UserService {
     refreshToken: string,
     response: Response,
   ): Promise<IResponseRefreshToken> {
+    if (!refreshToken) {
+      throw new HttpException(
+        ErrorMessage.REFRESH_TOKEN_NOT_EXISTS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     const user = await this.userRepository.findOne({
       where: {
-        refreshToken,
+        refreshToken: refreshToken,
       },
-      relations: ['userDetail'],
+      relations: ['userDetail', 'temple'],
     });
 
     if (!user) {
@@ -135,6 +155,7 @@ export class UserService {
       name: user.userDetail.name,
       role: user.role,
       familyId: user.familyId,
+      templeId: user.temple ? user.temple.id : null,
     };
 
     const data = await this.returnResponseAuthUser(authUserData, response);
@@ -155,6 +176,7 @@ export class UserService {
       name: authUserData.name,
       role: authUserData.role,
       fid: authUserData.familyId,
+      tid: authUserData.templeId,
     };
 
     const refreshToken = await this.jwtService.signAsync(payload, {

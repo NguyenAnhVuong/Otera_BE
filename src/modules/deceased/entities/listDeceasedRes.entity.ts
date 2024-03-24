@@ -1,9 +1,9 @@
 import { Deceased } from '@core/database/entity/deceased.entity';
-import { GraphQLResponse } from '@core/global/entities/graphQLRes.entity';
+import { GQLResponse } from '@core/global/entities/gqlRes.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class ListDeceasedRes extends GraphQLResponse {
+export class ListDeceasedRes extends GQLResponse {
   @Field(() => [Deceased])
   data: Deceased[];
 }

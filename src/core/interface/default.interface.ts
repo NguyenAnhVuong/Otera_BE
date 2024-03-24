@@ -4,13 +4,14 @@ export interface IUserData {
   name: string;
   role: string;
   fid?: number;
+  tid?: number;
   [key: string]: any;
 }
 
 export interface IPaginationQuery {
-  page: number;
-  take: number;
-  skip: number;
+  page?: number;
+  take?: number;
+  skip?: number;
   [key: string]: any;
 }
 

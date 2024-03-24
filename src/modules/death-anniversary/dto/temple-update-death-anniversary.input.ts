@@ -2,6 +2,7 @@ import { EStatus } from '@core/enum';
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
+  IsBoolean,
   IsDate,
   IsEnum,
   IsNumber,
@@ -10,7 +11,7 @@ import {
 } from 'class-validator';
 
 @InputType()
-export class UpdateStatusDeathAnniversaryInput {
+export class TempleUpdateDeathAnniversaryInput {
   @IsNumber()
   @Field(() => Int)
   id: number;
@@ -18,6 +19,28 @@ export class UpdateStatusDeathAnniversaryInput {
   @IsEnum(EStatus)
   @Field(() => EStatus)
   status: EStatus;
+
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  enableUpdate?: boolean;
+
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  desiredStartTime?: Date;
+
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  desiredEndTime: Date;
+
+  @IsString()
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  note?: string;
 
   @IsDate()
   @Type(() => Date)
@@ -35,4 +58,9 @@ export class UpdateStatusDeathAnniversaryInput {
   @IsOptional()
   @Field(() => String, { nullable: true })
   linkLiveStream?: string;
+
+  @IsString()
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  rejectReason?: string;
 }

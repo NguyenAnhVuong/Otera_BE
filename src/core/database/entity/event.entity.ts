@@ -1,9 +1,10 @@
+import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { EPriority } from 'src/core/enum/default.enum';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { EventParticipant } from './eventParticipant.entity';
-import { Image } from './image.entity';
-import { EPriority } from 'src/core/enum/default.enum';
-import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { EventParticipantType } from './eventParticipantType.entity';
+import { Image } from './image.entity';
+import 'dotenv/config.js';
 
 @Entity('events')
 @ObjectType()
@@ -16,44 +17,58 @@ export class Event {
   @Field(() => Int, { nullable: true })
   templeId: number | null;
 
+  @Column({ name: 'creatorId', type: 'int' })
+  @Field(() => Int)
+  creatorId: number;
+
   @Column({ name: 'name', type: 'varchar', length: 250 })
   @Field(() => String)
   name: string;
 
-  @Column({ name: 'avatar', type: 'varchar', length: 250 })
+  @Column({
+    name: 'avatar',
+    type: 'varchar',
+    length: 250,
+    default: process.env.APP_URL + '/event-default.png',
+  })
   @Field(() => String)
   avatar: string;
 
-  @Column({ name: 'description', type: 'varchar', length: 1000 })
-  @Field(() => String)
+  @Column({
+    name: 'description',
+    type: 'varchar',
+    length: 1000,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
   description: string;
 
-  @Column({ name: 'startDateEvent', type: 'date' })
-  @Field(() => String)
+  @Column({ name: 'startDateEvent', type: 'timestamp' })
+  @Field(() => Date)
   startDateEvent: Date;
 
-  @Column({ name: 'endDateEvent', type: 'date' })
-  @Field(() => String)
+  @Column({ name: 'endDateEvent', type: 'timestamp' })
+  @Field(() => Date)
   endDateEvent: Date;
 
-  @Column({ name: 'startDateBooking', type: 'date' })
-  @Field(() => String)
+  @Column({ name: 'startDateBooking', type: 'timestamp' })
+  @Field(() => Date)
   startDateBooking: Date;
 
-  @Column({ name: 'endDateBooking', type: 'date' })
-  @Field(() => String)
+  @Column({ name: 'endDateBooking', type: 'timestamp' })
+  @Field(() => Date)
   endDateBooking: Date;
 
   @Column({ name: 'address', type: 'varchar', length: 250 })
   @Field(() => String)
   address: string;
 
-  @Column({ name: 'phone', type: 'varchar', length: 250 })
-  @Field(() => String)
+  @Column({ name: 'phone', type: 'varchar', length: 250, nullable: true })
+  @Field(() => String, { nullable: true })
   phone: string;
 
-  @Column({ name: 'email', type: 'varchar', length: 250 })
-  @Field(() => String)
+  @Column({ name: 'email', type: 'varchar', length: 250, nullable: true })
+  @Field(() => String, { nullable: true })
   email: string;
 
   @Column({
@@ -65,9 +80,17 @@ export class Event {
   @Field(() => EPriority, { defaultValue: EPriority.MEDIUM })
   priority: EPriority;
 
-  @Column({ name: 'priorityExpired', type: 'date', nullable: true })
+  @Column({ name: 'priorityExpired', type: 'timestamp', nullable: true })
   @Field(() => Date, { nullable: true })
   priorityExpired: Date | null;
+
+  @Column({ name: 'isDeleted', type: 'boolean', default: false })
+  @Field(() => Boolean)
+  isDeleted: boolean;
+
+  @Column({ name: 'maxParticipant', type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
+  maxParticipant: number | null;
 
   @Column({
     name: 'createdAt',

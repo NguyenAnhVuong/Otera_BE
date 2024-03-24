@@ -1,15 +1,15 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class GraphQLResponse {
+export class GQLResponse {
   @Field(() => Int)
   statusCode: number;
 
   @Field(() => String, { nullable: true })
-  errorMessage: string;
+  errorMessage: string | null;
 
   @Field(() => String, { nullable: true })
-  errorCode: string;
+  errorCode: string | null;
 
   @Field(() => String)
   timestamp: string;

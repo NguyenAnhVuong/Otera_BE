@@ -51,6 +51,9 @@ custom_types:
           value: TEMPLE_ADMIN
         - description: null
           is_deprecated: null
+          value: TEMPLE_MEMBER
+        - description: null
+          is_deprecated: null
           value: PUBLIC_USER
     - name: EPriority
       values:

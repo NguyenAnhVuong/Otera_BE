@@ -7,6 +7,7 @@ export interface IResponseAuthUser {
   email: string;
   role: ERole;
   familyId?: number;
+  templeId?: number;
 }
 
 export interface IResponseAuth {
@@ -21,6 +22,7 @@ export interface IJwtPayload {
   name: string;
   role: ERole;
   fid?: number;
+  tid?: number;
 }
 
 export interface IResponseRefreshToken {

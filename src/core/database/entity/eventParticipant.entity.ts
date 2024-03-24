@@ -31,9 +31,14 @@ export class EventParticipant {
     name: 'bookingStatus',
     type: 'enum',
     enum: EBookingStatus,
+    default: EBookingStatus.BOOKING,
   })
-  @Field(() => EBookingStatus)
+  @Field(() => EBookingStatus, { defaultValue: EBookingStatus.BOOKING })
   bookingStatus: EBookingStatus;
+
+  @Column({ name: 'isDeleted', type: 'boolean', default: false })
+  @Field(() => Boolean)
+  isDeleted: boolean;
 
   @Column({
     name: 'createdAt',
