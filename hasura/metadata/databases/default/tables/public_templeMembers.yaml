@@ -1,0 +1,10 @@
+table:
+  name: templeMembers
+  schema: public
+object_relationships:
+  - name: temple
+    using:
+      foreign_key_constraint_on: templeId
+  - name: user
+    using:
+      foreign_key_constraint_on: userId

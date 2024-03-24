@@ -7,5 +7,9 @@
   "INVALID_PARAM": "Invalid param",
   "FAMILY_NOT_IN_TEMPLE": "Family not in temple",
   "DECEASED_NOT_IN_FAMILY": "Deceased not in family",
-  "TEMPLE_NOT_EXIST": "Temple not exist"
+  "TEMPLE_NOT_EXIST": "Temple not exist",
+  "EVENT_NOT_EXIST" : "Event not exist",
+  "EVENT_NOT_BOOKING_TIME" : "Event not booking time",
+  "EVENT_PARTICIPANT_EXIST" : "Event participant exist"
+
 }

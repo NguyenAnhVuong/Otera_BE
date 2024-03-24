@@ -56,6 +56,14 @@ export class DeathAnniversary {
   @Field(() => EStatus)
   status: EStatus;
 
+  @Column({
+    name: 'enableUpdate',
+    type: 'boolean',
+    default: true,
+  })
+  @Field(() => Boolean)
+  enableUpdate: boolean;
+
   @Column({ name: 'creatorId', type: 'int' })
   @Field(() => Int)
   creatorId: number;
@@ -63,6 +71,15 @@ export class DeathAnniversary {
   @Column({ name: 'note', type: 'varchar', length: 5000, nullable: true })
   @Field(() => String, { nullable: true })
   note: string | null;
+
+  @Column({
+    name: 'rejectReason',
+    type: 'varchar',
+    length: 5000,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  rejectReason: string | null;
 
   @Column({ name: 'isDeleted', type: 'boolean', default: false })
   @Field(() => Boolean)

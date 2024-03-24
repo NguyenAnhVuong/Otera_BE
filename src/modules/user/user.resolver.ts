@@ -1,5 +1,5 @@
-import { GraphQLRoles } from '@core/decorator/graphQLRoles.decorator';
-import { GraphQLUserData } from '@core/decorator/graphQLUser.decorator';
+import { GQLRoles } from '@core/decorator/gqlRoles.decorator';
+import { GQLUserData } from '@core/decorator/gqlUser.decorator';
 import { ERole } from '@core/enum';
 import { IUserData } from '@core/interface/default.interface';
 import { UserService } from '@modules/user/user.service';
@@ -11,8 +11,8 @@ export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
   @Query(() => UserRes, { name: 'getUser' })
-  @GraphQLRoles(Object.values(ERole))
-  getUser(@GraphQLUserData() userData: IUserData) {
+  @GQLRoles(Object.values(ERole))
+  getUser(@GQLUserData() userData: IUserData) {
     return this.userService.getUser(userData);
   }
 }

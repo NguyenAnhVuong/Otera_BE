@@ -14,6 +14,7 @@ import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Review } from './review.entity';
 import { DeathAnniversary } from './deathAnniversary.entity';
 import { User } from './user.entity';
+import { TempleMember } from './templeMember.entity';
 
 registerEnumType(EPriority, {
   name: 'EPriority',
@@ -67,7 +68,7 @@ export class Temple {
   @Field(() => EPriority, { defaultValue: EPriority.MEDIUM })
   priority: EPriority;
 
-  @Column({ name: 'priorityExpired', type: 'date', nullable: true })
+  @Column({ name: 'priorityExpired', type: 'timestamp', nullable: true })
   @Field(() => Date, { nullable: true })
   priorityExpired: Date | null;
 
@@ -75,7 +76,7 @@ export class Temple {
   @Field(() => EPlan, { defaultValue: EPlan.FREE })
   plan: EPlan;
 
-  @Column({ name: 'planExpired', type: 'date', nullable: true })
+  @Column({ name: 'planExpired', type: 'timestamp', nullable: true })
   @Field(() => Date, { nullable: true })
   planExpired: Date | null;
 
@@ -135,4 +136,8 @@ export class Temple {
   )
   @Field(() => [DeathAnniversary])
   deathAnniversaries: DeathAnniversary[];
+
+  @OneToMany(() => TempleMember, (templeMember) => templeMember.temple)
+  @Field(() => [TempleMember])
+  templeMembers: TempleMember[];
 }

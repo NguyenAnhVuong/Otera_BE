@@ -7,5 +7,8 @@
   "INVALID_PARAM": "Thông số không hợp lệ",
   "FAMILY_NOT_IN_TEMPLE": "Gia đình không thuộc đền thờ",
   "DECEASED_NOT_IN_FAMILY": "Người đã mất không thuộc gia đình",
-  "TEMPLE_NOT_EXIST": "Chùa không tồn tại"
+  "TEMPLE_NOT_EXIST": "Chùa không tồn tại",
+  "EVENT_NOT_EXIST": "Sự kiện không tồn tại",
+  "EVENT_NOT_BOOKING_TIME": "Sự kiện không trong thời gian đặt chỗ",
+  "EVENT_PARTICIPANT_EXIST": "Người tham dự đã tồn tại"
 }

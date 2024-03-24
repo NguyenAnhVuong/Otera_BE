@@ -6,6 +6,7 @@ import { Temple } from 'src/core/database/entity/temple.entity';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { ImageModule } from '../image/image.module';
 import { UserModule } from '../user/user.module';
+import { TempleResolver } from './temple.resolver';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { UserModule } from '../user/user.module';
     UserModule,
   ],
   controllers: [TempleController],
-  providers: [TempleService],
+  providers: [TempleService, TempleResolver],
   exports: [TempleService],
 })
 export class TempleModule {}

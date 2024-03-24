@@ -17,6 +17,7 @@ import { ImageService } from './../image/image.service';
 import { VCreateTempleDto } from './dto/create-temple.dto';
 import { VGetTemplesDto } from './dto/get-temples.dto';
 import { ErrorMessage } from '@core/enum';
+import { VSystemGetTemplesDto } from './dto/system-get-temples.input';
 
 @Injectable()
 export class TempleService {
@@ -39,7 +40,7 @@ export class TempleService {
     avatar: Express.Multer.File,
     images?: Express.Multer.File[],
   ): Promise<Temple> {
-    return this.dataSource.transaction(async (manager: EntityManager) => {
+    return await this.dataSource.transaction(async (manager: EntityManager) => {
       const templeRepository = manager.getRepository(Temple);
       const uploadedAvatar = await this.cloudinaryService.uploadImage(avatar);
       const newTemple = await templeRepository.save({
@@ -95,12 +96,36 @@ export class TempleService {
     const { skip, take, keyword, familyId } = query;
     const [items, totalItems] = await this.templeRepository.findAndCount({
       where: {
-        name: ILike(`%${keyword}%`),
+        ...(keyword && { name: ILike(`%${keyword}%`) }),
         ...(familyId && {
           familyTemples: {
             familyId,
           },
         }),
+      },
+      skip,
+      take,
+      order: {
+        priority: 'DESC',
+        createdAt: 'DESC',
+      },
+    });
+
+    return returnPagingData(items, totalItems, query);
+  }
+
+  async systemGetTemples(query: VSystemGetTemplesDto) {
+    const { skip, take, keyword, familyId, priority, status } = query;
+    const [items, totalItems] = await this.templeRepository.findAndCount({
+      where: {
+        ...(keyword && { name: ILike(`%${keyword}%`) }),
+        ...(familyId && {
+          familyTemples: {
+            familyId,
+          },
+        }),
+        ...(priority && { priority }),
+        ...(status && { status }),
       },
       skip,
       take,

@@ -1,28 +1,30 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { JwtAuthGuard } from './core/global/auth/guards/jwt-auth.guard';
-import { RolesGuard } from './core/global/auth/guards/roles.guard';
+import { GQLRolesGuard } from '@core/global/auth/guards/gqlRoles.guard';
 import { ConstanceModule } from '@core/global/constance/constance.module';
 import { I18nCustomModule } from '@core/global/i18nCustom/i18nCustom.module';
 import { HttpExceptionFilter } from '@helper/httpException.filter';
+import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
+import { EventParticipantModule } from '@modules/event-participant/event-participant.module';
+import { EventModule } from '@modules/event/event.module';
+import { TestModule } from '@modules/test/test.module';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { GraphQLModule } from '@nestjs/graphql';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { EConfiguration } from './core/config/configuration.config';
+import { JwtAuthGuard } from './core/global/auth/guards/jwt-auth.guard';
+import { RolesGuard } from './core/global/auth/guards/roles.guard';
 import { ResponseInterceptor } from './core/interceptor';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { DeceasedModule } from './modules/deceased/deceased.module';
 import { FamilyModule } from './modules/family/family.module';
 import { TempleModule } from './modules/temple/temple.module';
 import { UserModule } from './modules/user/user.module';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { TestModule } from '@modules/test/test.module';
-import { GraphQLRolesGuard } from '@core/global/auth/guards/graphQLRoles.guard';
-import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
 
 @Module({
   imports: [
@@ -62,6 +64,8 @@ import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniver
     CloudinaryModule,
     TestModule,
     DeathAnniversaryModule,
+    EventModule,
+    EventParticipantModule,
   ],
   controllers: [AppController],
   providers: [
@@ -80,7 +84,7 @@ import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniver
     },
     {
       provide: APP_GUARD,
-      useClass: GraphQLRolesGuard,
+      useClass: GQLRolesGuard,
     },
     {
       provide: APP_INTERCEPTOR,

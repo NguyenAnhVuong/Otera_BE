@@ -1,8 +1,27 @@
-import { CreateDeathAnniversaryInput } from './create-death-anniversary.input';
-import { InputType, Field, Int, PartialType } from '@nestjs/graphql';
+import { Field, InputType, Int } from '@nestjs/graphql';
+import { Type } from 'class-transformer';
+import { IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 
 @InputType()
-export class UpdateDeathAnniversaryInput extends PartialType(CreateDeathAnniversaryInput) {
+export class UpdateDeathAnniversaryInput {
   @Field(() => Int)
+  @IsNumber()
   id: number;
+
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  desiredStartTime?: Date;
+
+  @IsDate()
+  @Type(() => Date)
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
+  desiredEndTime: Date;
+
+  @IsString()
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  note?: string;
 }

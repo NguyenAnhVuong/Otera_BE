@@ -7,8 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, LessThan, MoreThan, Repository } from 'typeorm';
 import { CreateDeathAnniversaryInput } from './dto/create-death-anniversary.input';
-import { GetDeathAnniversariesInput } from './dto/death-anniversary.input';
-import { UpdateStatusDeathAnniversaryInput } from './dto/update-status-death-anniversary.input';
+import { GetDeathAnniversariesInput } from './dto/get-death-anniversaries.input';
 
 @Injectable()
 export class DeathAnniversaryService {
@@ -50,6 +49,7 @@ export class DeathAnniversaryService {
     const temple = await this.templeService.getTempleById(adminId);
     return await this.deathAnniversaryRepository.find({
       where: {
+        isDeleted: false,
         ...(familyId ? { familyId } : { templeId: temple.id }),
         ...(isEnd && {
           actualEndTime: LessThan(new Date()),
@@ -65,18 +65,20 @@ export class DeathAnniversaryService {
   }
 
   async updateStatusDeathAnniversary(
-    updateStatusDeathAnniversaryInput: UpdateStatusDeathAnniversaryInput,
+    updateStatusDeathAnniversaryInput: DeepPartial<DeathAnniversary>,
   ) {
-    const { id, status, actualStartTime, actualEndTime, linkLiveStream } =
+    const { id, ...newDeathAnniversaryData } =
       updateStatusDeathAnniversaryInput;
     return await this.deathAnniversaryRepository.update(
       { id },
-      {
-        status,
-        linkLiveStream,
-        ...(actualStartTime && { actualStartTime }),
-        ...(actualEndTime && { actualEndTime }),
-      },
+      newDeathAnniversaryData,
+    );
+  }
+
+  async deleteDeathAnniversaryById(id: number) {
+    return await this.deathAnniversaryRepository.update(
+      { id },
+      { isDeleted: true },
     );
   }
 }

@@ -41,3 +41,10 @@ array_relationships:
         table:
           name: reviews
           schema: public
+  - name: templeMembers
+    using:
+      foreign_key_constraint_on:
+        column: templeId
+        table:
+          name: templeMembers
+          schema: public
