@@ -1,9 +1,11 @@
 import { GQLArgsPaging } from '@core/decorator/gqlQueryPaging.decorator';
 import { GQLRoles } from '@core/decorator/gqlRoles.decorator';
 import { GQLUserData } from '@core/decorator/gqlUser.decorator';
+import { IsPublicOrAuth } from '@core/decorator/publicOrAuth.decorator';
 import { ERole } from '@core/enum';
 import { UpdateRes } from '@core/global/entities/updateRes.entity';
 import { IUserData } from '@core/interface/default.interface';
+import { HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { VCreateEventInput } from './dto/create-event.input';
 import { TempleGetEventArgs } from './dto/temple-get-event.args';
@@ -11,7 +13,7 @@ import { VUpdateEventInput } from './dto/update-event.input';
 import { EventRes } from './entity/eventRes.entity';
 import { EventsRes } from './entity/eventsRes.entity';
 import { EventService } from './event.service';
-import { HttpStatus, ParseIntPipe } from '@nestjs/common';
+import { GetEventArgs } from './dto/get-event.args';
 
 @Resolver()
 export class EventResolver {
@@ -26,6 +28,15 @@ export class EventResolver {
     return this.eventService.templeGetEvents(userData, args);
   }
 
+  @IsPublicOrAuth()
+  @Query(() => EventsRes, { name: 'getEvents' })
+  getEvents(
+    @GQLUserData() userData: IUserData,
+    @Args() @GQLArgsPaging() args: GetEventArgs,
+  ) {
+    return this.eventService.getEvents(userData, args);
+  }
+
   @GQLRoles(Object.values(ERole))
   @Query(() => EventRes, { name: 'getEventById' })
   getEventById(
@@ -38,7 +49,6 @@ export class EventResolver {
     )
     id: number,
   ) {
-    console.log('id: ', id);
     return this.eventService.getEventById(id);
   }
 
@@ -53,7 +63,10 @@ export class EventResolver {
 
   @GQLRoles([ERole.TEMPLE_ADMIN, ERole.TEMPLE_MEMBER])
   @Mutation(() => UpdateRes, { name: 'updateEvent' })
-  updateEvent(@Args('updateEventInput') updateEventInput: VUpdateEventInput) {
-    return this.eventService.updateEvent(updateEventInput);
+  updateEvent(
+    @Args('updateEventInput') updateEventInput: VUpdateEventInput,
+    @GQLUserData() userData: IUserData,
+  ) {
+    return this.eventService.updateEvent(updateEventInput, userData);
   }
 }

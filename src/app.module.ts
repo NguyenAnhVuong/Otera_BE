@@ -25,6 +25,7 @@ import { DeceasedModule } from './modules/deceased/deceased.module';
 import { FamilyModule } from './modules/family/family.module';
 import { TempleModule } from './modules/temple/temple.module';
 import { UserModule } from './modules/user/user.module';
+import DatabaseMysqlLogger from '@helper/typeorm.logger';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { UserModule } from './modules/user/user.module';
         autoLoadEntities: true,
         migrations: ['src/migration/**/*.ts'],
         subscribers: ['src/subscriber/**/*.ts'],
+        logger: new DatabaseMysqlLogger(),
       }),
     }),
     I18nCustomModule,
