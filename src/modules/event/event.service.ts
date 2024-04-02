@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import { VCreateEventInput } from './dto/create-event.input';
@@ -9,6 +9,8 @@ import { ImageService } from '@modules/image/image.service';
 import { VUpdateEventInput } from './dto/update-event.input';
 import { TempleGetEventArgs } from './dto/temple-get-event.args';
 import { returnPagingData } from '@helper/utils';
+import { ErrorMessage } from '@core/enum';
+import { GetEventArgs } from './dto/get-event.args';
 
 @Injectable()
 export class EventService {
@@ -22,6 +24,40 @@ export class EventService {
 
     private readonly dataSource: DataSource,
   ) {}
+
+  async getEvents(userData: IUserData, args: GetEventArgs) {
+    const { templeId, upcoming, ended, priority, take, skip } = args;
+
+    const queryBuilder = this.eventRepository
+      .createQueryBuilder('event')
+      .where('event.isDeleted = :isDeleted', { isDeleted: false })
+      .skip(skip)
+      .take(take);
+
+    if (templeId) {
+      queryBuilder.andWhere('event.templeId = :templeId', { templeId });
+    }
+
+    if (upcoming) {
+      queryBuilder.addOrderBy('event.startDateEvent', 'ASC');
+    }
+
+    if (ended) {
+      queryBuilder.addOrderBy('event.endDateEvent', 'DESC');
+    }
+
+    if (priority) {
+      queryBuilder.addOrderBy('event.priority', 'DESC');
+    }
+
+    if (userData) {
+      queryBuilder.addOrderBy(`ABS(event.id - ${userData.tid})`, 'ASC');
+    }
+
+    const [events, count] = await queryBuilder.getManyAndCount();
+
+    return returnPagingData(events, count, args);
+  }
 
   async templeGetEvents(userData: IUserData, args: TempleGetEventArgs) {
     const { tid: templeId } = userData;
@@ -96,19 +132,29 @@ export class EventService {
     const eventRepository = entityManager
       ? entityManager.getRepository(Event)
       : this.eventRepository;
-
     return await eventRepository.findOne({
       where: { id, isDeleted: false },
       relations: ['eventParticipantTypes', 'eventParticipants', 'images'],
     });
   }
 
-  async updateEvent(updateEventInput: VUpdateEventInput) {
+  async updateEvent(updateEventInput: VUpdateEventInput, userData: IUserData) {
     const { id, roles, images, ...updateEventData } = updateEventInput;
 
     return await this.dataSource.transaction(
       async (entityManager: EntityManager) => {
         const eventRepository = entityManager.getRepository(Event);
+
+        const event = await eventRepository.findOne({
+          where: { id, isDeleted: false },
+        });
+
+        if (event.templeId !== userData.tid) {
+          throw new HttpException(
+            ErrorMessage.UNAUTHORIZED,
+            HttpStatus.UNAUTHORIZED,
+          );
+        }
 
         if (roles && roles.length) {
           await this.eventParticipantTypeService.updateParticipantTypeByEventId(

@@ -1,6 +1,10 @@
 table:
   name: events
   schema: public
+object_relationships:
+  - name: user
+    using:
+      foreign_key_constraint_on: creatorId
 array_relationships:
   - name: eventParticipantTypes
     using:

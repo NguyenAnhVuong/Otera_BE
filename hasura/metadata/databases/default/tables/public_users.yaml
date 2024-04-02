@@ -30,6 +30,13 @@ array_relationships:
         table:
           name: deathAnniversaries
           schema: public
+  - name: events
+    using:
+      foreign_key_constraint_on:
+        column: creatorId
+        table:
+          name: events
+          schema: public
   - name: reviews
     using:
       foreign_key_constraint_on:
