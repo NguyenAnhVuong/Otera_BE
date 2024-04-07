@@ -26,28 +26,23 @@ export class EventService {
   ) {}
 
   async getEvents(userData: IUserData, args: GetEventArgs) {
-    const { templeId, upcoming, ended, priority, take, skip } = args;
+    const { templeId, upcoming, take, skip } = args;
 
     const queryBuilder = this.eventRepository
       .createQueryBuilder('event')
       .where('event.isDeleted = :isDeleted', { isDeleted: false })
       .skip(skip)
-      .take(take);
-
+      .take(take)
+      .orderBy('event.priority', 'DESC');
     if (templeId) {
       queryBuilder.andWhere('event.templeId = :templeId', { templeId });
     }
 
     if (upcoming) {
       queryBuilder.addOrderBy('event.startDateEvent', 'ASC');
-    }
-
-    if (ended) {
-      queryBuilder.addOrderBy('event.endDateEvent', 'DESC');
-    }
-
-    if (priority) {
-      queryBuilder.addOrderBy('event.priority', 'DESC');
+      queryBuilder.andWhere('event.startDateEvent > :now', {
+        now: new Date(),
+      });
     }
 
     if (userData) {
@@ -63,16 +58,33 @@ export class EventService {
     const { tid: templeId } = userData;
     const { upcoming, ended, priority, take, skip } = args;
 
-    const [events, count] = await this.eventRepository.findAndCount({
-      where: { templeId, isDeleted: false },
-      take,
-      skip,
-      order: {
-        ...(upcoming && { startDateEvent: 'ASC' }),
-        ...(ended && { endDateEvent: 'DESC' }),
-        ...(priority && { priority: 'DESC' }),
-      },
-    });
+    const queryBuilder = this.eventRepository
+      .createQueryBuilder('event')
+      .where('event.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('event.templeId = :templeId', { templeId })
+      .skip(skip)
+      .take(take)
+      .orderBy('event.createdAt', 'DESC');
+    if (upcoming) {
+      queryBuilder.andWhere('event.startDateEvent > :now', {
+        now: new Date(),
+      });
+      queryBuilder.addOrderBy('event.startDateEvent', 'ASC');
+    }
+
+    if (ended) {
+      queryBuilder.andWhere('event.endDateEvent < :now', {
+        now: new Date(),
+      });
+      queryBuilder.addOrderBy('event.endDateEvent', 'ASC');
+    }
+
+    if (priority) {
+      queryBuilder.addOrderBy('event.priority', 'DESC');
+    }
+
+    const [events, count] = await queryBuilder.getManyAndCount();
+
     return returnPagingData(events, count, args);
   }
 
