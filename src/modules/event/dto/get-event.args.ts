@@ -14,15 +14,4 @@ export class GetEventArgs extends PaginationQuery {
   @IsOptional()
   @ValidateIf((o) => !o.ended)
   upcoming?: boolean;
-
-  @Field(() => Boolean, { nullable: true })
-  @IsBoolean()
-  @IsOptional()
-  @ValidateIf((o) => !o.upcoming)
-  ended?: boolean;
-
-  @Field(() => Boolean, { nullable: true })
-  @IsBoolean()
-  @IsOptional()
-  priority?: boolean;
 }

@@ -385,7 +385,7 @@ type Query {
   test123(id: Int!): Test2!
   getDeathAnniversaries(getDeathAnniversariesInput: GetDeathAnniversariesInput!): DeathAnniversariesRes!
   templeGetEvents(page: Int, take: Int, skip: Int, upcoming: Boolean, ended: Boolean, priority: Boolean): EventsRes!
-  getEvents(page: Int, take: Int, skip: Int, templeId: Int, upcoming: Boolean, ended: Boolean, priority: Boolean): EventsRes!
+  getEvents(page: Int, take: Int, skip: Int, templeId: Int, upcoming: Boolean): EventsRes!
   getEventById(id: Int!): EventRes!
 }
 
