@@ -331,12 +331,40 @@ type UpdateRes {
   data: AffectedResult
 }
 
+type EventDetail {
+  id: Int!
+  templeId: Int
+  creatorId: Int!
+  name: String!
+  avatar: String!
+  description: String
+  startDateEvent: DateTime!
+  endDateEvent: DateTime!
+  startDateBooking: DateTime!
+  endDateBooking: DateTime!
+  address: String!
+  phone: String
+  email: String
+  priority: EPriority!
+  priorityExpired: DateTime
+  isDeleted: Boolean!
+  maxParticipant: Int
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  eventParticipants: [EventParticipant!]!
+  images: [Image!]!
+  eventParticipantTypes: [EventParticipantType!]!
+  user: User!
+  currentParticipant: Float!
+  isBooked: Boolean!
+}
+
 type EventRes {
   statusCode: Int!
   errorMessage: String
   errorCode: String
   timestamp: String!
-  data: Event
+  data: EventDetail
 }
 
 type EventsPagingData {
@@ -377,6 +405,10 @@ type Test2 {
   data: Test!
 }
 
+type IsBookedEvent {
+  isBooked: Boolean!
+}
+
 type Query {
   getUser: UserRes!
   systemGetTemples(page: Int, take: Int, skip: Int, keyword: String, familyId: Float, priority: EPriority, status: EStatus): TemplesRes!
@@ -385,7 +417,7 @@ type Query {
   test123(id: Int!): Test2!
   getDeathAnniversaries(getDeathAnniversariesInput: GetDeathAnniversariesInput!): DeathAnniversariesRes!
   templeGetEvents(page: Int, take: Int, skip: Int, upcoming: Boolean, ended: Boolean, priority: Boolean): EventsRes!
-  getEvents(page: Int, take: Int, skip: Int, templeId: Int, upcoming: Boolean): EventsRes!
+  getEvents(page: Int, take: Int, skip: Int, templeId: Int): EventsRes!
   getEventById(id: Int!): EventRes!
 }
 

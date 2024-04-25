@@ -3,9 +3,11 @@ import { GQLUserData } from '@core/decorator/gqlUser.decorator';
 import { ERole } from '@core/enum';
 import { CreateRes } from '@core/global/entities/createRes.entity';
 import { IUserData } from '@core/interface/default.interface';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver, Int } from '@nestjs/graphql';
 import { VBookingEventInput } from './dto/booking-event.entity';
 import { EventParticipantService } from './event-participant.service';
+import { IsBookedEventRes } from './entity/isBookedEvent.entity';
+import { HttpStatus, ParseIntPipe } from '@nestjs/common';
 
 @Resolver()
 export class EventParticipantResolver {

@@ -8,10 +8,4 @@ export class GetEventArgs extends PaginationQuery {
   @Field(() => Int, { nullable: true })
   @IsOptional()
   templeId?: number;
-
-  @Field(() => Boolean, { nullable: true })
-  @IsBoolean()
-  @IsOptional()
-  @ValidateIf((o) => !o.ended)
-  upcoming?: boolean;
 }
