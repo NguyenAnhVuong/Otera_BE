@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import { VCreateEventInput } from './dto/create-event.input';
@@ -9,8 +15,9 @@ import { ImageService } from '@modules/image/image.service';
 import { VUpdateEventInput } from './dto/update-event.input';
 import { TempleGetEventArgs } from './dto/temple-get-event.args';
 import { returnPagingData } from '@helper/utils';
-import { ErrorMessage } from '@core/enum';
+import { ERole, ErrorMessage } from '@core/enum';
 import { GetEventArgs } from './dto/get-event.args';
+import { EventParticipantService } from '@modules/event-participant/event-participant.service';
 
 @Injectable()
 export class EventService {
@@ -22,35 +29,48 @@ export class EventService {
 
     private readonly imageService: ImageService,
 
+    @Inject(forwardRef(() => EventParticipantService))
+    private readonly eventParticipantService: EventParticipantService,
+
     private readonly dataSource: DataSource,
   ) {}
 
   async getEvents(userData: IUserData, args: GetEventArgs) {
-    const { templeId, upcoming, take, skip } = args;
+    const { templeId, take, skip } = args;
 
     const queryBuilder = this.eventRepository
       .createQueryBuilder('event')
       .where('event.isDeleted = :isDeleted', { isDeleted: false })
       .skip(skip)
       .take(take)
-      .orderBy('event.priority', 'DESC');
+      .orderBy('event.priority', 'DESC')
+      .addOrderBy('event.startDateEvent', 'ASC');
+
     if (templeId) {
       queryBuilder.andWhere('event.templeId = :templeId', { templeId });
     }
 
-    if (upcoming) {
-      queryBuilder.addOrderBy('event.startDateEvent', 'ASC');
-      queryBuilder.andWhere('event.startDateEvent > :now', {
-        now: new Date(),
-      });
-    }
-
     if (userData) {
-      queryBuilder.addOrderBy(`ABS(event.id - ${userData.tid})`, 'ASC');
+      queryBuilder
+        .leftJoin('event.eventParticipantTypes', 'eventParticipantTypes')
+        .andWhere('eventParticipantTypes.isDeleted = :isDeleted', {
+          isDeleted: false,
+        })
+        .andWhere(
+          '(eventParticipantTypes.role = :publicUserRole OR ' +
+            '(eventParticipantTypes.role IN (:...familyRoles) AND event.templeId IN (:...userTempleIDs)) OR ' +
+            '(eventParticipantTypes.role = :role AND eventParticipantTypes.role NOT IN (:...familyRoles)))',
+          {
+            role: userData.role,
+            publicUserRole: ERole.PUBLIC_USER,
+            familyRoles: [ERole.FAMILY_MEMBER, ERole.FAMILY_ADMIN],
+            userTempleIDs: userData.tid,
+          },
+        );
     }
 
     const [events, count] = await queryBuilder.getManyAndCount();
-
+    console.log('events: ', events[0].eventParticipantTypes);
     return returnPagingData(events, count, args);
   }
 
@@ -140,14 +160,39 @@ export class EventService {
     });
   }
 
-  async getEventById(id: number, entityManager?: EntityManager) {
-    const eventRepository = entityManager
-      ? entityManager.getRepository(Event)
-      : this.eventRepository;
-    return await eventRepository.findOne({
+  async getEventById(id: number) {
+    return await this.eventRepository.findOne({
       where: { id, isDeleted: false },
-      relations: ['eventParticipantTypes', 'eventParticipants', 'images'],
     });
+  }
+
+  async getEventDetailById(id: number, userData?: IUserData) {
+    const currentParticipant =
+      await this.eventParticipantService.getCurrentParticipantsByEventId(id);
+
+    const eventData = await this.eventRepository
+      .createQueryBuilder('event')
+      .where('event.id = :id', { id })
+      .andWhere('event.isDeleted = :isDeleted', { isDeleted: false })
+      .leftJoinAndSelect('event.eventParticipantTypes', 'eventParticipantTypes')
+      .leftJoinAndSelect(
+        'event.eventParticipants',
+        'eventParticipants',
+        'eventParticipants.isDeleted = false AND eventParticipants.userId = :userId',
+        { userId: userData.id },
+      )
+      .leftJoinAndSelect('event.images', 'images')
+      .getOne();
+
+    return {
+      ...eventData,
+      currentParticipant,
+      isBooked:
+        eventData?.eventParticipants &&
+        eventData.eventParticipants.some(
+          (participant) => participant.userId === userData.id,
+        ),
+    };
   }
 
   async updateEvent(updateEventInput: VUpdateEventInput, userData: IUserData) {

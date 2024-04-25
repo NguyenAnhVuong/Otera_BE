@@ -3,17 +3,18 @@ import { GQLRoles } from '@core/decorator/gqlRoles.decorator';
 import { GQLUserData } from '@core/decorator/gqlUser.decorator';
 import { IsPublicOrAuth } from '@core/decorator/publicOrAuth.decorator';
 import { ERole } from '@core/enum';
+import { CreateRes } from '@core/global/entities/createRes.entity';
 import { UpdateRes } from '@core/global/entities/updateRes.entity';
 import { IUserData } from '@core/interface/default.interface';
 import { HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { VCreateEventInput } from './dto/create-event.input';
+import { GetEventArgs } from './dto/get-event.args';
 import { TempleGetEventArgs } from './dto/temple-get-event.args';
 import { VUpdateEventInput } from './dto/update-event.input';
 import { EventRes } from './entity/eventRes.entity';
 import { EventsRes } from './entity/eventsRes.entity';
 import { EventService } from './event.service';
-import { GetEventArgs } from './dto/get-event.args';
 
 @Resolver()
 export class EventResolver {
@@ -37,9 +38,10 @@ export class EventResolver {
     return this.eventService.getEvents(userData, args);
   }
 
-  @GQLRoles(Object.values(ERole))
+  @IsPublicOrAuth()
   @Query(() => EventRes, { name: 'getEventById' })
   getEventById(
+    @GQLUserData() userData: IUserData,
     @Args(
       'id',
       { type: () => Int },
@@ -49,7 +51,7 @@ export class EventResolver {
     )
     id: number,
   ) {
-    return this.eventService.getEventById(id);
+    return this.eventService.getEventDetailById(id, userData);
   }
 
   @GQLRoles([ERole.TEMPLE_ADMIN, ERole.TEMPLE_MEMBER])

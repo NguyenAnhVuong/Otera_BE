@@ -81,7 +81,13 @@ export class UserService {
       where: {
         email: userLogin.email,
       },
-      relations: ['userDetail', 'temple', 'templeMember'],
+      relations: [
+        'userDetail',
+        'temple',
+        'templeMember',
+        'family',
+        'family.familyTemples',
+      ],
     });
 
     if (!user) {
@@ -100,14 +106,18 @@ export class UserService {
       );
     }
 
-    let templeId = null;
+    let templeIds = null;
 
     if (user.templeMember) {
-      templeId = user.templeMember.templeId;
+      templeIds = [user.templeMember.templeId];
     }
 
     if (user.temple) {
-      templeId = user.temple.id;
+      templeIds = [user.temple.id];
+    }
+
+    if (user.family && user.family.familyTemples.length > 0) {
+      templeIds = user.family.familyTemples.map((temple) => temple.templeId);
     }
 
     const authUserData: IResponseAuthUser = {
@@ -117,7 +127,7 @@ export class UserService {
       name: user.userDetail.name,
       role: user.role,
       familyId: user.familyId,
-      templeId,
+      templeIds,
     };
 
     return await this.returnResponseAuthUser(authUserData, response);
@@ -138,7 +148,13 @@ export class UserService {
       where: {
         refreshToken: refreshToken,
       },
-      relations: ['userDetail', 'temple'],
+      relations: [
+        'userDetail',
+        'temple',
+        'templeMember',
+        'family',
+        'family.familyTemples',
+      ],
     });
 
     if (!user) {
@@ -155,7 +171,9 @@ export class UserService {
       name: user.userDetail.name,
       role: user.role,
       familyId: user.familyId,
-      templeId: user.temple ? user.temple.id : null,
+      templeIds: user.temple
+        ? [user.temple.id]
+        : user.family.familyTemples.map((temple) => temple.templeId),
     };
 
     const data = await this.returnResponseAuthUser(authUserData, response);
@@ -176,7 +194,7 @@ export class UserService {
       name: authUserData.name,
       role: authUserData.role,
       fid: authUserData.familyId,
-      tid: authUserData.templeId,
+      tid: authUserData.templeIds,
     };
 
     const refreshToken = await this.jwtService.signAsync(payload, {
