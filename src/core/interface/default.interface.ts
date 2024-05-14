@@ -4,7 +4,7 @@ export interface IUserData {
   name: string;
   role: string;
   fid?: number;
-  tid?: number;
+  tid?: number[];
   [key: string]: any;
 }
 

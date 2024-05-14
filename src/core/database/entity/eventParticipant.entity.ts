@@ -8,11 +8,12 @@ import {
 } from 'typeorm';
 import { Event } from './event.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { User } from './user.entity';
 
 registerEnumType(EBookingStatus, {
   name: 'EBookingStatus',
 });
-@Entity('eventPaticipants')
+@Entity('eventParticipants')
 @ObjectType()
 export class EventParticipant {
   @PrimaryGeneratedColumn()
@@ -36,9 +37,25 @@ export class EventParticipant {
   @Field(() => EBookingStatus, { defaultValue: EBookingStatus.BOOKING })
   bookingStatus: EBookingStatus;
 
+  @Column({ name: 'code', type: 'varchar', length: 10, nullable: true })
+  @Field(() => String, { nullable: true })
+  code: string;
+
+  @Column({ name: 'rejectReason', type: 'text', nullable: true })
+  @Field(() => String, { nullable: true })
+  rejectReason: string;
+
   @Column({ name: 'isDeleted', type: 'boolean', default: false })
   @Field(() => Boolean)
   isDeleted: boolean;
+
+  @Column({ name: 'approverId', type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
+  approverId: number;
+
+  @Column({ name: 'checkInAt', type: 'timestamp', nullable: true })
+  @Field(() => Date, { nullable: true })
+  checkInAt: Date;
 
   @Column({
     name: 'createdAt',
@@ -60,4 +77,14 @@ export class EventParticipant {
   @JoinColumn({ name: 'eventId' })
   @Field(() => Event)
   event: Event;
+
+  @ManyToOne(() => User, (user) => user.eventParticipants)
+  @JoinColumn({ name: 'userId' })
+  @Field(() => User)
+  user: User;
+
+  @ManyToOne(() => User, (user) => user.eventParticipants)
+  @JoinColumn({ name: 'approverId' })
+  @Field(() => User, { nullable: true })
+  approver: User;
 }

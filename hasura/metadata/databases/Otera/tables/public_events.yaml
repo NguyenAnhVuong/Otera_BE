@@ -13,12 +13,12 @@ array_relationships:
         table:
           name: eventParticipantTypes
           schema: public
-  - name: eventPaticipants
+  - name: eventParticipants
     using:
       foreign_key_constraint_on:
         column: eventId
         table:
-          name: eventPaticipants
+          name: eventParticipants
           schema: public
   - name: images
     using:

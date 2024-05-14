@@ -1,6 +1,6 @@
 import { EPriority, EStatus } from '@core/enum';
 import { PaginationQuery } from '@core/global/entities/paginationQuery.entity';
-import { Field, ArgsType, Int } from '@nestjs/graphql';
+import { ArgsType, Field } from '@nestjs/graphql';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 @ArgsType()

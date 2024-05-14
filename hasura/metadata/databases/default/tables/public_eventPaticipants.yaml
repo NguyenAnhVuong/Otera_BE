@@ -1,7 +1,0 @@
-table:
-  name: eventPaticipants
-  schema: public
-object_relationships:
-  - name: event
-    using:
-      foreign_key_constraint_on: eventId

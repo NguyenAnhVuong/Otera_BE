@@ -10,12 +10,13 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { DeathAnniversary } from './deathAnniversary.entity';
+import { Event } from './event.entity';
+import { EventParticipant } from './eventParticipant.entity';
 import { Family } from './family.entity';
 import { Review } from './review.entity';
 import { Temple } from './temple.entity';
 import { TempleMember } from './templeMember.entity';
 import { UserDetail } from './userDetail.entity';
-import { Event } from './event.entity';
 
 registerEnumType(ERole, {
   name: 'ERole',
@@ -31,7 +32,7 @@ export class User {
   @Field(() => String)
   email: string;
 
-  @Column({ name: 'password', type: 'varchar', length: 100 })
+  @Column({ name: 'password', type: 'varchar', length: 100, select: false })
   password: string;
 
   @Column({
@@ -42,10 +43,6 @@ export class User {
   })
   @Field(() => ERole, { defaultValue: ERole.PUBLIC_USER })
   role: ERole;
-
-  @Column({ name: 'refreshToken', type: 'text', nullable: true })
-  @Field(() => String, { nullable: true })
-  refreshToken: string | null;
 
   @Column({ name: 'familyId', type: 'int', nullable: true })
   @Field(() => Int, { nullable: true })
@@ -98,4 +95,7 @@ export class User {
 
   @OneToMany(() => Event, (event) => event.user)
   events: Event[];
+
+  @OneToMany(() => EventParticipant, (event) => event.user)
+  eventParticipants: EventParticipant[];
 }

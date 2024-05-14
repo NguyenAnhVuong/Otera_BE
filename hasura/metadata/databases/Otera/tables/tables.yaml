@@ -1,7 +1,7 @@
 - "!include public_deathAnniversaries.yaml"
 - "!include public_deceaseds.yaml"
 - "!include public_eventParticipantTypes.yaml"
-- "!include public_eventPaticipants.yaml"
+- "!include public_eventParticipants.yaml"
 - "!include public_events.yaml"
 - "!include public_families.yaml"
 - "!include public_familyTemples.yaml"
