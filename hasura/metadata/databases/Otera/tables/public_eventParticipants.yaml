@@ -1,0 +1,13 @@
+table:
+  name: eventParticipants
+  schema: public
+object_relationships:
+  - name: event
+    using:
+      foreign_key_constraint_on: eventId
+  - name: user
+    using:
+      foreign_key_constraint_on: approverId
+  - name: userByUserid
+    using:
+      foreign_key_constraint_on: userId

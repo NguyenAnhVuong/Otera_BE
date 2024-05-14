@@ -13,6 +13,6 @@ export class UserResolver {
   @Query(() => UserRes, { name: 'getUser' })
   @GQLRoles(Object.values(ERole))
   getUser(@GQLUserData() userData: IUserData) {
-    return this.userService.getUser(userData);
+    return this.userService.getUser(userData.id);
   }
 }

@@ -3,7 +3,6 @@ import { GQLRoles } from '@core/decorator/gqlRoles.decorator';
 import { GQLUserData } from '@core/decorator/gqlUser.decorator';
 import { IsPublicOrAuth } from '@core/decorator/publicOrAuth.decorator';
 import { ERole } from '@core/enum';
-import { CreateRes } from '@core/global/entities/createRes.entity';
 import { UpdateRes } from '@core/global/entities/updateRes.entity';
 import { IUserData } from '@core/interface/default.interface';
 import { HttpStatus, ParseIntPipe } from '@nestjs/common';
@@ -15,6 +14,8 @@ import { VUpdateEventInput } from './dto/update-event.input';
 import { EventRes } from './entity/eventRes.entity';
 import { EventsRes } from './entity/eventsRes.entity';
 import { EventService } from './event.service';
+import { GetBookingEventsArgs } from './dto/get-booking-events.args';
+import { BookingEventsRes } from './entity/bookingEvensRes.entity';
 
 @Resolver()
 export class EventResolver {
@@ -36,6 +37,15 @@ export class EventResolver {
     @Args() @GQLArgsPaging() args: GetEventArgs,
   ) {
     return this.eventService.getEvents(userData, args);
+  }
+
+  @GQLRoles(Object.values(ERole))
+  @Query(() => BookingEventsRes, { name: 'getBookingEvents' })
+  getBookingEvents(
+    @GQLUserData() userData: IUserData,
+    @Args() @GQLArgsPaging() args: GetBookingEventsArgs,
+  ) {
+    return this.eventService.getBookingEvents(userData, args);
   }
 
   @IsPublicOrAuth()

@@ -44,6 +44,12 @@ export enum EPlan {
 
 export enum EBookingStatus {
   BOOKING = 'BOOKING',
+  REJECTED = 'REJECTED',
   APPROVED = 'APPROVED',
   CANCEL = 'CANCEL',
+}
+
+export enum ESortOrder {
+  ASC = 'ASC',
+  DESC = 'DESC',
 }

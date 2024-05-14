@@ -24,6 +24,10 @@ export class FamilyTemple {
   @Field(() => Int, { nullable: true })
   templeId: number | null;
 
+  @Column({ name: 'isDeleted', type: 'boolean', default: false })
+  @Field(() => Boolean, { defaultValue: false })
+  isDeleted: boolean;
+
   @Column({
     name: 'createdAt',
     type: 'timestamp',

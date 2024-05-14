@@ -76,9 +76,8 @@ export class VCreateEventInput {
   email: string;
 
   @IsNumber()
-  @IsNotEmpty()
-  @Field(() => Number)
-  maxParticipant: number;
+  @Field(() => Number, { nullable: true })
+  maxParticipant?: number;
 
   @IsNotEmpty()
   @IsArray()

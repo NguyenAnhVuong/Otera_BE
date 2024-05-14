@@ -10,6 +10,8 @@
   "TEMPLE_NOT_EXIST": "Temple not exist",
   "EVENT_NOT_EXIST" : "Event not exist",
   "EVENT_NOT_BOOKING_TIME" : "Event not booking time",
-  "EVENT_PARTICIPANT_EXIST" : "Event participant exist"
-
+  "EVENT_PARTICIPANT_EXIST" : "Event participant exist",
+  "EVENT_PARTICIPANT_NOT_EXIST" : "Event participant not exist",
+  "EVENT_IS_ENDED": "Event is ended",
+  "BOOKING_IS_ENDED": "Booking is ended"
 }

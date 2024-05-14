@@ -1,6 +1,6 @@
 import { PaginationQuery } from '@core/global/entities/paginationQuery.entity';
 import { ArgsType, Field, Int } from '@nestjs/graphql';
-import { IsBoolean, IsNumber, IsOptional, ValidateIf } from 'class-validator';
+import { IsNumber, IsOptional } from 'class-validator';
 
 @ArgsType()
 export class GetEventArgs extends PaginationQuery {

@@ -15,9 +15,11 @@ import { ImageService } from '@modules/image/image.service';
 import { VUpdateEventInput } from './dto/update-event.input';
 import { TempleGetEventArgs } from './dto/temple-get-event.args';
 import { returnPagingData } from '@helper/utils';
-import { ERole, ErrorMessage } from '@core/enum';
+import { EBookingStatus, ERole, ErrorMessage } from '@core/enum';
 import { GetEventArgs } from './dto/get-event.args';
 import { EventParticipantService } from '@modules/event-participant/event-participant.service';
+import { GetBookingEventsArgs } from './dto/get-booking-events.args';
+import { EventParticipant } from '@core/database/entity/eventParticipant.entity';
 
 @Injectable()
 export class EventService {
@@ -45,11 +47,11 @@ export class EventService {
       .take(take)
       .orderBy('event.priority', 'DESC')
       .addOrderBy('event.startDateEvent', 'ASC');
-
+    // TODO sort near by today
     if (templeId) {
       queryBuilder.andWhere('event.templeId = :templeId', { templeId });
     }
-
+    console.log('userData.tid: ', userData.tid);
     if (userData) {
       queryBuilder
         .leftJoin('event.eventParticipantTypes', 'eventParticipantTypes')
@@ -58,7 +60,9 @@ export class EventService {
         })
         .andWhere(
           '(eventParticipantTypes.role = :publicUserRole OR ' +
-            '(eventParticipantTypes.role IN (:...familyRoles) AND event.templeId IN (:...userTempleIDs)) OR ' +
+            (userData.tid
+              ? '(eventParticipantTypes.role IN (:...familyRoles) AND event.templeId IN (:...userTempleIDs)) OR '
+              : 'eventParticipantTypes.role IN (:...familyRoles) OR ') +
             '(eventParticipantTypes.role = :role AND eventParticipantTypes.role NOT IN (:...familyRoles)))',
           {
             role: userData.role,
@@ -70,37 +74,140 @@ export class EventService {
     }
 
     const [events, count] = await queryBuilder.getManyAndCount();
-    console.log('events: ', events[0].eventParticipantTypes);
+
     return returnPagingData(events, count, args);
   }
 
   async templeGetEvents(userData: IUserData, args: TempleGetEventArgs) {
     const { tid: templeId } = userData;
-    const { upcoming, ended, priority, take, skip } = args;
-
+    const { take, skip, name, upcoming, onGoing, ended, orderBy } = args;
     const queryBuilder = this.eventRepository
       .createQueryBuilder('event')
       .where('event.isDeleted = :isDeleted', { isDeleted: false })
-      .andWhere('event.templeId = :templeId', { templeId })
+      .andWhere('event.templeId = :templeId', { templeId: templeId[0] })
+      .leftJoinAndSelect(
+        'event.eventParticipantTypes',
+        'eventParticipantTypes',
+        'eventParticipantTypes.isDeleted = false',
+      )
+      .loadRelationCountAndMap(
+        'eventParticipants.currentParticipant',
+        'event.eventParticipants',
+        'currentParticipant',
+        (qb) =>
+          qb.where(
+            'currentParticipant.isDeleted = false AND currentParticipant.bookingStatus = :approveStatus',
+            { approveStatus: EBookingStatus.APPROVED },
+          ),
+      )
+      .loadRelationCountAndMap(
+        'eventParticipants.bookingParticipant',
+        'event.eventParticipants',
+        'bookingParticipant',
+        (qb) =>
+          qb.andWhere(
+            'bookingParticipant.isDeleted = false AND bookingParticipant.bookingStatus = :bookingStatus',
+            { bookingStatus: EBookingStatus.BOOKING },
+          ),
+      )
+      .loadRelationCountAndMap(
+        'eventParticipants.checkInParticipant',
+        'event.eventParticipants',
+        'checkInParticipant',
+        (qb) =>
+          qb.andWhere(
+            "checkInParticipant.isDeleted = false AND checkInParticipant.bookingStatus = 'APPROVED' AND checkInParticipant.checkInAt IS NOT NULL",
+          ),
+      )
       .skip(skip)
-      .take(take)
-      .orderBy('event.createdAt', 'DESC');
+      .take(take);
+
+    if (name) {
+      queryBuilder.andWhere('event.name LIKE :name', { name: `%${name}%` });
+    }
+
     if (upcoming) {
       queryBuilder.andWhere('event.startDateEvent > :now', {
         now: new Date(),
       });
       queryBuilder.addOrderBy('event.startDateEvent', 'ASC');
-    }
-
-    if (ended) {
+    } else if (onGoing) {
+      queryBuilder.andWhere('event.startDateEvent <= :now', {
+        now: new Date(),
+      });
+      queryBuilder.andWhere('event.endDateEvent >= :now', {
+        now: new Date(),
+      });
+      queryBuilder.addOrderBy('event.startDateEvent', 'DESC');
+    } else if (ended) {
       queryBuilder.andWhere('event.endDateEvent < :now', {
         now: new Date(),
       });
-      queryBuilder.addOrderBy('event.endDateEvent', 'ASC');
+      queryBuilder.addOrderBy('event.endDateEvent', 'DESC');
+    } else if (!(orderBy && orderBy.length)) {
+      queryBuilder.addOrderBy('event.createdAt', 'DESC');
+      // TODO add priority
+      queryBuilder.addOrderBy('event.priority', 'DESC');
     }
 
-    if (priority) {
-      queryBuilder.addOrderBy('event.priority', 'DESC');
+    if (orderBy && orderBy.length) {
+      orderBy.forEach((order) => {
+        if (order.column === 'bookingParticipant') {
+          queryBuilder.addSelect((subQuery) => {
+            return subQuery
+              .select(
+                'COUNT(eventParticipantCount.id)',
+                'bookingParticipantSortable',
+              )
+              .from(EventParticipant, 'eventParticipantCount')
+              .where(
+                "eventParticipantCount.event = event.id AND eventParticipantCount.bookingStatus = 'BOOKING' AND eventParticipantCount.isDeleted = false",
+              );
+            // Use lower case in Postgres.
+            // Postgres folds identifiers to lowercase, unless you double-quote your identifiers.
+            // To make Postgres operations easier, use lower_snake
+          }, 'booking_participant_sortable');
+          queryBuilder.addOrderBy(
+            'booking_participant_sortable',
+            order.sortOrder,
+          );
+        } else if (order.column === 'currentParticipant') {
+          queryBuilder.addSelect((subQuery) => {
+            return subQuery
+              .select(
+                'COUNT(eventParticipantCount.id)',
+                'currentParticipantSortable',
+              )
+              .from(EventParticipant, 'eventParticipantCount')
+              .where(
+                "eventParticipantCount.event = event.id AND eventParticipantCount.bookingStatus = 'APPROVED' AND eventParticipantCount.isDeleted = false",
+              );
+          }, 'current_participant_sortable');
+          queryBuilder.addOrderBy(
+            'current_participant_sortable',
+            order.sortOrder,
+          );
+        } else if (order.column === 'checkInParticipant') {
+          queryBuilder.addSelect((subQuery) => {
+            return subQuery
+              .select(
+                'COUNT(eventParticipantCount.id)',
+                'checkInParticipantSortable',
+              )
+              .from(EventParticipant, 'eventParticipantCount')
+              .where(
+                "eventParticipantCount.event = event.id AND eventParticipantCount.bookingStatus = 'APPROVED' AND eventParticipantCount.isDeleted = false AND eventParticipantCount.checkInAt IS NOT NULL",
+              );
+          }, 'check_in_participant_sortable');
+          queryBuilder.addOrderBy(
+            'check_in_participant_sortable',
+            order.sortOrder,
+          );
+        } else {
+          // order by not add "" to alias, so use snake_case instead of camelCase
+          queryBuilder.addOrderBy(`event.${order.column}`, order.sortOrder);
+        }
+      });
     }
 
     const [events, count] = await queryBuilder.getManyAndCount();
@@ -108,8 +215,51 @@ export class EventService {
     return returnPagingData(events, count, args);
   }
 
+  async getBookingEvents(userData: IUserData, args: GetBookingEventsArgs) {
+    const { take, skip, bookingStatus, name, address, orderBy } = args;
+
+    const query = this.eventRepository
+      .createQueryBuilder('event')
+      .where('event.isDeleted = :isDeleted', { isDeleted: false })
+      .andWhere('eventParticipants.userId = :userId', { userId: userData.id })
+      .andWhere('eventParticipants.isDeleted = :isDeleted', {
+        isDeleted: false,
+      })
+      .leftJoinAndSelect('event.eventParticipants', 'eventParticipants')
+      .leftJoinAndSelect('eventParticipants.approver', 'approver')
+      .leftJoinAndSelect('approver.userDetail', 'approverDetail')
+      .skip(skip)
+      .take(take);
+
+    if (bookingStatus) {
+      query.andWhere('eventParticipants.bookingStatus = :bookingStatus', {
+        bookingStatus,
+      });
+    }
+
+    if (name) {
+      query.andWhere('event.name LIKE :name', { name: `%${name}%` });
+    }
+
+    if (address) {
+      query.andWhere('event.address LIKE :address', {
+        address: `%${address}%`,
+      });
+    }
+
+    if (orderBy && orderBy.length) {
+      orderBy.forEach((order) => {
+        query.addOrderBy(`event.${order.column}`, order.sortOrder);
+      });
+    }
+
+    const [data, count] = await query.getManyAndCount();
+
+    return returnPagingData(data, count, args);
+  }
+
   async createEvent(userData: IUserData, createEventInput: VCreateEventInput) {
-    const { id: userId, tid: templeId } = userData;
+    const { id: userId, tid: templeIds } = userData;
     const { roles, images } = createEventInput;
 
     const newEvent: DeepPartial<Event> = {
@@ -124,7 +274,7 @@ export class EventService {
       email: createEventInput.email,
       maxParticipant: createEventInput.maxParticipant,
       creatorId: userId,
-      templeId,
+      templeId: templeIds[0],
       avatar: createEventInput.avatar,
     };
 
@@ -206,7 +356,7 @@ export class EventService {
           where: { id, isDeleted: false },
         });
 
-        if (event.templeId !== userData.tid) {
+        if (event.templeId !== userData.tid[0]) {
           throw new HttpException(
             ErrorMessage.UNAUTHORIZED,
             HttpStatus.UNAUTHORIZED,

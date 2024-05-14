@@ -1,0 +1,1 @@
+export const EVENT_PARTICIPANT_CODE_LENGTH = 6;

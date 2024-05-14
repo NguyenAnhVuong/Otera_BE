@@ -66,7 +66,6 @@ export class UserService {
           userDetailId: newUserDetail.id,
           ...userRegister,
         });
-        delete newUser.password;
 
         return newUser;
       },
@@ -77,18 +76,16 @@ export class UserService {
     userLogin: VUserLoginDto,
     response: Response,
   ): Promise<IResponseAuth> {
-    const user = await this.userRepository.findOne({
-      where: {
-        email: userLogin.email,
-      },
-      relations: [
-        'userDetail',
-        'temple',
-        'templeMember',
-        'family',
-        'family.familyTemples',
-      ],
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email: userLogin.email })
+      .leftJoinAndSelect('user.userDetail', 'userDetail')
+      .leftJoinAndSelect('user.temple', 'temple')
+      .leftJoinAndSelect('user.templeMember', 'templeMember')
+      .leftJoinAndSelect('user.family', 'family')
+      .leftJoinAndSelect('family.familyTemples', 'familyTemples')
+      .getOne();
 
     if (!user) {
       throw new HttpException(
@@ -144,9 +141,13 @@ export class UserService {
       );
     }
 
+    const payload = (await this.jwtService.verifyAsync(
+      refreshToken,
+    )) as IJwtPayload;
+
     const user = await this.userRepository.findOne({
       where: {
-        refreshToken: refreshToken,
+        id: payload.id,
       },
       relations: [
         'userDetail',
@@ -203,7 +204,6 @@ export class UserService {
       ),
     });
 
-    await this.userRepository.update(authUserData.id, { refreshToken });
     response.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'lax',
@@ -212,6 +212,7 @@ export class UserService {
         EConfiguration.REFRESH_TOKEN_EXPIRES_IN,
       ),
     });
+
     return {
       accessToken: await this.jwtService.signAsync(payload),
       user: authUserData,
@@ -219,13 +220,7 @@ export class UserService {
   }
 
   async getAllUser() {
-    const userList = await this.userRepository.find();
-
-    return userList.map((user) => {
-      delete user.password;
-      delete user.refreshToken;
-      return user;
-    });
+    return await this.userRepository.find();
   }
 
   async getUserById(id: number) {
@@ -256,7 +251,7 @@ export class UserService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    await this.userRepository.update(userData.id, { refreshToken: null });
+
     response.clearCookie('refreshToken', {
       httpOnly: true,
       secure: true,
@@ -265,13 +260,48 @@ export class UserService {
     return true;
   }
 
-  async getUser(userData: IUserData) {
+  async getUser(id: number) {
     const user = await this.userRepository.findOne({
       where: {
-        id: userData.id,
+        id,
       },
       relations: ['userDetail'],
     });
     return user;
+  }
+
+  async getFamilyNameAndIsBelongToTemple(userId: number, templeId: number) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where({
+        id: userId,
+      })
+      .leftJoinAndSelect('user.family', 'family')
+      .leftJoinAndSelect(
+        'family.familyTemples',
+        'familyTemples',
+        'familyTemples.templeId = :templeId AND familyTemples.isDeleted = false',
+        { templeId },
+      )
+      .getOne();
+
+    if (!user) {
+      throw new HttpException(
+        ErrorMessage.ACCOUNT_NOT_EXISTS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (!user.family) {
+      return {
+        familyName: null,
+        isBelongToTemple: false,
+      };
+    }
+
+    return {
+      familyName: user.family.name,
+      isBelongToTemple: !!user.family.familyTemples.length,
+    };
   }
 }

@@ -4,9 +4,21 @@ import { PagingData } from '@core/global/entities/pagingData.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
+export class EventManagementInfo extends Event {
+  @Field(() => Number)
+  currentParticipant: number;
+
+  @Field(() => Number)
+  bookingParticipant: number;
+
+  @Field(() => Number)
+  checkInParticipant: number;
+}
+
+@ObjectType()
 export class EventsPagingData extends PagingData {
-  @Field(() => [Event])
-  data: [Event];
+  @Field(() => [EventManagementInfo])
+  data: [EventManagementInfo];
 }
 
 @ObjectType()

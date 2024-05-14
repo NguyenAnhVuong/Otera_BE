@@ -4,11 +4,13 @@ import { EventParticipantResolver } from './event-participant.resolver';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventParticipant } from '@core/database/entity/eventParticipant.entity';
 import { EventModule } from '@modules/event/event.module';
+import { UserModule } from '@modules/user/user.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([EventParticipant]),
     forwardRef(() => EventModule),
+    UserModule,
   ],
   providers: [EventParticipantResolver, EventParticipantService],
   exports: [EventParticipantService],
