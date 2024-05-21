@@ -45,7 +45,6 @@ export class Event {
   @Column({
     name: 'description',
     type: 'varchar',
-    length: 1000,
     nullable: true,
   })
   @Field(() => String, { nullable: true })

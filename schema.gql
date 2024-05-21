@@ -4,6 +4,7 @@
 
 type Family {
   id: Int!
+  familyCode: String!
   adminId: Int!
   name: String!
   description: String!
@@ -492,6 +493,64 @@ type Test2 {
   data: Test!
 }
 
+type FamilyRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Family!
+}
+
+type FamilyMembers {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [User!]!
+}
+
+type FamilyMembersRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: FamilyMembers!
+}
+
+type Notification {
+  id: Int!
+  userId: Int
+  title: String!
+  description: String
+  type: ENotificationType!
+  inviteFamilyId: Int
+  redirectTo: String
+  isRead: Boolean!
+  isDeleted: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum ENotificationType {
+  INVITE_FAMILY
+}
+
+type NotificationsPagingData {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [Notification!]!
+}
+
+type NotificationsRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: NotificationsPagingData!
+}
+
 type IsBookedEvent {
   isBooked: Boolean!
 }
@@ -499,6 +558,8 @@ type IsBookedEvent {
 type Query {
   getUser: UserRes!
   systemGetTemples(page: Int, take: Int, skip: Int, keyword: String, familyId: Float, priority: EPriority, status: EStatus): TemplesRes!
+  getFamily(page: Int, take: Int, skip: Int, id: Int!): FamilyRes!
+  getFamilyMembers(page: Int, take: Int, skip: Int, orderBy: [OrderBy!], id: Int!, name: String, address: String, email: String, phone: String, roleFilter: [ERole!]): FamilyMembersRes!
   getListDeceased(familyId: Int!): ListDeceasedRes!
   getDeceased(id: Int!): DeceasedRes!
   test123(id: Int!): Test2!
@@ -510,12 +571,6 @@ type Query {
   getEventParticipants(page: Int, take: Int, skip: Int, eventId: Int!, name: String, email: String, address: String, familyName: String, bookingStatus: EBookingStatus!, isBelongToTemple: Boolean, orderBy: [OrderBy!]): EventParticipantsRes!
 }
 
-input GetDeathAnniversariesInput {
-  isEnd: Boolean
-  isStart: Boolean
-  isPending: Boolean
-}
-
 input OrderBy {
   column: String!
   sortOrder: ESortOrder!
@@ -524,6 +579,12 @@ input OrderBy {
 enum ESortOrder {
   ASC
   DESC
+}
+
+input GetDeathAnniversariesInput {
+  isEnd: Boolean
+  isStart: Boolean
+  isPending: Boolean
 }
 
 type Mutation {
@@ -540,6 +601,9 @@ type Mutation {
   updateEventParticipant(bookingEventInput: UpdateEventParticipantInput!): UpdateRes!
   eventParticipantCheckIn(eventParticipantCheckInInput: VEventParticipantCheckInInput!): UpdateRes!
   cancelBookingEvent(eventId: Int!): UpdateRes!
+  updateNotification(updateNotificationInput: UpdateNotificationInput!): UpdateRes!
+  responseFamilyInvitation(responseInviteFamilyInput: ResponseInviteFamilyInput!): UpdateRes!
+  inviteToFamily(inviteFamilyInput: InviteFamilyInput!): CreateRes!
 }
 
 input CreateTestInput {
@@ -632,4 +696,25 @@ input UpdateEventParticipantInput {
 input VEventParticipantCheckInInput {
   eventId: Int!
   code: String!
+}
+
+input UpdateNotificationInput {
+  id: Int!
+  isRead: Boolean!
+  isDeleted: Boolean!
+  createdAt: DateTime!
+}
+
+input ResponseInviteFamilyInput {
+  id: Int!
+  notificationId: Int!
+  status: EStatus!
+}
+
+input InviteFamilyInput {
+  email: String!
+}
+
+type Subscription {
+  getNotifications(page: Int, take: Int, skip: Int): NotificationsRes!
 }

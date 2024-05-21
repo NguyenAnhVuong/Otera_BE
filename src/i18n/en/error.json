@@ -13,5 +13,10 @@
   "EVENT_PARTICIPANT_EXIST" : "Event participant exist",
   "EVENT_PARTICIPANT_NOT_EXIST" : "Event participant not exist",
   "EVENT_IS_ENDED": "Event is ended",
-  "BOOKING_IS_ENDED": "Booking is ended"
+  "BOOKING_IS_ENDED": "Booking is ended",
+  "USER_ALREADY_IN_FAMILY": "User already in family",
+  "INVITATION_NOT_FOUND": "Invitation not found",
+  "FAMILY_NOT_EXIST": "Family not exist",
+  "NOTIFICATION_NOT_EXIST": "Notification not exist",
+  "INVITATION_EXPIRED": "Invitation expired"
 }
