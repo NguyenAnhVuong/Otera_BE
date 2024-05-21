@@ -51,7 +51,7 @@ export class EventService {
     if (templeId) {
       queryBuilder.andWhere('event.templeId = :templeId', { templeId });
     }
-    console.log('userData.tid: ', userData.tid);
+
     if (userData) {
       queryBuilder
         .leftJoin('event.eventParticipantTypes', 'eventParticipantTypes')
@@ -278,36 +278,38 @@ export class EventService {
       avatar: createEventInput.avatar,
     };
 
-    return this.dataSource.transaction(async (entityManager: EntityManager) => {
-      const createdEvent = await entityManager
-        .getRepository(Event)
-        .save(newEvent);
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const createdEvent = await entityManager
+          .getRepository(Event)
+          .save(newEvent);
 
-      const participantTypes = roles.map((role) => {
-        return {
-          eventId: createdEvent.id,
-          role,
-        };
-      });
+        const participantTypes = roles.map((role) => {
+          return {
+            eventId: createdEvent.id,
+            role,
+          };
+        });
 
-      await this.eventParticipantTypeService.createParticipantTypes(
-        participantTypes,
-        entityManager,
-      );
-
-      if (images && images.length > 0) {
-        await this.imageService.createImages(
-          images.map((image) => {
-            return {
-              image,
-              eventId: createdEvent.id,
-            };
-          }),
+        await this.eventParticipantTypeService.createParticipantTypes(
+          participantTypes,
           entityManager,
         );
-      }
-      return createdEvent;
-    });
+
+        if (images && images.length > 0) {
+          await this.imageService.createImages(
+            images.map((image) => {
+              return {
+                image,
+                eventId: createdEvent.id,
+              };
+            }),
+            entityManager,
+          );
+        }
+        return createdEvent;
+      },
+    );
   }
 
   async getEventById(id: number) {

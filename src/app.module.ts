@@ -2,6 +2,7 @@ import { GQLRolesGuard } from '@core/global/auth/guards/gqlRoles.guard';
 import { ConstanceModule } from '@core/global/constance/constance.module';
 import { I18nCustomModule } from '@core/global/i18nCustom/i18nCustom.module';
 import { HttpExceptionFilter } from '@helper/httpException.filter';
+import DatabaseMysqlLogger from '@helper/typeorm.logger';
 import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
 import { EventParticipantModule } from '@modules/event-participant/event-participant.module';
 import { EventModule } from '@modules/event/event.module';
@@ -25,7 +26,8 @@ import { DeceasedModule } from './modules/deceased/deceased.module';
 import { FamilyModule } from './modules/family/family.module';
 import { TempleModule } from './modules/temple/temple.module';
 import { UserModule } from './modules/user/user.module';
-import DatabaseMysqlLogger from '@helper/typeorm.logger';
+import { NotificationModule } from '@modules/notification/notification.module';
+import { InviteFamilyModule } from '@modules/invite-family/invite-family.module';
 
 @Module({
   imports: [
@@ -68,6 +70,10 @@ import DatabaseMysqlLogger from '@helper/typeorm.logger';
     DeathAnniversaryModule,
     EventModule,
     EventParticipantModule,
+    FamilyModule,
+    NotificationModule,
+    InviteFamilyModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

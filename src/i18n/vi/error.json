@@ -13,5 +13,10 @@
   "EVENT_PARTICIPANT_EXIST": "Người tham dự đã tồn tại",
   "EVENT_PARTICIPANT_NOT_EXIST": "Người tham dự không tồn tại",
   "EVENT_IS_ENDED": "Sự kiện đã kết thúc",
-  "BOOKING_IS_ENDED": "Thời gian đăng ký đã kết thúc"
+  "BOOKING_IS_ENDED": "Thời gian đăng ký đã kết thúc",
+  "USER_ALREADY_IN_FAMILY": "Người dùng đã thuộc gia đình",
+  "INVITATION_NOT_FOUND": "Lời mời không tồn tại",
+  "FAMILY_NOT_EXIST": "Gia đình không tồn tại",
+  "NOTIFICATION_NOT_EXIST": "Thông báo không tồn tại",
+  "INVITATION_EXPIRED": "Lời mời đã hết hạn"
 }

@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { FamilyService } from './family.service';
-import { FamilyController } from './family.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Family } from 'src/core/database/entity/family.entity';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
-import { UserModule } from '../user/user.module';
 import { FamilyTempleModule } from '../family-temple/family-temple.module';
+import { UserModule } from '../user/user.module';
+import { FamilyController } from './family.controller';
+import { FamilyResolver } from './family.resolver';
+import { FamilyService } from './family.service';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { FamilyTempleModule } from '../family-temple/family-temple.module';
     FamilyTempleModule,
   ],
   controllers: [FamilyController],
-  providers: [FamilyService],
+  providers: [FamilyService, FamilyResolver],
+  exports: [FamilyService],
 })
 export class FamilyModule {}

@@ -13,6 +13,15 @@ export class Family {
   @Field(() => Int)
   id: number;
 
+  @Column({
+    name: 'familyCode',
+    type: 'varchar',
+    length: 250,
+    unique: true,
+  })
+  @Field(() => String)
+  familyCode: string;
+
   @Column({ name: 'adminId', type: 'int' })
   @Field(() => Int)
   adminId: number;

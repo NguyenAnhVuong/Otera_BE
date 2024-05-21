@@ -1,12 +1,16 @@
-import { FamilyTempleService } from './../family-temple/family-temple.service';
-import { UserService } from './../user/user.service';
-import { Injectable } from '@nestjs/common';
+import { ErrorMessage } from '@core/enum';
+import { IUserData } from '@core/interface/default.interface';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Family } from 'src/core/database/entity/family.entity';
-import { Repository, DataSource, EntityManager } from 'typeorm';
-import { VCreateFamilyDto } from './dto/create-family.dto';
-import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { ERole } from 'src/core/enum/default.enum';
+import { DataSource, EntityManager, Repository } from 'typeorm';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { FamilyTempleService } from './../family-temple/family-temple.service';
+import { UserService } from './../user/user.service';
+import { VCreateFamilyDto } from './dto/create-family.dto';
+import { GetFamilyMembersArgs } from './dto/get-family-members.dto';
+import { GetFamilyArgs } from './dto/get-family.args';
 
 @Injectable()
 export class FamilyService {
@@ -23,6 +27,7 @@ export class FamilyService {
     private readonly dataSource: DataSource,
   ) {}
 
+  // TODO approved by temple and generate family code
   async createFamily(
     familyParams: VCreateFamilyDto,
     avatar: Express.Multer.File,
@@ -56,5 +61,35 @@ export class FamilyService {
 
       return newFamily;
     });
+  }
+
+  async getFamilyById(getFamilyArgs: GetFamilyArgs) {
+    const { id } = getFamilyArgs;
+    const query = this.familyRepository.createQueryBuilder('family').where({
+      id,
+    });
+
+    return await query.getOne();
+  }
+
+  async getFamilyMembers(
+    userData: IUserData,
+    getFamilyMembersArgs: GetFamilyMembersArgs,
+  ) {
+    const { tid, fid } = userData;
+
+    const familyInTemple = await this.familyTempleService.checkFamilyInTemple(
+      getFamilyMembersArgs.id,
+      tid[0],
+    );
+
+    if (!familyInTemple && fid !== getFamilyMembersArgs.id) {
+      throw new HttpException(
+        ErrorMessage.NO_PERMISSION,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.userService.getUserInFamily(getFamilyMembersArgs);
   }
 }

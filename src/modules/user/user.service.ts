@@ -1,4 +1,5 @@
 import { IUserData } from '@core/interface/default.interface';
+import { returnPagingData } from '@helper/utils';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -19,6 +20,7 @@ import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import { UserDetailService } from './../user-detail/user-detail.service';
 import { VUserLoginDto } from './dto/user-login.dto';
 import { VUserRegisterDto } from './dto/user-register.dto';
+import { GetFamilyMembersArgs } from '../family/dto/get-family-members.dto';
 
 @Injectable()
 export class UserService {
@@ -303,5 +305,50 @@ export class UserService {
       familyName: user.family.name,
       isBelongToTemple: !!user.family.familyTemples.length,
     };
+  }
+
+  async getUserByEmail(email: string) {
+    return await this.userRepository.findOne({
+      where: {
+        email,
+      },
+    });
+  }
+
+  async getUserInFamily(getFamilyMembersArgs: GetFamilyMembersArgs) {
+    const { id, name, address, email, phone, roleFilter } =
+      getFamilyMembersArgs;
+
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .where({
+        familyId: id,
+      })
+      .leftJoinAndSelect('user.userDetail', 'userDetail');
+
+    if (name) {
+      query.andWhere('userDetail.name LIKE :name', { name: `%${name}%` });
+    }
+
+    if (address) {
+      query.andWhere('userDetail.address LIKE :address', {
+        address: `%${address}%`,
+      });
+    }
+
+    if (email) {
+      query.andWhere('user.email LIKE :email', { email: `%${email}%` });
+    }
+
+    if (phone) {
+      query.andWhere('userDetail.phone LIKE :phone', { phone: `%${phone}%` });
+    }
+
+    if (roleFilter.length) {
+      query.andWhere('user.role IN (:...roleFilter)', { roleFilter });
+    }
+
+    const [data, count] = await query.getManyAndCount();
+    return returnPagingData(data, count, getFamilyMembersArgs);
   }
 }

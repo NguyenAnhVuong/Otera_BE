@@ -53,3 +53,7 @@ export enum ESortOrder {
   ASC = 'ASC',
   DESC = 'DESC',
 }
+
+export enum ENotificationType {
+  INVITE_FAMILY = 'INVITE_FAMILY',
+}

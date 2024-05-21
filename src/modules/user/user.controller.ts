@@ -36,7 +36,6 @@ export class UserController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const { refreshToken } = request.cookies;
-    console.log({ refreshToken });
     return this.userService.refreshToken(refreshToken, response);
   }
 
