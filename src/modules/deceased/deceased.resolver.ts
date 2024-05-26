@@ -10,6 +10,7 @@ import { IUserData } from '@core/interface/default.interface';
 import { DeceasedRes } from './entities/deceasedRes.entity';
 import { UpdateRes } from '@core/global/entities/updateRes.entity';
 import { VUpdateDeceasedInput } from './dto/update-deceased.input';
+import { HttpStatus, ParseIntPipe } from '@nestjs/common';
 
 @Resolver(() => Deceased)
 export class DeceasedResolver {
@@ -18,7 +19,12 @@ export class DeceasedResolver {
   @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
   @Query(() => ListDeceasedRes, { name: 'getListDeceased' })
   getListDeceasedByFamilyId(
-    @Args('familyId', { type: () => Int }) familyId: number,
+    @Args(
+      'familyId',
+      { type: () => Int },
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    familyId: number,
   ) {
     return this.deceasedService.getListDeceasedByFamilyId(familyId);
   }
@@ -26,7 +32,12 @@ export class DeceasedResolver {
   @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
   @Query(() => DeceasedRes, { name: 'getDeceased' })
   getDeceasedById(
-    @Args('id', { type: () => Int }) id: number,
+    @Args(
+      'id',
+      { type: () => Int },
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
     @GQLUserData() userData: IUserData,
   ) {
     return this.deceasedService.getDeceasedByIdAndFamilyId(
@@ -42,5 +53,21 @@ export class DeceasedResolver {
     @Args('updateDeceasedInput') updateDeceasedInput: VUpdateDeceasedInput,
   ) {
     return this.deceasedService.updateDeceased(userData, updateDeceasedInput);
+  }
+
+  @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
+  @Mutation(() => UpdateRes, { name: 'deleteDeceased' })
+  deleteDeceased(
+    @GQLUserData() userData: IUserData,
+    @Args(
+      'id',
+      { type: () => Int },
+      new ParseIntPipe({
+        errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE,
+      }),
+    )
+    id: number,
+  ) {
+    return this.deceasedService.deleteDeceased(userData, id);
   }
 }

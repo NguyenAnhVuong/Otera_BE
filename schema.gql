@@ -236,6 +236,7 @@ type Deceased {
   familyId: Int!
   creatorId: Int!
   modifierId: Int
+  isDeleted: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   temple: Temple!
@@ -571,8 +572,8 @@ type Query {
   getFamilyMembers(page: Int, take: Int, skip: Int, orderBy: [OrderBy!], id: Int!, name: String, address: String, email: String, phone: String, roleFilter: [ERole!]): FamilyMembersRes!
   getListDeceased(familyId: Int!): ListDeceasedRes!
   getDeceased(id: Int!): DeceasedRes!
-  test123(id: Int!): Test2!
   getDeathAnniversaries(getDeathAnniversariesInput: GetDeathAnniversariesInput!): DeathAnniversariesRes!
+  test123(id: Int!): Test2!
   templeGetEvents(page: Int, take: Int, skip: Int, name: String, upcoming: Boolean, onGoing: Boolean, ended: Boolean, orderBy: [OrderBy!]): EventsRes!
   getEvents(page: Int, take: Int, skip: Int, templeId: Int): EventsRes!
   getBookingEvents(page: Int, take: Int, skip: Int, name: String, address: String, orderBy: [OrderBy!], bookingStatus: EBookingStatus): BookingEventsRes!
@@ -599,13 +600,14 @@ input GetDeathAnniversariesInput {
 type Mutation {
   removeFamilyMember(removeFamilyMemberInput: RemoveFamilyMemberInput!): UpdateRes!
   updateDeceased(updateDeceasedInput: VUpdateDeceasedInput!): UpdateRes!
-  createTest(createTestInput: CreateTestInput!): Test!
-  updateTest(updateTestInput: UpdateTestInput!): Test!
-  removeTest(id: Int!): Test!
+  deleteDeceased(id: Int!): UpdateRes!
   createDeathAnniversary(createDeathAnniversaryInput: CreateDeathAnniversaryInput!): DeathAnniversaryRes!
   templeUpdateDeathAnniversary(templeUpdateDeathAnniversaryInput: TempleUpdateDeathAnniversaryInput!): GQLResponse!
   familyUpdateDeathAnniversary(updateDeathAnniversaryInput: UpdateDeathAnniversaryInput!): GQLResponse!
   cancelDeathAnniversary(cancelDeathAnniversaryInput: CancelDeathAnniversaryInput!): GQLResponse!
+  createTest(createTestInput: CreateTestInput!): Test!
+  updateTest(updateTestInput: UpdateTestInput!): Test!
+  removeTest(id: Int!): Test!
   createEvent(createEventInput: VCreateEventInput!): EventRes!
   updateEvent(updateEventInput: VUpdateEventInput!): UpdateRes!
   bookingEvent(bookingEventInput: VBookingEventInput!): CreateRes!
@@ -633,17 +635,6 @@ input VUpdateDeceasedInput {
   gender: EGender
   citizenNumber: String
   templeId: Int
-}
-
-input CreateTestInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-input UpdateTestInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
 }
 
 input CreateDeathAnniversaryInput {
@@ -675,6 +666,17 @@ input UpdateDeathAnniversaryInput {
 }
 
 input CancelDeathAnniversaryInput {
+  id: Int!
+}
+
+input CreateTestInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input UpdateTestInput {
+  """Example field (placeholder)"""
+  exampleField: Int
   id: Int!
 }
 

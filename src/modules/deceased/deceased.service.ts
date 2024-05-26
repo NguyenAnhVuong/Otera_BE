@@ -1,5 +1,11 @@
 import { CloudinaryService } from './../cloudinary/cloudinary.service';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Deceased } from 'src/core/database/entity/deceased.entity';
 import { Repository, DataSource, EntityManager, DeepPartial } from 'typeorm';
@@ -12,6 +18,7 @@ import { FamilyTempleService } from '@modules/family-temple/family-temple.servic
 import { ErrorMessage } from '@core/enum';
 import * as dayjs from 'dayjs';
 import { VUpdateDeceasedInput } from './dto/update-deceased.input';
+import { DeathAnniversaryService } from '@modules/death-anniversary/death-anniversary.service';
 
 @Injectable()
 export class DeceasedService {
@@ -26,6 +33,9 @@ export class DeceasedService {
     private readonly imageService: ImageService,
 
     private readonly familyTempleService: FamilyTempleService,
+
+    @Inject(forwardRef(() => DeathAnniversaryService))
+    private readonly deathAnniversaryService: DeathAnniversaryService,
 
     private readonly dataSource: DataSource,
   ) {}
@@ -105,6 +115,7 @@ export class DeceasedService {
     return await this.deceasedRepository.find({
       where: {
         familyId,
+        isDeleted: false,
       },
       relations: ['images', 'userDetail'],
     });
@@ -115,6 +126,7 @@ export class DeceasedService {
       where: {
         id,
         familyId,
+        isDeleted: false,
       },
       relations: ['images', 'userDetail', 'modifier', 'modifier.userDetail'],
     });
@@ -133,6 +145,7 @@ export class DeceasedService {
       where: {
         id: deceasedId,
         familyId,
+        isDeleted: false,
       },
       relations: ['userDetail'],
     });
@@ -215,6 +228,35 @@ export class DeceasedService {
             ...(templeId && { templeId }),
           },
         );
+      },
+    );
+  }
+
+  // TODO required approve by temple
+  async deleteDeceased(userData: IUserData, id: number) {
+    const { fid } = userData;
+
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const deceasedRepository = entityManager.getRepository(Deceased);
+
+        const deceased = await this.checkDeceasedInFamily(
+          id,
+          fid,
+          entityManager,
+        );
+
+        if (!deceased) {
+          throw new HttpException(
+            ErrorMessage.NO_PERMISSION,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        this.deathAnniversaryService.deleteDeathAnniversaryByDeceasedId(
+          id,
+          entityManager,
+        );
+        return await deceasedRepository.update({ id }, { isDeleted: true });
       },
     );
   }
