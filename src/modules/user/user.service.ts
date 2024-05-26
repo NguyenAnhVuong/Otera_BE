@@ -351,4 +351,37 @@ export class UserService {
     const [data, count] = await query.getManyAndCount();
     return returnPagingData(data, count, getFamilyMembersArgs);
   }
+
+  removeFamilyMember(userData: IUserData, familyMemberId: number) {
+    return this.dataSource.transaction(async (entityManager: EntityManager) => {
+      const userRepository = entityManager.getRepository(User);
+
+      const user = await userRepository.findOne({
+        where: {
+          id: familyMemberId,
+          familyId: userData.familyId,
+        },
+        relations: ['family'],
+      });
+
+      if (!user) {
+        throw new HttpException(
+          ErrorMessage.ACCOUNT_NOT_EXISTS,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (user.family.adminId !== userData.id) {
+        throw new HttpException(
+          ErrorMessage.NO_PERMISSION,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return await userRepository.update(familyMemberId, {
+        familyId: null,
+        role: ERole.PUBLIC_USER,
+      });
+    });
+  }
 }

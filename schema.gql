@@ -2,6 +2,42 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type DeathAnniversary {
+  id: Int!
+  deceasedId: Int!
+  familyId: Int!
+  templeId: Int!
+  desiredStartTime: DateTime!
+  desiredEndTime: DateTime!
+  actualStartTime: DateTime
+  actualEndTime: DateTime
+  status: EStatus!
+  enableUpdate: Boolean!
+  creatorId: Int!
+  note: String
+  rejectReason: String
+  isDeleted: Boolean!
+  isLiveStream: Boolean!
+  linkLiveStream: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deceased: Deceased!
+  temple: Temple!
+  user: User!
+  family: Family!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum EStatus {
+  REJECTED
+  PENDING
+  APPROVED
+}
+
 type Family {
   id: Int!
   familyCode: String!
@@ -19,17 +55,6 @@ type Family {
   familyTemples: [FamilyTemple!]!
   deathAnniversaries: [DeathAnniversary!]!
 }
-
-enum EStatus {
-  REJECTED
-  PENDING
-  APPROVED
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type FamilyTemple {
   id: Int!
@@ -210,6 +235,7 @@ type Deceased {
   templeId: Int!
   familyId: Int!
   creatorId: Int!
+  modifierId: Int
   createdAt: DateTime!
   updatedAt: DateTime!
   temple: Temple!
@@ -217,31 +243,7 @@ type Deceased {
   images: [Image!]!
   userDetail: UserDetail!
   deathAnniversaries: [DeathAnniversary!]!
-}
-
-type DeathAnniversary {
-  id: Int!
-  deceasedId: Int!
-  familyId: Int!
-  templeId: Int!
-  desiredStartTime: DateTime!
-  desiredEndTime: DateTime!
-  actualStartTime: DateTime
-  actualEndTime: DateTime
-  status: EStatus!
-  enableUpdate: Boolean!
-  creatorId: Int!
-  note: String
-  rejectReason: String
-  isDeleted: Boolean!
-  isLiveStream: Boolean!
-  linkLiveStream: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  deceased: Deceased!
-  temple: Temple!
-  user: User!
-  family: Family!
+  modifier: User!
 }
 
 type User {
@@ -254,6 +256,13 @@ type User {
   updatedAt: DateTime!
   temple: Temple!
   userDetail: UserDetail!
+  family: Family!
+  reviews: [Review!]!
+  deathAnniversaries: [DeathAnniversary!]!
+  templeMember: TempleMember!
+  events: [Event!]!
+  eventParticipants: [EventParticipant!]!
+  modifiedDeceaseds: [Deceased!]!
 }
 
 type GQLResponse {
@@ -295,6 +304,18 @@ type DeceasedRes {
   data: Deceased!
 }
 
+type AffectedResult {
+  affected: Int!
+}
+
+type UpdateRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: AffectedResult
+}
+
 type UserRes {
   statusCode: Int!
   errorMessage: String
@@ -325,18 +346,6 @@ type CreateRes {
   errorCode: String
   timestamp: String!
   data: Boolean!
-}
-
-type AffectedResult {
-  affected: Int!
-}
-
-type UpdateRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: AffectedResult
 }
 
 type EventParticipantRes {
@@ -588,6 +597,8 @@ input GetDeathAnniversariesInput {
 }
 
 type Mutation {
+  removeFamilyMember(removeFamilyMemberInput: RemoveFamilyMemberInput!): UpdateRes!
+  updateDeceased(updateDeceasedInput: VUpdateDeceasedInput!): UpdateRes!
   createTest(createTestInput: CreateTestInput!): Test!
   updateTest(updateTestInput: UpdateTestInput!): Test!
   removeTest(id: Int!): Test!
@@ -604,6 +615,24 @@ type Mutation {
   updateNotification(updateNotificationInput: UpdateNotificationInput!): UpdateRes!
   responseFamilyInvitation(responseInviteFamilyInput: ResponseInviteFamilyInput!): UpdateRes!
   inviteToFamily(inviteFamilyInput: InviteFamilyInput!): CreateRes!
+}
+
+input RemoveFamilyMemberInput {
+  id: Int!
+}
+
+input VUpdateDeceasedInput {
+  id: Int!
+  dateOfDeath: String
+  description: String
+  avatar: String
+  images: [String!]
+  name: String
+  birthday: String
+  address: String
+  gender: EGender
+  citizenNumber: String
+  templeId: Int
 }
 
 input CreateTestInput {

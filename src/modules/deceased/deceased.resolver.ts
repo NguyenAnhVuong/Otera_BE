@@ -1,5 +1,5 @@
 import { Deceased } from '@core/database/entity/deceased.entity';
-import { Args, Int, Query, Resolver } from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { DeceasedService } from './deceased.service';
 
 import { GQLRoles } from '@core/decorator/gqlRoles.decorator';
@@ -8,6 +8,8 @@ import { ListDeceasedRes } from './entities/listDeceasedRes.entity';
 import { GQLUserData } from '@core/decorator/gqlUser.decorator';
 import { IUserData } from '@core/interface/default.interface';
 import { DeceasedRes } from './entities/deceasedRes.entity';
+import { UpdateRes } from '@core/global/entities/updateRes.entity';
+import { VUpdateDeceasedInput } from './dto/update-deceased.input';
 
 @Resolver(() => Deceased)
 export class DeceasedResolver {
@@ -31,5 +33,14 @@ export class DeceasedResolver {
       id,
       userData.familyId,
     );
+  }
+
+  @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
+  @Mutation(() => UpdateRes, { name: 'updateDeceased' })
+  updateDeceased(
+    @GQLUserData() userData: IUserData,
+    @Args('updateDeceasedInput') updateDeceasedInput: VUpdateDeceasedInput,
+  ) {
+    return this.deceasedService.updateDeceased(userData, updateDeceasedInput);
   }
 }

@@ -19,4 +19,17 @@ export class UserDetailService {
     const userDetail = await userDetailRepository.save(userDetailParams);
     return userDetail;
   }
+
+  async updateUserDetail(
+    userDetailParams: DeepPartial<UserDetail>,
+    entityManager?: EntityManager,
+  ) {
+    const userDetailRepository =
+      entityManager?.getRepository(UserDetail) || this.userDetailRepository;
+    const userDetail = await userDetailRepository.update(
+      userDetailParams.id,
+      userDetailParams,
+    );
+    return userDetail;
+  }
 }

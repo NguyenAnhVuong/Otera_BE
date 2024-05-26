@@ -68,7 +68,7 @@ export class Temple {
   @Field(() => EPriority, { defaultValue: EPriority.MEDIUM })
   priority: EPriority;
 
-  @Column({ name: 'priorityExpired', type: 'timestamp', nullable: true })
+  @Column({ name: 'priorityExpired', type: 'timestamptz', nullable: true })
   @Field(() => Date, { nullable: true })
   priorityExpired: Date | null;
 
@@ -76,7 +76,7 @@ export class Temple {
   @Field(() => EPlan, { defaultValue: EPlan.FREE })
   plan: EPlan;
 
-  @Column({ name: 'planExpired', type: 'timestamp', nullable: true })
+  @Column({ name: 'planExpired', type: 'timestamptz', nullable: true })
   @Field(() => Date, { nullable: true })
   planExpired: Date | null;
 
@@ -95,7 +95,7 @@ export class Temple {
 
   @Column({
     name: 'createdAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -103,7 +103,7 @@ export class Temple {
 
   @Column({
     name: 'updatedAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)

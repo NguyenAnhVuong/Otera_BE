@@ -36,14 +36,14 @@ export class InviteFamily {
 
   @Column({
     name: 'expiredAt',
-    type: 'timestamp',
+    type: 'timestamptz',
   })
   @Field(() => Date)
   expiredAt: Date;
 
   @Column({
     name: 'createdAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -51,7 +51,7 @@ export class InviteFamily {
 
   @Column({
     name: 'updatedAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)

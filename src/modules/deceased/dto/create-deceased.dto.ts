@@ -38,7 +38,7 @@ export class VCreateDeceasedDto {
 
   @IsString()
   @IsOptional()
-  citizenNumber: string;
+  citizenNumber?: string;
 
   @IsString()
   @IsOptional()
