@@ -3,18 +3,27 @@ import { EStatus } from '@core/enum';
 import { IUserData } from '@core/interface/default.interface';
 import { DeceasedService } from '@modules/deceased/deceased.service';
 import { TempleService } from '@modules/temple/temple.service';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, LessThan, MoreThan, Repository } from 'typeorm';
+import {
+  DeepPartial,
+  EntityManager,
+  LessThan,
+  MoreThan,
+  Repository,
+} from 'typeorm';
 import { CreateDeathAnniversaryInput } from './dto/create-death-anniversary.input';
 import { GetDeathAnniversariesInput } from './dto/get-death-anniversaries.input';
 
 @Injectable()
 export class DeathAnniversaryService {
   constructor(
+    @Inject(forwardRef(() => DeceasedService))
     private readonly deceasedService: DeceasedService,
+
     @InjectRepository(DeathAnniversary)
     private readonly deathAnniversaryRepository: Repository<DeathAnniversary>,
+
     private readonly templeService: TempleService,
   ) {}
 
@@ -78,6 +87,19 @@ export class DeathAnniversaryService {
   async deleteDeathAnniversaryById(id: number) {
     return await this.deathAnniversaryRepository.update(
       { id },
+      { isDeleted: true },
+    );
+  }
+
+  async deleteDeathAnniversaryByDeceasedId(
+    deceasedId: number,
+    entityManager?: EntityManager,
+  ) {
+    const deathAnniversaryRepository = entityManager
+      ? entityManager.getRepository(DeathAnniversary)
+      : this.deathAnniversaryRepository;
+    return await deathAnniversaryRepository.update(
+      { deceasedId },
       { isDeleted: true },
     );
   }

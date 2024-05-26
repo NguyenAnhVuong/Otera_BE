@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { DeathAnniversaryService } from './death-anniversary.service';
 import { DeathAnniversaryResolver } from './death-anniversary.resolver';
 import { DeceasedModule } from '@modules/deceased/deceased.module';
@@ -9,9 +9,10 @@ import { TempleModule } from '@modules/temple/temple.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([DeathAnniversary]),
-    DeceasedModule,
+    forwardRef(() => DeceasedModule),
     TempleModule,
   ],
   providers: [DeathAnniversaryResolver, DeathAnniversaryService],
+  exports: [DeathAnniversaryService],
 })
 export class DeathAnniversaryModule {}

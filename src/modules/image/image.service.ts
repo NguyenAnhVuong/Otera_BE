@@ -57,4 +57,20 @@ export class ImageService {
     await imageRepository.save(imageParams);
     return true;
   }
+
+  async deleteImagesByDeceasedId(
+    deceasedId: number,
+    entityManager?: EntityManager,
+  ): Promise<boolean> {
+    const imageRepository =
+      entityManager?.getRepository(Image) || this.imageRepository;
+    const images = await imageRepository.find({ where: { deceasedId } });
+
+    await this.cloudinaryService.deleteImagesByUrls(
+      images.map((image) => image.image),
+    );
+
+    await imageRepository.delete({ deceasedId });
+    return true;
+  }
 }
