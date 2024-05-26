@@ -6,15 +6,15 @@ import { UpdateRes } from '@core/global/entities/updateRes.entity';
 import { IUserData } from '@core/interface/default.interface';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { InviteFamilyInput } from './dto/invite-family.input';
-import { InviteFamilyService } from './invite-family.service';
 import { ResponseInviteFamilyInput } from './dto/response-invite-family.input';
+import { InviteFamilyService } from './invite-family.service';
 
 @Resolver()
 export class InviteFamilyResolver {
   constructor(private readonly inviteFamilyService: InviteFamilyService) {}
 
-  @Mutation(() => UpdateRes, { name: 'responseFamilyInvitation' })
   @GQLRoles([ERole.PUBLIC_USER])
+  @Mutation(() => UpdateRes, { name: 'responseFamilyInvitation' })
   responseFamilyInvitation(
     @GQLUserData() userData: IUserData,
     @Args('responseInviteFamilyInput')

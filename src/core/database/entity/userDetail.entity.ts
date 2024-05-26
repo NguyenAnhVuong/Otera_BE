@@ -20,7 +20,7 @@ export class UserDetail {
     name: 'avatar',
     type: 'varchar',
     length: 250,
-    default: process.env.APP_URL + '/avatar-default.png',
+    default: process.env.DEFAULT_AVATAR_URL,
   })
   @Field(() => String)
   avatar: string;
@@ -64,7 +64,7 @@ export class UserDetail {
 
   @Column({
     name: 'createdAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -72,7 +72,7 @@ export class UserDetail {
 
   @Column({
     name: 'updatedAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)

@@ -53,13 +53,13 @@ export class EventParticipant {
   @Field(() => Int, { nullable: true })
   approverId: number;
 
-  @Column({ name: 'checkInAt', type: 'timestamp', nullable: true })
+  @Column({ name: 'checkInAt', type: 'timestamptz', nullable: true })
   @Field(() => Date, { nullable: true })
   checkInAt: Date;
 
   @Column({
     name: 'createdAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -67,7 +67,7 @@ export class EventParticipant {
 
   @Column({
     name: 'updatedAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)

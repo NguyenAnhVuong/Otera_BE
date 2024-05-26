@@ -37,7 +37,7 @@ export class Event {
     name: 'avatar',
     type: 'varchar',
     length: 250,
-    default: process.env.APP_URL + '/event-default.png',
+    default: process.env.DEFAULT_EVENT_AVATAR_URL,
   })
   @Field(() => String)
   avatar: string;
@@ -50,19 +50,31 @@ export class Event {
   @Field(() => String, { nullable: true })
   description: string;
 
-  @Column({ name: 'startDateEvent', type: 'timestamp' })
+  @Column({
+    name: 'startDateEvent',
+    type: 'timestamptz',
+  })
   @Field(() => Date)
   startDateEvent: Date;
 
-  @Column({ name: 'endDateEvent', type: 'timestamp' })
+  @Column({
+    name: 'endDateEvent',
+    type: 'timestamptz',
+  })
   @Field(() => Date)
   endDateEvent: Date;
 
-  @Column({ name: 'startDateBooking', type: 'timestamp' })
+  @Column({
+    name: 'startDateBooking',
+    type: 'timestamptz',
+  })
   @Field(() => Date)
   startDateBooking: Date;
 
-  @Column({ name: 'endDateBooking', type: 'timestamp' })
+  @Column({
+    name: 'endDateBooking',
+    type: 'timestamptz',
+  })
   @Field(() => Date)
   endDateBooking: Date;
 
@@ -87,7 +99,7 @@ export class Event {
   @Field(() => EPriority, { defaultValue: EPriority.MEDIUM })
   priority: EPriority;
 
-  @Column({ name: 'priorityExpired', type: 'timestamp', nullable: true })
+  @Column({ name: 'priorityExpired', type: 'timestamptz', nullable: true })
   @Field(() => Date, { nullable: true })
   priorityExpired: Date | null;
 
@@ -101,7 +113,7 @@ export class Event {
 
   @Column({
     name: 'createdAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -109,7 +121,7 @@ export class Event {
 
   @Column({
     name: 'updatedAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)

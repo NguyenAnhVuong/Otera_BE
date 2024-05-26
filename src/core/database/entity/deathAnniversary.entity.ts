@@ -31,19 +31,25 @@ export class DeathAnniversary {
   @Field(() => Int)
   templeId: number;
 
-  @Column({ name: 'desiredStartTime', type: 'timestamp' })
+  @Column({
+    name: 'desiredStartTime',
+    type: 'timestamptz',
+  })
   @Field(() => Date)
   desiredStartTime: Date;
 
-  @Column({ name: 'desiredEndTime', type: 'timestamp' })
+  @Column({
+    name: 'desiredEndTime',
+    type: 'timestamptz',
+  })
   @Field(() => Date)
   desiredEndTime: Date;
 
-  @Column({ name: 'actualStartTime', type: 'timestamp', nullable: true })
+  @Column({ name: 'actualStartTime', type: 'timestamptz', nullable: true })
   @Field(() => Date, { nullable: true })
   actualStartTime: Date | null;
 
-  @Column({ name: 'actualEndTime', type: 'timestamp', nullable: true })
+  @Column({ name: 'actualEndTime', type: 'timestamptz', nullable: true })
   @Field(() => Date, { nullable: true })
   actualEndTime: Date | null;
 
@@ -100,7 +106,7 @@ export class DeathAnniversary {
 
   @Column({
     name: 'createdAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -108,7 +114,7 @@ export class DeathAnniversary {
 
   @Column({
     name: 'updatedAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)

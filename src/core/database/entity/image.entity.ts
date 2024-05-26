@@ -35,7 +35,7 @@ export class Image {
 
   @Column({
     name: 'createdAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -43,7 +43,7 @@ export class Image {
 
   @Column({
     name: 'updatedAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)

@@ -77,17 +77,18 @@ export class FamilyService {
     getFamilyMembersArgs: GetFamilyMembersArgs,
   ) {
     const { tid, fid } = userData;
-
-    const familyInTemple = await this.familyTempleService.checkFamilyInTemple(
-      getFamilyMembersArgs.id,
-      tid[0],
-    );
-
-    if (!familyInTemple && fid !== getFamilyMembersArgs.id) {
-      throw new HttpException(
-        ErrorMessage.NO_PERMISSION,
-        HttpStatus.BAD_REQUEST,
+    if (tid[0]) {
+      const familyInTemple = await this.familyTempleService.checkFamilyInTemple(
+        getFamilyMembersArgs.id,
+        tid[0],
       );
+
+      if (!familyInTemple && fid !== getFamilyMembersArgs.id) {
+        throw new HttpException(
+          ErrorMessage.NO_PERMISSION,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
     }
 
     return await this.userService.getUserInFamily(getFamilyMembersArgs);

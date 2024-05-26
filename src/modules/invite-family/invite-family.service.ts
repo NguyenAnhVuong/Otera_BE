@@ -74,6 +74,7 @@ export class InviteFamilyService {
           userId: user.id,
           isDeleted: false,
           expiredAt: MoreThan(new Date()),
+          status: EStatus.PENDING,
         },
       });
 
@@ -97,27 +98,27 @@ export class InviteFamilyService {
           user.id,
           entityManager,
         );
-      }
-
-      await inviteFamilyRepository.save({
-        familyId,
-        userId: user.id,
-        expiredAt: newExpiredAt,
-      });
-
-      await this.notificationService.createNotification(
-        {
+      } else {
+        const inviteFamily = await inviteFamilyRepository.save({
+          familyId,
           userId: user.id,
-          title: Notifications.inviteFamily.title,
-          description: Notifications.inviteFamily.description(
-            name,
-            family.name,
-          ),
-          type: ENotificationType.INVITE_FAMILY,
-          inviteFamilyId: familyId,
-        },
-        entityManager,
-      );
+          expiredAt: newExpiredAt,
+        });
+
+        await this.notificationService.createNotification(
+          {
+            userId: user.id,
+            title: Notifications.inviteFamily.title,
+            description: Notifications.inviteFamily.description(
+              name,
+              family.name,
+            ),
+            type: ENotificationType.INVITE_FAMILY,
+            inviteFamilyId: inviteFamily.id,
+          },
+          entityManager,
+        );
+      }
     });
     return true;
   }

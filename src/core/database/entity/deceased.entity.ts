@@ -1,3 +1,4 @@
+import { User } from '@core/database/entity/user.entity';
 import {
   Column,
   Entity,
@@ -60,9 +61,13 @@ export class Deceased {
   @Field(() => Int)
   creatorId: number;
 
+  @Column({ name: 'modifierId', type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
+  modifierId: number;
+
   @Column({
     name: 'createdAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -70,7 +75,7 @@ export class Deceased {
 
   @Column({
     name: 'updatedAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -101,4 +106,8 @@ export class Deceased {
   )
   @Field(() => [DeathAnniversary])
   deathAnniversaries: DeathAnniversary[];
+
+  @ManyToOne(() => User, (user) => user.modifiedDeceaseds)
+  @Field(() => User)
+  modifier: User;
 }

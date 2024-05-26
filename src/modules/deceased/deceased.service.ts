@@ -11,6 +11,7 @@ import { IUserData } from '@core/interface/default.interface';
 import { FamilyTempleService } from '@modules/family-temple/family-temple.service';
 import { ErrorMessage } from '@core/enum';
 import * as dayjs from 'dayjs';
+import { VUpdateDeceasedInput } from './dto/update-deceased.input';
 
 @Injectable()
 export class DeceasedService {
@@ -67,7 +68,7 @@ export class DeceasedService {
         birthday: dayjs(birthday).format('YYYY-MM-DD'),
         address,
         gender,
-        citizenNumber,
+        ...(citizenNumber && { citizenNumber }),
       };
 
       const userDetail = await this.userDetailService.createUserDetail(
@@ -115,16 +116,25 @@ export class DeceasedService {
         id,
         familyId,
       },
-      relations: ['images', 'userDetail'],
+      relations: ['images', 'userDetail', 'modifier', 'modifier.userDetail'],
     });
   }
 
-  async checkDeceasedInFamily(deceasedId: number, familyId: number) {
-    const deceased = await this.deceasedRepository.findOne({
+  async checkDeceasedInFamily(
+    deceasedId: number,
+    familyId: number,
+    entityManager?: EntityManager,
+  ) {
+    const deceasedRepository = entityManager
+      ? entityManager.getRepository(Deceased)
+      : this.deceasedRepository;
+
+    const deceased = await deceasedRepository.findOne({
       where: {
         id: deceasedId,
         familyId,
       },
+      relations: ['userDetail'],
     });
 
     if (!deceased) {
@@ -134,5 +144,78 @@ export class DeceasedService {
       );
     }
     return deceased;
+  }
+
+  async updateDeceased(
+    userData: IUserData,
+    updateDeceasedInput: VUpdateDeceasedInput,
+  ) {
+    const { id: modifierId, fid } = userData;
+    const {
+      id,
+      dateOfDeath,
+      description,
+      avatar,
+      images,
+      name,
+      birthday,
+      address,
+      gender,
+      citizenNumber,
+      templeId,
+    } = updateDeceasedInput;
+
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const deceasedRepository = entityManager.getRepository(Deceased);
+
+        const deceased = await this.checkDeceasedInFamily(id, fid);
+
+        if (!deceased) {
+          throw new HttpException(
+            ErrorMessage.NO_PERMISSION,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        if (avatar) {
+          await this.cloudinaryService.deleteImagesByUrls([
+            deceased.userDetail.avatar,
+          ]);
+        }
+
+        await this.userDetailService.updateUserDetail({
+          id: deceased.userDetailId,
+          ...(name && { name }),
+          ...(birthday && { birthday: dayjs(birthday).format('YYYY-MM-DD') }),
+          ...(address && { address }),
+          ...(gender && {
+            gender,
+          }),
+          ...(citizenNumber && { citizenNumber }),
+          ...(avatar && { avatar }),
+        });
+
+        if (images && images.length) {
+          await this.imageService.updateImageByDeceasedId(
+            id,
+            images.map((image) => ({ image, deceasedId: id })),
+            entityManager,
+          );
+        }
+
+        return await deceasedRepository.update(
+          { id },
+          {
+            modifierId,
+            ...(dateOfDeath && {
+              dateOfDeath: dayjs(dateOfDeath).format('YYYY-MM-DD'),
+            }),
+            ...(description && { description }),
+            ...(templeId && { templeId }),
+          },
+        );
+      },
+    );
   }
 }

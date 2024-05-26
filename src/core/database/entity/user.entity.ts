@@ -1,3 +1,4 @@
+import { Deceased } from 'src/core/database/entity/deceased.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { ERole } from 'src/core/enum/default.enum';
 import {
@@ -54,7 +55,7 @@ export class User {
 
   @Column({
     name: 'createdAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -62,7 +63,7 @@ export class User {
 
   @Column({
     name: 'updatedAt',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
   })
   @Field(() => Date)
@@ -79,23 +80,33 @@ export class User {
 
   @ManyToOne(() => Family, (family) => family.users)
   @JoinColumn({ name: 'familyId' })
+  @Field(() => Family)
   family: Family;
 
   @OneToMany(() => Review, (review) => review.user)
+  @Field(() => [Review])
   reviews: Review[];
 
   @OneToMany(
     () => DeathAnniversary,
     (deathAnniversary) => deathAnniversary.user,
   )
+  @Field(() => [DeathAnniversary])
   deathAnniversaries: DeathAnniversary[];
 
   @OneToOne(() => TempleMember, (templeMember) => templeMember.user)
+  @Field(() => TempleMember)
   templeMember: TempleMember;
 
   @OneToMany(() => Event, (event) => event.user)
+  @Field(() => [Event])
   events: Event[];
 
   @OneToMany(() => EventParticipant, (event) => event.user)
+  @Field(() => [EventParticipant])
   eventParticipants: EventParticipant[];
+
+  @OneToMany(() => Deceased, (deceased) => deceased.modifier)
+  @Field(() => [Deceased])
+  modifiedDeceaseds: Deceased[];
 }
