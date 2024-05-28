@@ -1,4 +1,4 @@
-import { EPriority } from '@core/enum';
+import { EMailType, EPriority } from '@core/enum';
 import * as bcrypt from 'bcrypt';
 import { IPaginationResponse } from 'src/core/interface/default.interface';
 import * as winston from 'winston';
@@ -87,3 +87,49 @@ export const generateRandomCode = (length: number) => {
  * @param expiresIn by hour, exp: "1h"
  * @returns
  */
+
+export const getMailFormat = (type: EMailType) => {
+  switch (type) {
+    case EMailType.APPROVE_EVENT_PARTICIPANT:
+      return {
+        title: '【Otera】Đăng ký tham gia sự kiện thành công',
+        content: `
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+        <tr>
+            <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                <p style="font-size: 16px; color: #333333;">Kính gửi {eventParticipantName},</p>
+
+                <p style="font-size: 16px; color: #333333;">Cảm ơn bạn đã đăng ký tham gia sự kiện <strong>{eventName}</strong> của {templeName}.</p>
+    
+                <p style="font-size: 16px; color: #333333;">Chúng tôi xin trân trọng thông báo rằng đăng ký tham gia sự kiện <strong>{eventName}</strong> đã được chấp thuận bởi thầy <strong>{approverName}</strong>.</p>
+                    
+                <p style="font-size: 16px; color: #333333;">Mã xác nhận của bạn là: <strong>{code}</strong></p>
+
+                <p style="font-size: 16px; color: #333333;">Vui lòng giữ mã xác nhận này để tham gia sự kiện.</p>
+
+                <p style="font-size: 16px; color: #333333;">Thời gian: {startDateEvent}</p>
+
+                <p style="font-size: 16px; color: #333333;">Địa điểm: {eventAddress}</p>
+
+                <p style="font-size: 16px; color: #333333;">Rất mong có sự góp mặt của bạn.</p>
+
+                <p style="font-size: 16px; color: #333333;">
+                    <a href="{eventDetailUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Chi tiết thông tin sự kiện {eventName}</a>
+                </p>
+
+                <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi:</p>
+
+                <p style="font-size: 16px; color: #333333;">
+                    <span>{eventPhone}</span><br>
+                    <span>{eventEmail}</span>
+                </p>
+
+                {footer}
+            </td>
+        </tr>
+    </table>`,
+      };
+    default:
+      throw new Error();
+  }
+};

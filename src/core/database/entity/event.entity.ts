@@ -13,6 +13,7 @@ import { EventParticipantType } from './eventParticipantType.entity';
 import { Image } from './image.entity';
 import 'dotenv/config.js';
 import { User } from './user.entity';
+import { Temple } from './temple.entity';
 
 @Entity('events')
 @ObjectType()
@@ -149,4 +150,9 @@ export class Event {
   @JoinColumn({ name: 'creatorId' })
   @Field(() => User)
   user: User;
+
+  @ManyToOne(() => Temple, (temple) => temple.events)
+  @JoinColumn({ name: 'templeId' })
+  @Field(() => Temple)
+  temple: Temple;
 }

@@ -20,6 +20,13 @@ array_relationships:
         table:
           name: deceaseds
           schema: public
+  - name: events
+    using:
+      foreign_key_constraint_on:
+        column: templeId
+        table:
+          name: events
+          schema: public
   - name: familyTemples
     using:
       foreign_key_constraint_on:

@@ -1,4 +1,4 @@
-import { EBookingStatus, ErrorMessage } from '@core/enum';
+import { EBookingStatus, EMailType, ErrorMessage } from '@core/enum';
 import { IUserData } from '@core/interface/default.interface';
 import { EventService } from '@modules/event/event.service';
 import { UserService } from '@modules/user/user.service';
@@ -15,9 +15,19 @@ import { EventParticipant } from './../../core/database/entity/eventParticipant.
 import { VBookingEventInput } from './dto/booking-event.entity';
 import { VGetEventParticipantsArgs } from './dto/get-event-participants.args';
 import { UpdateEventParticipantInput } from './dto/update-event-participant.input';
-import { generateRandomCode, returnPagingData } from '@helper/utils';
+import {
+  generateRandomCode,
+  getMailFormat,
+  returnPagingData,
+} from '@helper/utils';
 import { EVENT_PARTICIPANT_CODE_LENGTH } from '@core/constants';
 import { VEventParticipantCheckInInput } from './dto/event-participant-check-in.input';
+import { sendMail } from '@helper/mailtrap';
+import * as format from 'string-format';
+import * as dayjs from 'dayjs';
+import { FormatDate } from '@core/constants/formatDate';
+import { ConfigService } from '@nestjs/config';
+import { EConfiguration } from '@core/config';
 
 @Injectable()
 export class EventParticipantService {
@@ -27,6 +37,8 @@ export class EventParticipantService {
 
     @Inject(forwardRef(() => EventService))
     private readonly eventService: EventService,
+
+    private readonly configService: ConfigService,
 
     private readonly userService: UserService,
   ) {}
@@ -133,6 +145,7 @@ export class EventParticipantService {
         id: eventParticipantId,
         isDeleted: false,
       },
+      relations: ['user', 'user.userDetail', 'event', 'event.temple'],
     });
 
     if (!eventParticipant) {
@@ -145,7 +158,32 @@ export class EventParticipantService {
     let randomCode = null;
     if (newEventParticipant.bookingStatus === EBookingStatus.APPROVED) {
       randomCode = generateRandomCode(EVENT_PARTICIPANT_CODE_LENGTH);
-
+      const mailFormat = getMailFormat(EMailType.APPROVE_EVENT_PARTICIPANT);
+      sendMail({
+        to: eventParticipant.user.email,
+        title: mailFormat.title,
+        content: format(mailFormat.content, {
+          eventParticipantName: eventParticipant.user.userDetail.name,
+          eventName: eventParticipant.event.name,
+          templeName: eventParticipant.event.temple.name,
+          approverName: userData.name,
+          code: randomCode,
+          startDateEvent: dayjs(eventParticipant.event.startDateEvent).format(
+            FormatDate.HH_mm_DD_MM_YYYY,
+          ),
+          eventAddress: eventParticipant.event.address,
+          eventPhone: eventParticipant.event.phone
+            ? 'Điện thoại: ' + eventParticipant.event.phone
+            : '',
+          eventEmail: eventParticipant.event.email
+            ? 'Email: ' + eventParticipant.event.email
+            : '',
+          eventDetailUrl:
+            this.configService.get(EConfiguration.CLIENT_URL) +
+            '/event/' +
+            eventParticipant.event.id,
+        }),
+      });
       while (await this.checkExistedCode(eventParticipantId, randomCode)) {
         randomCode = generateRandomCode(EVENT_PARTICIPANT_CODE_LENGTH);
       }
