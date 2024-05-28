@@ -18,5 +18,6 @@
   "INVITATION_NOT_FOUND": "Invitation not found",
   "FAMILY_NOT_EXIST": "Family not exist",
   "NOTIFICATION_NOT_EXIST": "Notification not exist",
-  "INVITATION_EXPIRED": "Invitation expired"
+  "INVITATION_EXPIRED": "Invitation expired",
+  "SEND_MAIL_FAIL": "Send mail fail"
 }

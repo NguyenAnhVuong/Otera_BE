@@ -57,3 +57,7 @@ export enum ESortOrder {
 export enum ENotificationType {
   INVITE_FAMILY = 'INVITE_FAMILY',
 }
+
+export enum EMailType {
+  APPROVE_EVENT_PARTICIPANT = 'APPROVE_EVENT_PARTICIPANT',
+}

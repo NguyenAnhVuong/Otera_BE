@@ -15,6 +15,7 @@ import { Review } from './review.entity';
 import { DeathAnniversary } from './deathAnniversary.entity';
 import { User } from './user.entity';
 import { TempleMember } from './templeMember.entity';
+import { Event } from './event.entity';
 
 registerEnumType(EPriority, {
   name: 'EPriority',
@@ -140,4 +141,8 @@ export class Temple {
   @OneToMany(() => TempleMember, (templeMember) => templeMember.temple)
   @Field(() => [TempleMember])
   templeMembers: TempleMember[];
+
+  @OneToMany(() => Event, (event) => event.temple)
+  @Field(() => [Event])
+  events: Event[];
 }

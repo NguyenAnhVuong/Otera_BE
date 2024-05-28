@@ -88,42 +88,6 @@ type TempleMember {
   temple: Temple!
 }
 
-type Temple {
-  id: Int!
-  name: String!
-  avatar: String!
-  address: String!
-  phone: String
-  email: String
-  website: String
-  priority: EPriority!
-  priorityExpired: DateTime
-  plan: EPlan!
-  planExpired: DateTime
-  status: EStatus!
-  adminId: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  admin: User!
-  deceaseds: [Deceased!]!
-  familyTemples: [FamilyTemple!]!
-  images: [Image!]!
-  reviews: [Review!]!
-  deathAnniversaries: [DeathAnniversary!]!
-  templeMembers: [TempleMember!]!
-}
-
-enum EPriority {
-  LOW
-  MEDIUM
-  HIGH
-}
-
-enum EPlan {
-  FREE
-  PREMIUM
-}
-
 type EventParticipant {
   id: Int!
   eventId: Int!
@@ -191,6 +155,44 @@ type Event {
   images: [Image!]!
   eventParticipantTypes: [EventParticipantType!]!
   user: User!
+  temple: Temple!
+}
+
+enum EPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+type Temple {
+  id: Int!
+  name: String!
+  avatar: String!
+  address: String!
+  phone: String
+  email: String
+  website: String
+  priority: EPriority!
+  priorityExpired: DateTime
+  plan: EPlan!
+  planExpired: DateTime
+  status: EStatus!
+  adminId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  admin: User!
+  deceaseds: [Deceased!]!
+  familyTemples: [FamilyTemple!]!
+  images: [Image!]!
+  reviews: [Review!]!
+  deathAnniversaries: [DeathAnniversary!]!
+  templeMembers: [TempleMember!]!
+  events: [Event!]!
+}
+
+enum EPlan {
+  FREE
+  PREMIUM
 }
 
 type Image {
@@ -407,6 +409,7 @@ type EventDetail {
   images: [Image!]!
   eventParticipantTypes: [EventParticipantType!]!
   user: User!
+  temple: Temple!
   currentParticipant: Float!
   isBooked: Boolean!
 }
@@ -443,6 +446,7 @@ type EventManagementInfo {
   images: [Image!]!
   eventParticipantTypes: [EventParticipantType!]!
   user: User!
+  temple: Temple!
   currentParticipant: Float!
   bookingParticipant: Float!
   checkInParticipant: Float!
