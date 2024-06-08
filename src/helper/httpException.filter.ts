@@ -57,7 +57,7 @@ export class HttpExceptionFilter
     //   userLang = this.i18nCustomService.switchLanguage(userLanguage);
     // }
     if (request) {
-      const language: TLanguage = request.headers['accept-language'] || 'en';
+      const language: TLanguage = request.headers['accept-language'] || 'vi';
 
       const status =
         exception instanceof HttpException

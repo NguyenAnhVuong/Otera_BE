@@ -2,6 +2,46 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type FamilyTemple {
+  id: Int!
+  familyId: Int
+  templeId: Int
+  isDeleted: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  family: Family!
+  temple: Temple!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Family {
+  id: Int!
+  familyCode: String!
+  adminId: Int!
+  name: String!
+  description: String!
+  address: String!
+  phone: String!
+  avatar: String!
+  status: EStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  users: [User!]!
+  deceaseds: [Deceased!]!
+  familyTemples: [FamilyTemple!]!
+  deathAnniversaries: [DeathAnniversary!]!
+}
+
+enum EStatus {
+  REJECTED
+  PENDING
+  APPROVED
+}
+
 type DeathAnniversary {
   id: Int!
   deceasedId: Int!
@@ -25,67 +65,6 @@ type DeathAnniversary {
   temple: Temple!
   user: User!
   family: Family!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-enum EStatus {
-  REJECTED
-  PENDING
-  APPROVED
-}
-
-type Family {
-  id: Int!
-  familyCode: String!
-  adminId: Int!
-  name: String!
-  description: String!
-  address: String!
-  phone: String!
-  avatar: String!
-  status: EStatus!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  users: [User!]!
-  deceaseds: [Deceased!]!
-  familyTemples: [FamilyTemple!]!
-  deathAnniversaries: [DeathAnniversary!]!
-}
-
-type FamilyTemple {
-  id: Int!
-  familyId: Int
-  templeId: Int
-  isDeleted: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  family: Family!
-  temple: Temple!
-}
-
-type Review {
-  id: Int!
-  userId: Int!
-  templeId: Int
-  eventId: Int
-  content: String!
-  rating: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  temple: Temple!
-  user: User!
-}
-
-type TempleMember {
-  id: Int!
-  templeId: Int!
-  userId: Int!
-  user: User!
-  temple: Temple!
 }
 
 type EventParticipant {
@@ -164,11 +143,35 @@ enum EPriority {
   HIGH
 }
 
+type Review {
+  id: Int!
+  userId: Int!
+  templeId: Int
+  eventId: Int
+  content: String!
+  rating: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  temple: Temple!
+  user: User!
+}
+
+type FollowerTemple {
+  id: Int!
+  templeId: Int!
+  userId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  temple: Temple!
+}
+
 type Temple {
   id: Int!
   name: String!
   avatar: String!
   address: String!
+  description: String!
   phone: String
   email: String
   website: String
@@ -186,7 +189,7 @@ type Temple {
   images: [Image!]!
   reviews: [Review!]!
   deathAnniversaries: [DeathAnniversary!]!
-  templeMembers: [TempleMember!]!
+  followerTemples: [FollowerTemple!]!
   events: [Event!]!
 }
 
@@ -246,7 +249,7 @@ type Deceased {
   images: [Image!]!
   userDetail: UserDetail!
   deathAnniversaries: [DeathAnniversary!]!
-  modifier: User!
+  modifier: User
 }
 
 type User {
@@ -259,10 +262,10 @@ type User {
   updatedAt: DateTime!
   temple: Temple!
   userDetail: UserDetail!
-  family: Family!
+  family: Family
   reviews: [Review!]!
   deathAnniversaries: [DeathAnniversary!]!
-  templeMember: TempleMember!
+  followerTemples: FollowerTemple!
   events: [Event!]!
   eventParticipants: [EventParticipant!]!
   modifiedDeceaseds: [Deceased!]!
@@ -343,6 +346,32 @@ type TemplesRes {
   data: TemplesPagingData!
 }
 
+type TempleRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Temple!
+}
+
+type Notification {
+  id: Int!
+  userId: Int
+  title: String!
+  description: String
+  type: ENotificationType!
+  inviteFamilyId: Int
+  redirectTo: String
+  isRead: Boolean!
+  isDeleted: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+enum ENotificationType {
+  INVITE_FAMILY
+}
+
 type CreateRes {
   statusCode: Int!
   errorMessage: String
@@ -366,7 +395,7 @@ type EventParticipantRes {
   event: Event!
   user: User!
   approver: User
-  isBelongToTemple: Boolean!
+  isFollowing: Boolean!
   familyName: String
 }
 
@@ -485,6 +514,22 @@ type BookingEventsRes {
   data: BookingEventsPagingData!
 }
 
+type NotificationsPagingData {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [Notification!]!
+}
+
+type NotificationsRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: NotificationsPagingData!
+}
+
 type Test {
   """Example field (placeholder)"""
   exampleField: Int!
@@ -531,38 +576,28 @@ type FamilyMembersRes {
   data: FamilyMembers!
 }
 
-type Notification {
-  id: Int!
-  userId: Int
-  title: String!
-  description: String
-  type: ENotificationType!
-  inviteFamilyId: Int
-  redirectTo: String
-  isRead: Boolean!
-  isDeleted: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-enum ENotificationType {
-  INVITE_FAMILY
-}
-
-type NotificationsPagingData {
-  totalItems: Int!
-  page: Int!
-  totalPages: Int!
-  take: Int!
-  data: [Notification!]!
-}
-
-type NotificationsRes {
+type DeleteRes {
   statusCode: Int!
   errorMessage: String
   errorCode: String
   timestamp: String!
-  data: NotificationsPagingData!
+  data: Boolean!
+}
+
+type FollowerTemplesPagingData {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [FollowerTemple!]!
+}
+
+type FollowerTemplesRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: FollowerTemplesPagingData!
 }
 
 type IsBookedEvent {
@@ -572,6 +607,7 @@ type IsBookedEvent {
 type Query {
   getUser: UserRes!
   systemGetTemples(page: Int, take: Int, skip: Int, keyword: String, familyId: Float, priority: EPriority, status: EStatus): TemplesRes!
+  getTempleDetail(id: Int!): TempleRes!
   getFamily(page: Int, take: Int, skip: Int, id: Int!): FamilyRes!
   getFamilyMembers(page: Int, take: Int, skip: Int, orderBy: [OrderBy!], id: Int!, name: String, address: String, email: String, phone: String, roleFilter: [ERole!]): FamilyMembersRes!
   getListDeceased(familyId: Int!): ListDeceasedRes!
@@ -582,7 +618,8 @@ type Query {
   getEvents(page: Int, take: Int, skip: Int, templeId: Int): EventsRes!
   getBookingEvents(page: Int, take: Int, skip: Int, name: String, address: String, orderBy: [OrderBy!], bookingStatus: EBookingStatus): BookingEventsRes!
   getEventById(id: Int!): EventRes!
-  getEventParticipants(page: Int, take: Int, skip: Int, eventId: Int!, name: String, email: String, address: String, familyName: String, bookingStatus: EBookingStatus!, isBelongToTemple: Boolean, orderBy: [OrderBy!]): EventParticipantsRes!
+  getEventParticipants(page: Int, take: Int, skip: Int, eventId: Int!, name: String, email: String, address: String, familyName: String, bookingStatus: EBookingStatus!, isFollowing: Boolean, orderBy: [OrderBy!]): EventParticipantsRes!
+  templeGetFollowers(page: Int, take: Int, skip: Int, name: String, email: String, phone: String, address: String, familyName: String, orderBy: [OrderBy!], isInFamily: Boolean): FollowerTemplesRes!
 }
 
 input OrderBy {
@@ -621,6 +658,8 @@ type Mutation {
   updateNotification(updateNotificationInput: UpdateNotificationInput!): UpdateRes!
   responseFamilyInvitation(responseInviteFamilyInput: ResponseInviteFamilyInput!): UpdateRes!
   inviteToFamily(inviteFamilyInput: InviteFamilyInput!): CreateRes!
+  followTemple(followTempleInput: VFollowTempleInput!): CreateRes!
+  unfollowTemple(templeId: Int!): DeleteRes!
 }
 
 input RemoveFamilyMemberInput {
@@ -748,6 +787,10 @@ input ResponseInviteFamilyInput {
 
 input InviteFamilyInput {
   email: String!
+}
+
+input VFollowTempleInput {
+  templeId: Int!
 }
 
 type Subscription {

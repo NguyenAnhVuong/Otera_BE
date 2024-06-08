@@ -40,10 +40,7 @@ export class DeceasedResolver {
     id: number,
     @GQLUserData() userData: IUserData,
   ) {
-    return this.deceasedService.getDeceasedByIdAndFamilyId(
-      id,
-      userData.familyId,
-    );
+    return this.deceasedService.getDeceasedByIdAndFamilyId(id, userData.fid);
   }
 
   @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])

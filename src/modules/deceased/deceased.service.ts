@@ -15,7 +15,7 @@ import { UserDetailService } from '../user-detail/user-detail.service';
 import { ImageService } from '../image/image.service';
 import { IUserData } from '@core/interface/default.interface';
 import { FamilyTempleService } from '@modules/family-temple/family-temple.service';
-import { ErrorMessage } from '@core/enum';
+import { EStatus, ErrorMessage } from '@core/enum';
 import * as dayjs from 'dayjs';
 import { VUpdateDeceasedInput } from './dto/update-deceased.input';
 import { DeathAnniversaryService } from '@modules/death-anniversary/death-anniversary.service';
@@ -122,14 +122,32 @@ export class DeceasedService {
   }
 
   async getDeceasedByIdAndFamilyId(id: number, familyId: number) {
-    return await this.deceasedRepository.findOne({
-      where: {
-        id,
-        familyId,
-        isDeleted: false,
-      },
-      relations: ['images', 'userDetail', 'modifier', 'modifier.userDetail'],
-    });
+    return await this.deceasedRepository
+      .createQueryBuilder('deceased')
+      .where(
+        'deceased.id = :id AND deceased.familyId = :familyId AND deceased.isDeleted = false',
+        {
+          id,
+          familyId,
+        },
+      )
+      .leftJoinAndSelect('deceased.images', 'images')
+      .leftJoinAndSelect('deceased.userDetail', 'userDetail')
+      .leftJoinAndSelect('deceased.modifier', 'modifier')
+      .leftJoinAndSelect('modifier.userDetail', 'modifierUserDetail')
+      .leftJoinAndSelect(
+        'deceased.deathAnniversaries',
+        'deathAnniversaries',
+        `deathAnniversaries.isDeleted = false AND deathAnniversaries.desiredStartTime > :now AND 
+        (deathAnniversaries.status = :pendingStatus OR 
+          (deathAnniversaries.status = :rejectStatus AND deathAnniversaries.enableUpdate = false))`,
+        {
+          now: new Date(),
+          pendingStatus: EStatus.PENDING,
+          rejectStatus: EStatus.REJECTED,
+        },
+      )
+      .getOne();
   }
 
   async checkDeceasedInFamily(

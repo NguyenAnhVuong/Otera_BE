@@ -15,6 +15,8 @@ import 'dotenv/config.js';
 import { User } from './user.entity';
 import { Temple } from './temple.entity';
 
+// TODO public full event
+// TODO Add free open status
 @Entity('events')
 @ObjectType()
 export class Event {

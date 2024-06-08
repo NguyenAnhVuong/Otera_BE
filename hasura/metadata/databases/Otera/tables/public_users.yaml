@@ -12,13 +12,6 @@ object_relationships:
         table:
           name: temples
           schema: public
-  - name: templeMember
-    using:
-      foreign_key_constraint_on:
-        column: userId
-        table:
-          name: templeMembers
-          schema: public
   - name: userDetail
     using:
       foreign_key_constraint_on: userDetailId
@@ -57,6 +50,13 @@ array_relationships:
         column: creatorId
         table:
           name: events
+          schema: public
+  - name: followerTemples
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: followerTemples
           schema: public
   - name: reviews
     using:

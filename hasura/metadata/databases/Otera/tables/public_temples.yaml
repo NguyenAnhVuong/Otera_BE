@@ -34,6 +34,13 @@ array_relationships:
         table:
           name: familyTemples
           schema: public
+  - name: followerTemples
+    using:
+      foreign_key_constraint_on:
+        column: templeId
+        table:
+          name: followerTemples
+          schema: public
   - name: images
     using:
       foreign_key_constraint_on:
@@ -47,11 +54,4 @@ array_relationships:
         column: templeId
         table:
           name: reviews
-          schema: public
-  - name: templeMembers
-    using:
-      foreign_key_constraint_on:
-        column: templeId
-        table:
-          name: templeMembers
           schema: public

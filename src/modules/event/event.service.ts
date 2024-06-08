@@ -20,6 +20,7 @@ import { GetEventArgs } from './dto/get-event.args';
 import { EventParticipantService } from '@modules/event-participant/event-participant.service';
 import { GetBookingEventsArgs } from './dto/get-booking-events.args';
 import { EventParticipant } from '@core/database/entity/eventParticipant.entity';
+import { NotificationService } from '@modules/notification/notification.service';
 
 @Injectable()
 export class EventService {
@@ -33,6 +34,8 @@ export class EventService {
 
     @Inject(forwardRef(() => EventParticipantService))
     private readonly eventParticipantService: EventParticipantService,
+
+    private readonly notificationService: NotificationService,
 
     private readonly dataSource: DataSource,
   ) {}

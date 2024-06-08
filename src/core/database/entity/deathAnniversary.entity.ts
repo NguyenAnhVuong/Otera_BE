@@ -12,6 +12,7 @@ import { Temple } from './temple.entity';
 import { User } from './user.entity';
 import { Family } from './family.entity';
 
+// TODO dia chi phan mo
 @Entity('deathAnniversaries')
 @ObjectType()
 export class DeathAnniversary {
