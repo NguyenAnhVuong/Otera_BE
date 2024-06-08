@@ -72,10 +72,28 @@ export class TempleService {
   }
 
   async getTempleById(id: number): Promise<Temple> {
-    return this.templeRepository.findOne({
+    return await this.templeRepository.findOne({
       where: { id },
       relations: ['images'],
     });
+  }
+
+  async getTempleDetail(id: number, userId?: number): Promise<Temple> {
+    return await this.templeRepository
+      .createQueryBuilder('temple')
+      .where({
+        id,
+      })
+      .leftJoinAndSelect('temple.images', 'images')
+      .leftJoinAndSelect(
+        'temple.followerTemples',
+        'followerTemples',
+        'followerTemples.userId = :userId',
+        {
+          userId,
+        },
+      )
+      .getOne();
   }
 
   async getTempleByAdminId(adminId: number): Promise<Temple> {

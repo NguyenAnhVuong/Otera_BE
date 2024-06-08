@@ -112,6 +112,6 @@ export class Deceased {
   deathAnniversaries: DeathAnniversary[];
 
   @ManyToOne(() => User, (user) => user.modifiedDeceaseds)
-  @Field(() => User)
+  @Field(() => User, { nullable: true })
   modifier: User;
 }

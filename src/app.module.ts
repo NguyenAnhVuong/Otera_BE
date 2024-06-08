@@ -28,6 +28,7 @@ import { TempleModule } from './modules/temple/temple.module';
 import { UserModule } from './modules/user/user.module';
 import { NotificationModule } from '@modules/notification/notification.module';
 import { InviteFamilyModule } from '@modules/invite-family/invite-family.module';
+import { FollowerTempleModule } from '@modules/follower-temple/follower-temple.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { InviteFamilyModule } from '@modules/invite-family/invite-family.module'
     NotificationModule,
     InviteFamilyModule,
     NotificationModule,
+    FollowerTempleModule,
   ],
   controllers: [AppController],
   providers: [

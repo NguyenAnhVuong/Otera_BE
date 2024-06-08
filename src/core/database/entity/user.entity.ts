@@ -1,5 +1,5 @@
-import { Deceased } from 'src/core/database/entity/deceased.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Deceased } from 'src/core/database/entity/deceased.entity';
 import { ERole } from 'src/core/enum/default.enum';
 import {
   Column,
@@ -15,8 +15,8 @@ import { Event } from './event.entity';
 import { EventParticipant } from './eventParticipant.entity';
 import { Family } from './family.entity';
 import { Review } from './review.entity';
+import { FollowerTemple } from './followerTemple.entity';
 import { Temple } from './temple.entity';
-import { TempleMember } from './templeMember.entity';
 import { UserDetail } from './userDetail.entity';
 
 registerEnumType(ERole, {
@@ -49,6 +49,8 @@ export class User {
   @Field(() => Int, { nullable: true })
   familyId: number | null;
 
+  // add templeId for temple admin and temple member
+
   @Column({ name: 'userDetailId', type: 'int', nullable: true })
   @Field(() => Int, { nullable: true })
   userDetailId: number | null;
@@ -80,7 +82,7 @@ export class User {
 
   @ManyToOne(() => Family, (family) => family.users)
   @JoinColumn({ name: 'familyId' })
-  @Field(() => Family)
+  @Field(() => Family, { nullable: true })
   family: Family;
 
   @OneToMany(() => Review, (review) => review.user)
@@ -94,9 +96,9 @@ export class User {
   @Field(() => [DeathAnniversary])
   deathAnniversaries: DeathAnniversary[];
 
-  @OneToOne(() => TempleMember, (templeMember) => templeMember.user)
-  @Field(() => TempleMember)
-  templeMember: TempleMember;
+  @OneToMany(() => FollowerTemple, (templeMember) => templeMember.user)
+  @Field(() => FollowerTemple)
+  followerTemples: FollowerTemple[];
 
   @OneToMany(() => Event, (event) => event.user)
   @Field(() => [Event])

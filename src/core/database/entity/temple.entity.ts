@@ -1,3 +1,4 @@
+import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { EPlan, EPriority, EStatus } from 'src/core/enum/default.enum';
 import {
   Column,
@@ -7,15 +8,14 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { DeathAnniversary } from './deathAnniversary.entity';
+import { Deceased } from './deceased.entity';
+import { Event } from './event.entity';
 import { FamilyTemple } from './familyTemple.entity';
 import { Image } from './image.entity';
-import { Deceased } from './deceased.entity';
-import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Review } from './review.entity';
-import { DeathAnniversary } from './deathAnniversary.entity';
+import { FollowerTemple } from './followerTemple.entity';
 import { User } from './user.entity';
-import { TempleMember } from './templeMember.entity';
-import { Event } from './event.entity';
 
 registerEnumType(EPriority, {
   name: 'EPriority',
@@ -46,6 +46,7 @@ export class Temple {
   address: string;
 
   @Column({ name: 'description', type: 'varchar', length: 5000 })
+  @Field(() => String)
   description: string;
 
   @Column({ name: 'phone', type: 'varchar', length: 250, nullable: true })
@@ -138,9 +139,9 @@ export class Temple {
   @Field(() => [DeathAnniversary])
   deathAnniversaries: DeathAnniversary[];
 
-  @OneToMany(() => TempleMember, (templeMember) => templeMember.temple)
-  @Field(() => [TempleMember])
-  templeMembers: TempleMember[];
+  @OneToMany(() => FollowerTemple, (templeMember) => templeMember.temple)
+  @Field(() => [FollowerTemple])
+  followerTemples: FollowerTemple[];
 
   @OneToMany(() => Event, (event) => event.temple)
   @Field(() => [Event])

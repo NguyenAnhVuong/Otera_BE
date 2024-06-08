@@ -134,6 +134,7 @@ export class EventParticipantService {
     return !!eventParticipant;
   }
 
+  // TODO add mail and notification when reject and notification when approve
   async updateEventParticipant(
     bookingEventInput: UpdateEventParticipantInput,
     userData: IUserData,
@@ -215,7 +216,7 @@ export class EventParticipantService {
       email,
       address,
       familyName,
-      isBelongToTemple,
+      isFollowing,
       orderBy,
     } = getEventParticipantsArgs;
     const query = this.eventParticipantRepository
@@ -232,26 +233,35 @@ export class EventParticipantService {
       .leftJoinAndSelect('eventParticipant.approver', 'approver')
       .leftJoinAndSelect('approver.userDetail', 'approverDetail')
       .leftJoinAndSelect('user.family', 'family')
-      .leftJoinAndSelect('family.familyTemples', 'familyTemples')
+      .leftJoinAndSelect(
+        'user.followerTemples',
+        'followerTemples',
+        'followerTemples.templeId = :templeId',
+        { templeId },
+      )
       .skip(skip)
       .take(take);
 
-    if (isBelongToTemple) {
-      query.andWhere('familyTemples.templeId = :templeId', { templeId });
+    if (isFollowing) {
+      query.andWhere('followerTemples.templeId = :templeId', { templeId });
     }
     if (name) {
-      query.andWhere('userDetail.name = :name', { name });
+      query.andWhere('userDetail.name like :name', { name: `%${name}%` });
     }
     if (email) {
-      query.andWhere('user.email = :email', { email });
+      query.andWhere('user.email like :email', { email: `%${email}%` });
     }
     if (address) {
-      query.andWhere('userDetail.address = :address', { address });
+      query.andWhere('userDetail.address like :address', {
+        address: `%${address}%`,
+      });
     }
     if (familyName) {
       query
         .leftJoin('user.family', 'family')
-        .andWhere('family.name = :familyName', { familyName });
+        .andWhere('family.name like :familyName', {
+          familyName: `%${familyName}%`,
+        });
     }
     if (orderBy && orderBy.length > 0) {
       orderBy.forEach((order) => {
@@ -265,9 +275,7 @@ export class EventParticipantService {
       data.map(async (eventParticipant) => {
         return {
           familyName: eventParticipant.user.family?.name,
-          isBelongToTemple: !!(
-            eventParticipant.user.family?.familyTemples.length > 0
-          ),
+          isFollowing: !!eventParticipant.user.followerTemples.length,
           ...eventParticipant,
         };
       }),

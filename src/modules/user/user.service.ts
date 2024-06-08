@@ -84,7 +84,7 @@ export class UserService {
       .where('user.email = :email', { email: userLogin.email })
       .leftJoinAndSelect('user.userDetail', 'userDetail')
       .leftJoinAndSelect('user.temple', 'temple')
-      .leftJoinAndSelect('user.templeMember', 'templeMember')
+      .leftJoinAndSelect('user.followerTemples', 'followerTemples')
       .leftJoinAndSelect('user.family', 'family')
       .leftJoinAndSelect('family.familyTemples', 'familyTemples')
       .getOne();
@@ -107,8 +107,8 @@ export class UserService {
 
     let templeIds = null;
 
-    if (user.templeMember) {
-      templeIds = [user.templeMember.templeId];
+    if (user.followerTemples.length > 0) {
+      templeIds = user.followerTemples.map((temple) => temple.templeId);
     }
 
     if (user.temple) {

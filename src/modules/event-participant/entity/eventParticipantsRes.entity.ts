@@ -6,7 +6,7 @@ import { Field, ObjectType } from '@nestjs/graphql';
 @ObjectType()
 export class EventParticipantRes extends EventParticipant {
   @Field(() => Boolean)
-  isBelongToTemple: boolean;
+  isFollowing: boolean;
 
   @Field(() => String, { nullable: true })
   familyName?: string;
