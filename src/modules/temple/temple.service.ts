@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Image } from 'src/core/database/entity/image.entity';
 import { Temple } from 'src/core/database/entity/temple.entity';
-import { ERole } from 'src/core/enum/default.enum';
+import { ERole, EStatus } from 'src/core/enum/default.enum';
 import { returnPagingData } from 'src/helper/utils';
 import {
   DataSource,
@@ -18,6 +18,8 @@ import { VCreateTempleDto } from './dto/create-temple.dto';
 import { VGetTemplesDto } from './dto/get-temples.dto';
 import { ErrorMessage } from '@core/enum';
 import { VSystemGetTemplesDto } from './dto/system-get-temples.input';
+import { VUpdateStatusTempleInput } from './dto/update-status-temple.input';
+import { IUserData } from '@core/interface/default.interface';
 
 @Injectable()
 export class TempleService {
@@ -73,16 +75,18 @@ export class TempleService {
 
   async getTempleById(id: number): Promise<Temple> {
     return await this.templeRepository.findOne({
-      where: { id },
+      where: { id, status: EStatus.APPROVED },
       relations: ['images'],
     });
   }
 
-  async getTempleDetail(id: number, userId?: number): Promise<Temple> {
+  async getTempleDetail(id: number, userData?: IUserData): Promise<Temple> {
+    const { id: userId, role } = userData;
     return await this.templeRepository
       .createQueryBuilder('temple')
       .where({
         id,
+        ...(role !== ERole.SYSTEM && { status: EStatus.APPROVED }),
       })
       .leftJoinAndSelect('temple.images', 'images')
       .leftJoinAndSelect(
@@ -120,6 +124,7 @@ export class TempleService {
             familyId,
           },
         }),
+        status: EStatus.APPROVED,
       },
       skip,
       take,
@@ -132,27 +137,62 @@ export class TempleService {
     return returnPagingData(items, totalItems, query);
   }
 
-  async systemGetTemples(query: VSystemGetTemplesDto) {
-    const { skip, take, keyword, familyId, priority, status } = query;
-    const [items, totalItems] = await this.templeRepository.findAndCount({
-      where: {
-        ...(keyword && { name: ILike(`%${keyword}%`) }),
-        ...(familyId && {
-          familyTemples: {
-            familyId,
-          },
-        }),
-        ...(priority && { priority }),
-        ...(status && { status }),
-      },
-      skip,
-      take,
-      order: {
-        priority: 'DESC',
-        createdAt: 'DESC',
-      },
+  async systemGetTemples(systemGetTemplesQuery: VSystemGetTemplesDto) {
+    const { name, email, address, orderBy, status, skip, take } =
+      systemGetTemplesQuery;
+    const query = this.templeRepository
+      .createQueryBuilder('temple')
+      .leftJoinAndSelect('temple.images', 'images')
+      .leftJoinAndSelect('temple.admin', 'admin')
+      .leftJoinAndSelect('admin.userDetail', 'userDetail')
+      .skip(skip)
+      .take(take);
+    if (name) {
+      query.andWhere('temple.name ILIKE :name', { name: `%${name}%` });
+    }
+
+    if (email) {
+      query.andWhere('temple.email ILIKE :email', { email: `%${email}%` });
+    }
+
+    if (address) {
+      query.andWhere('temple.address ILIKE :address', {
+        address: `%${address}%`,
+      });
+    }
+
+    if (status) {
+      query.andWhere('temple.status = :status', { status });
+    }
+
+    if (orderBy) {
+      orderBy.forEach((order) => {
+        query.addOrderBy(`temple.${order.column}`, order.sortOrder);
+      });
+    }
+
+    const [data, count] = await query.getManyAndCount();
+
+    return returnPagingData(data, count, systemGetTemplesQuery);
+  }
+
+  async updateStatusTemple(updateStatusTemple: VUpdateStatusTempleInput) {
+    const { id, status, rejectReason, blockReason } = updateStatusTemple;
+    const temple = await this.templeRepository.findOne({
+      where: { id },
     });
 
-    return returnPagingData(items, totalItems, query);
+    if (!temple) {
+      throw new HttpException(
+        ErrorMessage.TEMPLE_NOT_EXIST,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.templeRepository.update(id, {
+      status,
+      rejectReason,
+      blockReason,
+    });
   }
 }

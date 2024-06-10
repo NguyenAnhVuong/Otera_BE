@@ -85,6 +85,9 @@ custom_types:
         - description: null
           is_deprecated: null
           value: APPROVED
+        - description: null
+          is_deprecated: null
+          value: BLOCKED
     - name: EGender
       values:
         - description: null

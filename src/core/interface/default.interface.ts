@@ -1,8 +1,10 @@
+import { ERole } from '@core/enum';
+
 export interface IUserData {
   id: number;
   email: string;
   name: string;
-  role: string;
+  role: ERole;
   fid?: number;
   tid?: number[];
   [key: string]: any;

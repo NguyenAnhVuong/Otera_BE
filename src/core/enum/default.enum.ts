@@ -29,6 +29,7 @@ export enum EStatus {
   REJECTED = 'REJECTED',
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
+  BLOCKED = 'BLOCKED',
 }
 
 export enum EPriority {

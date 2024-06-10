@@ -1,37 +1,42 @@
 import { EPriority, EStatus } from '@core/enum';
+import { OrderBy } from '@core/global/entities/order.entity';
 import { PaginationQuery } from '@core/global/entities/paginationQuery.entity';
 import { ArgsType, Field } from '@nestjs/graphql';
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 
 @ArgsType()
 export class VSystemGetTemplesDto extends PaginationQuery {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
-  keyword?: string;
+  name?: string;
 
-  @Field(() => Number, { nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsNumber()
-  familyId?: number;
+  @IsString()
+  email?: string;
 
-  @Field(() => EPriority, { nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
-  @IsEnum(EPriority)
-  priority?: EPriority;
+  @IsString()
+  address?: number;
 
   @Field(() => EStatus, { nullable: true })
   @IsOptional()
   @IsEnum(EStatus)
   status?: EStatus;
 
-  // @IsNumber()
-  // @Field(() => Int, { nullable: true })
-  // @IsOptional()
-  // page?: number;
-
-  // @Field(() => Int, { nullable: true })
-  // @IsNumber()
-  // @IsOptional()
-  // take?: number;
+  @Field(() => [OrderBy], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderBy)
+  orderBy?: OrderBy[];
 }
