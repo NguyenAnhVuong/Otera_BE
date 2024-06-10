@@ -1,6 +1,5 @@
 import { HasuraBody } from '@core/decorator/hasuraBody.decorator';
 import { HasuraBodyPaging } from '@core/decorator/hasuraBodyPaging.decorator';
-import { IsPublicOrAuth } from '@core/decorator/publicOrAuth.decorator';
 import {
   Body,
   Controller,

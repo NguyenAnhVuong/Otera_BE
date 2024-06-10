@@ -327,21 +327,21 @@ export class UserService {
       .leftJoinAndSelect('user.userDetail', 'userDetail');
 
     if (name) {
-      query.andWhere('userDetail.name LIKE :name', { name: `%${name}%` });
+      query.andWhere('userDetail.name ILIKE :name', { name: `%${name}%` });
     }
 
     if (address) {
-      query.andWhere('userDetail.address LIKE :address', {
+      query.andWhere('userDetail.address ILIKE :address', {
         address: `%${address}%`,
       });
     }
 
     if (email) {
-      query.andWhere('user.email LIKE :email', { email: `%${email}%` });
+      query.andWhere('user.email ILIKE :email', { email: `%${email}%` });
     }
 
     if (phone) {
-      query.andWhere('userDetail.phone LIKE :phone', { phone: `%${phone}%` });
+      query.andWhere('userDetail.phone ILIKE :phone', { phone: `%${phone}%` });
     }
 
     if (roleFilter.length) {

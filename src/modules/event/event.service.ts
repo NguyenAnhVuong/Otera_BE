@@ -126,7 +126,7 @@ export class EventService {
       .take(take);
 
     if (name) {
-      queryBuilder.andWhere('event.name LIKE :name', { name: `%${name}%` });
+      queryBuilder.andWhere('event.name ILIKE :name', { name: `%${name}%` });
     }
 
     if (upcoming) {
@@ -241,11 +241,11 @@ export class EventService {
     }
 
     if (name) {
-      query.andWhere('event.name LIKE :name', { name: `%${name}%` });
+      query.andWhere('event.name ILIKE :name', { name: `%${name}%` });
     }
 
     if (address) {
-      query.andWhere('event.address LIKE :address', {
+      query.andWhere('event.address ILIKE :address', {
         address: `%${address}%`,
       });
     }

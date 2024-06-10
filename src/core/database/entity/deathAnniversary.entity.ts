@@ -82,7 +82,7 @@ export class DeathAnniversary {
   @Column({
     name: 'rejectReason',
     type: 'varchar',
-    length: 5000,
+    length: 255,
     nullable: true,
   })
   @Field(() => String, { nullable: true })

@@ -49,12 +49,12 @@ export class Temple {
   @Field(() => String)
   description: string;
 
-  @Column({ name: 'phone', type: 'varchar', length: 250, nullable: true })
+  @Column({ name: 'phone', type: 'varchar', length: 250 })
   @Field(() => String, { nullable: true })
-  phone: string | null;
+  phone: string;
 
-  @Column({ name: 'email', type: 'varchar', length: 250, nullable: true })
-  @Field(() => String, { nullable: true })
+  @Column({ name: 'email', type: 'varchar', length: 250 })
+  @Field(() => String)
   email: string;
 
   @Column({ name: 'website', type: 'varchar', length: 250, nullable: true })
@@ -86,10 +86,28 @@ export class Temple {
     name: 'status',
     type: 'enum',
     enum: EStatus,
-    default: EStatus.APPROVED,
+    default: EStatus.PENDING,
   })
-  @Field(() => EStatus, { defaultValue: EStatus.APPROVED })
+  @Field(() => EStatus, { defaultValue: EStatus.PENDING })
   status: EStatus;
+
+  @Column({
+    name: 'rejectReason',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  rejectReason: string | null;
+
+  @Column({
+    name: 'blockReason',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  blockReason: string | null;
 
   @Column({ name: 'adminId', type: 'int' })
   @Field(() => Int)

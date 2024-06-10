@@ -40,6 +40,7 @@ enum EStatus {
   REJECTED
   PENDING
   APPROVED
+  BLOCKED
 }
 
 type DeathAnniversary {
@@ -173,13 +174,15 @@ type Temple {
   address: String!
   description: String!
   phone: String
-  email: String
+  email: String!
   website: String
   priority: EPriority!
   priorityExpired: DateTime
   plan: EPlan!
   planExpired: DateTime
   status: EStatus!
+  rejectReason: String
+  blockReason: String
   adminId: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -606,7 +609,7 @@ type IsBookedEvent {
 
 type Query {
   getUser: UserRes!
-  systemGetTemples(page: Int, take: Int, skip: Int, keyword: String, familyId: Float, priority: EPriority, status: EStatus): TemplesRes!
+  systemGetTemples(page: Int, take: Int, skip: Int, name: String, email: String, address: String, status: EStatus, orderBy: [OrderBy!]): TemplesRes!
   getTempleDetail(id: Int!): TempleRes!
   getFamily(page: Int, take: Int, skip: Int, id: Int!): FamilyRes!
   getFamilyMembers(page: Int, take: Int, skip: Int, orderBy: [OrderBy!], id: Int!, name: String, address: String, email: String, phone: String, roleFilter: [ERole!]): FamilyMembersRes!
@@ -640,6 +643,7 @@ input GetDeathAnniversariesInput {
 
 type Mutation {
   removeFamilyMember(removeFamilyMemberInput: RemoveFamilyMemberInput!): UpdateRes!
+  updateStatusTemple(updateStatusTempleInput: VUpdateStatusTempleInput!): UpdateRes!
   updateDeceased(updateDeceasedInput: VUpdateDeceasedInput!): UpdateRes!
   deleteDeceased(id: Int!): UpdateRes!
   createDeathAnniversary(createDeathAnniversaryInput: CreateDeathAnniversaryInput!): DeathAnniversaryRes!
@@ -664,6 +668,13 @@ type Mutation {
 
 input RemoveFamilyMemberInput {
   id: Int!
+}
+
+input VUpdateStatusTempleInput {
+  id: Int!
+  status: EStatus!
+  rejectReason: String
+  blockReason: String
 }
 
 input VUpdateDeceasedInput {

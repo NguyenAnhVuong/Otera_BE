@@ -54,6 +54,7 @@ enum EStatus {
   REJECTED
   PENDING
   APPROVED
+  BLOCKED
 }
 
 enum EGender {

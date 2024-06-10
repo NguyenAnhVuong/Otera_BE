@@ -246,20 +246,20 @@ export class EventParticipantService {
       query.andWhere('followerTemples.templeId = :templeId', { templeId });
     }
     if (name) {
-      query.andWhere('userDetail.name like :name', { name: `%${name}%` });
+      query.andWhere('userDetail.name ILIKE :name', { name: `%${name}%` });
     }
     if (email) {
-      query.andWhere('user.email like :email', { email: `%${email}%` });
+      query.andWhere('user.email ILIKE :email', { email: `%${email}%` });
     }
     if (address) {
-      query.andWhere('userDetail.address like :address', {
+      query.andWhere('userDetail.address ILIKE :address', {
         address: `%${address}%`,
       });
     }
     if (familyName) {
       query
         .leftJoin('user.family', 'family')
-        .andWhere('family.name like :familyName', {
+        .andWhere('family.name ILIKE :familyName', {
           familyName: `%${familyName}%`,
         });
     }

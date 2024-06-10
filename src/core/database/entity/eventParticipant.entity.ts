@@ -41,7 +41,12 @@ export class EventParticipant {
   @Field(() => String, { nullable: true })
   code: string;
 
-  @Column({ name: 'rejectReason', type: 'text', nullable: true })
+  @Column({
+    name: 'rejectReason',
+    type: 'varchar',
+    nullable: true,
+    length: 255,
+  })
   @Field(() => String, { nullable: true })
   rejectReason: string;
 
