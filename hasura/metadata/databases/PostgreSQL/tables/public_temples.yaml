@@ -1,67 +1,60 @@
 table:
-  name: users
+  name: temples
   schema: public
-object_relationships:
-  - name: family
-    using:
-      foreign_key_constraint_on: familyId
-  - name: temple
-    using:
-      foreign_key_constraint_on:
-        column: adminId
-        table:
-          name: temples
-          schema: public
-  - name: userDetail
-    using:
-      foreign_key_constraint_on: userDetailId
 array_relationships:
   - name: deathAnniversaries
     using:
       foreign_key_constraint_on:
-        column: creatorId
+        column: templeId
         table:
           name: deathAnniversaries
           schema: public
   - name: deceaseds
     using:
       foreign_key_constraint_on:
-        column: modifierId
+        column: templeId
         table:
           name: deceaseds
-          schema: public
-  - name: eventParticipants
-    using:
-      foreign_key_constraint_on:
-        column: approverId
-        table:
-          name: eventParticipants
-          schema: public
-  - name: eventParticipantsByUserid
-    using:
-      foreign_key_constraint_on:
-        column: userId
-        table:
-          name: eventParticipants
           schema: public
   - name: events
     using:
       foreign_key_constraint_on:
-        column: creatorId
+        column: templeId
         table:
           name: events
+          schema: public
+  - name: familyTemples
+    using:
+      foreign_key_constraint_on:
+        column: templeId
+        table:
+          name: familyTemples
           schema: public
   - name: followerTemples
     using:
       foreign_key_constraint_on:
-        column: userId
+        column: templeId
         table:
           name: followerTemples
+          schema: public
+  - name: images
+    using:
+      foreign_key_constraint_on:
+        column: templeId
+        table:
+          name: images
           schema: public
   - name: reviews
     using:
       foreign_key_constraint_on:
-        column: userId
+        column: templeId
         table:
           name: reviews
+          schema: public
+  - name: users
+    using:
+      foreign_key_constraint_on:
+        column: templeId
+        table:
+          name: users
           schema: public

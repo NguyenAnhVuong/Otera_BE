@@ -21,6 +21,7 @@ import { UserDetailService } from './../user-detail/user-detail.service';
 import { VUserLoginDto } from './dto/user-login.dto';
 import { VUserRegisterDto } from './dto/user-register.dto';
 import { GetFamilyMembersArgs } from '../family/dto/get-family-members.dto';
+import { VGetTempleMembersArgs } from '@modules/temple/dto/get-temple-members.args';
 
 @Injectable()
 export class UserService {
@@ -111,9 +112,9 @@ export class UserService {
       templeIds = user.followerTemples.map((temple) => temple.templeId);
     }
 
-    if (user.temple) {
-      templeIds = [user.temple.id];
-    }
+    // if (user.temple) {
+    //   templeIds = [user.temple.id];
+    // }
 
     if (user.family && user.family.familyTemples.length > 0) {
       templeIds = user.family.familyTemples.map((temple) => temple.templeId);
@@ -383,5 +384,55 @@ export class UserService {
         role: ERole.PUBLIC_USER,
       });
     });
+  }
+
+  async getTempleMembers(
+    templeId: number,
+    getTempleMembersArgs: VGetTempleMembersArgs,
+  ) {
+    const { skip, take, name, email, address, phone, orderBy, roles } =
+      getTempleMembersArgs;
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.templeId = :templeId', { templeId })
+      .leftJoinAndSelect('user.userDetail', 'userDetail')
+      .skip(skip)
+      .take(take)
+      .orderBy('user.role', 'ASC');
+
+    if (name) {
+      query.andWhere('userDetail.name ILIKE :name', { name: `%${name}%` });
+    }
+
+    if (email) {
+      query.andWhere('user.email ILIKE :email', { email: `%${email}%` });
+    }
+
+    if (phone) {
+      query.andWhere('userDetail.phone ILIKE :phone', { phone: `%${phone}%` });
+    }
+
+    if (address) {
+      query.andWhere('userDetail.address ILIKE :address', {
+        address: `%${address}%`,
+      });
+    }
+
+    if (roles.length) {
+      query.andWhere('user.role IN (:...roles)', { roles });
+    }
+    if (orderBy) {
+      orderBy.forEach((order) => {
+        if (order.column === 'birthday') {
+          query.addOrderBy(`userDetail.${order.column}`, order.sortOrder);
+        } else {
+          query.addOrderBy(`user.${order.column}`, order.sortOrder);
+        }
+      });
+    }
+
+    const [data, count] = await query.getManyAndCount();
+
+    return returnPagingData(data, count, getTempleMembersArgs);
   }
 }

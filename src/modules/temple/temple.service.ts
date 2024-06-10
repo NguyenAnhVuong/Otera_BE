@@ -20,6 +20,9 @@ import { ErrorMessage } from '@core/enum';
 import { VSystemGetTemplesDto } from './dto/system-get-temples.input';
 import { VUpdateStatusTempleInput } from './dto/update-status-temple.input';
 import { IUserData } from '@core/interface/default.interface';
+import { User } from '@core/database/entity/user.entity';
+import { VRemoveTempleMemberInput } from './dto/remove-temple-member.input';
+import { VGetTempleMembersArgs } from './dto/get-temple-members.args';
 
 @Injectable()
 export class TempleService {
@@ -143,7 +146,12 @@ export class TempleService {
     const query = this.templeRepository
       .createQueryBuilder('temple')
       .leftJoinAndSelect('temple.images', 'images')
-      .leftJoinAndSelect('temple.admin', 'admin')
+      .leftJoinAndMapOne(
+        'temple.admin',
+        User,
+        'admin',
+        'temple.adminId = admin.id',
+      )
       .leftJoinAndSelect('admin.userDetail', 'userDetail')
       .skip(skip)
       .take(take);
@@ -193,6 +201,59 @@ export class TempleService {
       status,
       rejectReason,
       blockReason,
+    });
+  }
+
+  async addTempleMember(templeId: number, email: string) {
+    const user = await this.userService.getUserByEmail(email);
+
+    if (!user) {
+      throw new HttpException(
+        ErrorMessage.ACCOUNT_NOT_EXISTS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (user.role !== ERole.PUBLIC_USER) {
+      throw new HttpException(
+        ErrorMessage.INVALID_PARAM,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.userService.updateUserById(user.id, {
+      templeId,
+      role: ERole.TEMPLE_MEMBER,
+    });
+  }
+
+  async getTempleMembers(
+    templeId: number,
+    getTempleMembersArgs: VGetTempleMembersArgs,
+  ) {
+    return await this.userService.getTempleMembers(
+      templeId,
+      getTempleMembersArgs,
+    );
+  }
+
+  async removeTempleMember(
+    templeId: number,
+    removeTempleMemberInput: VRemoveTempleMemberInput,
+  ) {
+    const { userId } = removeTempleMemberInput;
+    const user = await this.userService.getUserById(userId);
+
+    if (user.templeId !== templeId) {
+      throw new HttpException(
+        ErrorMessage.INVALID_PARAM,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.userService.updateUserById(userId, {
+      templeId: null,
+      role: ERole.PUBLIC_USER,
     });
   }
 }

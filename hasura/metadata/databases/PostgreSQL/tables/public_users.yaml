@@ -1,57 +1,63 @@
 table:
-  name: temples
+  name: users
   schema: public
 object_relationships:
-  - name: user
+  - name: family
     using:
-      foreign_key_constraint_on: adminId
+      foreign_key_constraint_on: familyId
+  - name: temple
+    using:
+      foreign_key_constraint_on: templeId
+  - name: userDetail
+    using:
+      foreign_key_constraint_on: userDetailId
 array_relationships:
   - name: deathAnniversaries
     using:
       foreign_key_constraint_on:
-        column: templeId
+        column: creatorId
         table:
           name: deathAnniversaries
           schema: public
   - name: deceaseds
     using:
       foreign_key_constraint_on:
-        column: templeId
+        column: modifierId
         table:
           name: deceaseds
+          schema: public
+  - name: eventParticipants
+    using:
+      foreign_key_constraint_on:
+        column: approverId
+        table:
+          name: eventParticipants
+          schema: public
+  - name: eventParticipantsByUserid
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: eventParticipants
           schema: public
   - name: events
     using:
       foreign_key_constraint_on:
-        column: templeId
+        column: creatorId
         table:
           name: events
-          schema: public
-  - name: familyTemples
-    using:
-      foreign_key_constraint_on:
-        column: templeId
-        table:
-          name: familyTemples
           schema: public
   - name: followerTemples
     using:
       foreign_key_constraint_on:
-        column: templeId
+        column: userId
         table:
           name: followerTemples
-          schema: public
-  - name: images
-    using:
-      foreign_key_constraint_on:
-        column: templeId
-        table:
-          name: images
           schema: public
   - name: reviews
     using:
       foreign_key_constraint_on:
-        column: templeId
+        column: userId
         table:
           name: reviews
           schema: public
