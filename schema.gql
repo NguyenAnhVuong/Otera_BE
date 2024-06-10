@@ -144,6 +144,16 @@ enum EPriority {
   HIGH
 }
 
+type FollowerTemple {
+  id: Int!
+  templeId: Int!
+  userId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  temple: Temple!
+}
+
 type Review {
   id: Int!
   userId: Int!
@@ -155,16 +165,6 @@ type Review {
   updatedAt: DateTime!
   temple: Temple!
   user: User!
-}
-
-type FollowerTemple {
-  id: Int!
-  templeId: Int!
-  userId: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  user: User!
-  temple: Temple!
 }
 
 type Temple {
@@ -186,7 +186,7 @@ type Temple {
   adminId: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-  admin: User!
+  users: [User!]!
   deceaseds: [Deceased!]!
   familyTemples: [FamilyTemple!]!
   images: [Image!]!
@@ -260,6 +260,7 @@ type User {
   email: String!
   role: ERole!
   familyId: Int
+  templeId: Int
   userDetailId: Int
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -333,12 +334,50 @@ type UserRes {
   data: User!
 }
 
+type TempleRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Temple!
+}
+
+type TempleWithAdmin {
+  id: Int!
+  name: String!
+  avatar: String!
+  address: String!
+  description: String!
+  phone: String
+  email: String!
+  website: String
+  priority: EPriority!
+  priorityExpired: DateTime
+  plan: EPlan!
+  planExpired: DateTime
+  status: EStatus!
+  rejectReason: String
+  blockReason: String
+  adminId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  users: [User!]!
+  deceaseds: [Deceased!]!
+  familyTemples: [FamilyTemple!]!
+  images: [Image!]!
+  reviews: [Review!]!
+  deathAnniversaries: [DeathAnniversary!]!
+  followerTemples: [FollowerTemple!]!
+  events: [Event!]!
+  admin: User!
+}
+
 type TemplesPagingData {
   totalItems: Int!
   page: Int!
   totalPages: Int!
   take: Int!
-  data: [Temple!]
+  data: [TempleWithAdmin!]
 }
 
 type TemplesRes {
@@ -349,12 +388,20 @@ type TemplesRes {
   data: TemplesPagingData!
 }
 
-type TempleRes {
+type TempleMembersPagingData {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [User!]
+}
+
+type TempleMembersRes {
   statusCode: Int!
   errorMessage: String
   errorCode: String
   timestamp: String!
-  data: Temple!
+  data: TempleMembersPagingData!
 }
 
 type Notification {
@@ -611,6 +658,7 @@ type Query {
   getUser: UserRes!
   systemGetTemples(page: Int, take: Int, skip: Int, name: String, email: String, address: String, status: EStatus, orderBy: [OrderBy!]): TemplesRes!
   getTempleDetail(id: Int!): TempleRes!
+  getTempleMembers(page: Int, take: Int, skip: Int, name: String, email: String, phone: String, address: String, roles: [ERole!], orderBy: [OrderBy!]): TempleMembersRes!
   getFamily(page: Int, take: Int, skip: Int, id: Int!): FamilyRes!
   getFamilyMembers(page: Int, take: Int, skip: Int, orderBy: [OrderBy!], id: Int!, name: String, address: String, email: String, phone: String, roleFilter: [ERole!]): FamilyMembersRes!
   getListDeceased(familyId: Int!): ListDeceasedRes!
@@ -644,6 +692,8 @@ input GetDeathAnniversariesInput {
 type Mutation {
   removeFamilyMember(removeFamilyMemberInput: RemoveFamilyMemberInput!): UpdateRes!
   updateStatusTemple(updateStatusTempleInput: VUpdateStatusTempleInput!): UpdateRes!
+  addTempleMember(addTempleMemberInput: VAddTempleMemberInput!): UpdateRes!
+  removeTempleMember(removeTempleMemberInput: VRemoveTempleMemberInput!): UpdateRes!
   updateDeceased(updateDeceasedInput: VUpdateDeceasedInput!): UpdateRes!
   deleteDeceased(id: Int!): UpdateRes!
   createDeathAnniversary(createDeathAnniversaryInput: CreateDeathAnniversaryInput!): DeathAnniversaryRes!
@@ -675,6 +725,14 @@ input VUpdateStatusTempleInput {
   status: EStatus!
   rejectReason: String
   blockReason: String
+}
+
+input VAddTempleMemberInput {
+  email: String!
+}
+
+input VRemoveTempleMemberInput {
+  userId: Int!
 }
 
 input VUpdateDeceasedInput {

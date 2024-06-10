@@ -50,7 +50,7 @@ export class FollowerTempleService {
       .leftJoinAndSelect('followerTemple.user', 'user')
       .leftJoinAndSelect('user.family', 'family')
       .leftJoinAndSelect('user.userDetail', 'userDetail')
-      .orderBy('createdAt', 'DESC');
+      .orderBy('followerTemple.createdAt', 'DESC');
 
     if (isInFamily) {
       query.andWhere('user.familyId IS NOT NULL', { familyId: isInFamily });

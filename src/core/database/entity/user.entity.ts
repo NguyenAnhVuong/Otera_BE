@@ -49,7 +49,9 @@ export class User {
   @Field(() => Int, { nullable: true })
   familyId: number | null;
 
-  // add templeId for temple admin and temple member
+  @Column({ name: 'templeId', type: 'int', nullable: true })
+  @Field(() => Int, { nullable: true })
+  templeId: number | null;
 
   @Column({ name: 'userDetailId', type: 'int', nullable: true })
   @Field(() => Int, { nullable: true })
@@ -71,8 +73,9 @@ export class User {
   @Field(() => Date)
   updatedAt: Date;
 
-  @OneToOne(() => Temple, (temple) => temple.admin)
+  @ManyToOne(() => Temple, (temple) => temple.users)
   @Field(() => Temple)
+  @JoinColumn({ name: 'templeId' })
   temple: Temple;
 
   @OneToOne(() => UserDetail, (userDetail) => userDetail.user)
