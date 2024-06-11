@@ -238,13 +238,16 @@ enum EGender {
 type Deceased {
   id: Int!
   dateOfDeath: String!
+  tombAddress: String
   description: String
+  rejectReason: String
   userDetailId: Int
   templeId: Int!
-  familyId: Int!
+  familyId: Int
   creatorId: Int!
   modifierId: Int
   isDeleted: Boolean!
+  status: EStatus!
   createdAt: DateTime!
   updatedAt: DateTime!
   temple: Temple!
@@ -298,22 +301,6 @@ type DeathAnniversaryRes {
   data: DeathAnniversary!
 }
 
-type ListDeceasedRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: [Deceased!]!
-}
-
-type DeceasedRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: Deceased!
-}
-
 type AffectedResult {
   affected: Int!
 }
@@ -324,6 +311,30 @@ type UpdateRes {
   errorCode: String
   timestamp: String!
   data: AffectedResult
+}
+
+type DeceasedRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Deceased!
+}
+
+type DeceasedPaging {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [Deceased!]!
+}
+
+type DeceasedListRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: DeceasedPaging!
 }
 
 type UserRes {
@@ -661,7 +672,8 @@ type Query {
   getTempleMembers(page: Int, take: Int, skip: Int, name: String, email: String, phone: String, address: String, roles: [ERole!], orderBy: [OrderBy!]): TempleMembersRes!
   getFamily(page: Int, take: Int, skip: Int, id: Int!): FamilyRes!
   getFamilyMembers(page: Int, take: Int, skip: Int, orderBy: [OrderBy!], id: Int!, name: String, address: String, email: String, phone: String, roleFilter: [ERole!]): FamilyMembersRes!
-  getListDeceased(familyId: Int!): ListDeceasedRes!
+  templeGetDeceasedList(page: Int, take: Int, skip: Int, name: String, address: String, tombAddress: String, status: EStatus, isDeleted: Boolean, familyKeyword: String, orderBy: [OrderBy!]): DeceasedListRes!
+  getListDeceased(familyId: Int!): DeceasedListRes!
   getDeceased(id: Int!): DeceasedRes!
   getDeathAnniversaries(getDeathAnniversariesInput: GetDeathAnniversariesInput!): DeathAnniversariesRes!
   test123(id: Int!): Test2!
@@ -696,6 +708,8 @@ type Mutation {
   removeTempleMember(removeTempleMemberInput: VRemoveTempleMemberInput!): UpdateRes!
   updateDeceased(updateDeceasedInput: VUpdateDeceasedInput!): UpdateRes!
   deleteDeceased(id: Int!): UpdateRes!
+  restoreDeceased(id: Int!): UpdateRes!
+  updateDeceasedStatus(updateDeceasedStatusInput: VUpdateDeceasedStatusInput!): UpdateRes!
   createDeathAnniversary(createDeathAnniversaryInput: CreateDeathAnniversaryInput!): DeathAnniversaryRes!
   templeUpdateDeathAnniversary(templeUpdateDeathAnniversaryInput: TempleUpdateDeathAnniversaryInput!): GQLResponse!
   familyUpdateDeathAnniversary(updateDeathAnniversaryInput: UpdateDeathAnniversaryInput!): GQLResponse!
@@ -747,6 +761,12 @@ input VUpdateDeceasedInput {
   gender: EGender
   citizenNumber: String
   templeId: Int
+}
+
+input VUpdateDeceasedStatusInput {
+  id: Int!
+  status: EStatus!
+  rejectReason: String
 }
 
 input CreateDeathAnniversaryInput {

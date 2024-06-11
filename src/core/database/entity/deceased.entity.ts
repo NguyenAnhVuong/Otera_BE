@@ -14,6 +14,7 @@ import { Family } from './family.entity';
 import { UserDetail } from './userDetail.entity';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { DeathAnniversary } from './deathAnniversary.entity';
+import { EStatus } from '@core/enum';
 
 @Entity('deceaseds')
 @ObjectType()
@@ -27,6 +28,15 @@ export class Deceased {
   dateOfDeath: string;
 
   @Column({
+    name: 'tombAddress',
+    type: 'varchar',
+    length: 100,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  tombAddress: string;
+
+  @Column({
     name: 'description',
     type: 'varchar',
     length: 5000,
@@ -34,6 +44,15 @@ export class Deceased {
   })
   @Field(() => String, { nullable: true })
   description: string | null;
+
+  @Column({
+    name: 'rejectReason',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  rejectReason: string | null;
 
   @Column({
     name: 'userDetailId',
@@ -53,9 +72,10 @@ export class Deceased {
   @Column({
     name: 'familyId',
     type: 'int',
+    nullable: true,
   })
-  @Field(() => Int)
-  familyId: number;
+  @Field(() => Int, { nullable: true })
+  familyId?: number;
 
   @Column({ name: 'creatorId', type: 'int' })
   @Field(() => Int)
@@ -68,6 +88,15 @@ export class Deceased {
   @Column({ name: 'isDeleted', type: 'boolean', default: false })
   @Field(() => Boolean)
   isDeleted: boolean;
+
+  @Column({
+    name: 'status',
+    type: 'enum',
+    enum: EStatus,
+    default: EStatus.PENDING,
+  })
+  @Field(() => EStatus)
+  status: EStatus;
 
   @Column({
     name: 'createdAt',

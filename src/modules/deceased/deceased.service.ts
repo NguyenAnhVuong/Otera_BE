@@ -1,4 +1,7 @@
-import { CloudinaryService } from './../cloudinary/cloudinary.service';
+import { ERole, EStatus, ErrorMessage } from '@core/enum';
+import { IUserData } from '@core/interface/default.interface';
+import { DeathAnniversaryService } from '@modules/death-anniversary/death-anniversary.service';
+import { FamilyTempleService } from '@modules/family-temple/family-temple.service';
 import {
   HttpException,
   HttpStatus,
@@ -7,18 +10,18 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Deceased } from 'src/core/database/entity/deceased.entity';
-import { Repository, DataSource, EntityManager, DeepPartial } from 'typeorm';
-import { VCreateDeceasedDto } from './dto/create-deceased.dto';
-import { UserDetail } from 'src/core/database/entity/userDetail.entity';
-import { UserDetailService } from '../user-detail/user-detail.service';
-import { ImageService } from '../image/image.service';
-import { IUserData } from '@core/interface/default.interface';
-import { FamilyTempleService } from '@modules/family-temple/family-temple.service';
-import { EStatus, ErrorMessage } from '@core/enum';
 import * as dayjs from 'dayjs';
+import { Deceased } from 'src/core/database/entity/deceased.entity';
+import { UserDetail } from 'src/core/database/entity/userDetail.entity';
+import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
+import { ImageService } from '../image/image.service';
+import { UserDetailService } from '../user-detail/user-detail.service';
+import { CloudinaryService } from './../cloudinary/cloudinary.service';
+import { VCreateDeceasedDto } from './dto/create-deceased.dto';
+import { VUpdateDeceasedStatusInput } from './dto/update-deceased-status.input';
 import { VUpdateDeceasedInput } from './dto/update-deceased.input';
-import { DeathAnniversaryService } from '@modules/death-anniversary/death-anniversary.service';
+import { VTempleGetListDeceasedArgs } from './dto/temple-get-deceased-list.args';
+import { returnPagingData } from '@helper/utils';
 
 @Injectable()
 export class DeceasedService {
@@ -116,21 +119,22 @@ export class DeceasedService {
       where: {
         familyId,
         isDeleted: false,
+        status: EStatus.APPROVED,
       },
       relations: ['images', 'userDetail'],
     });
   }
 
-  async getDeceasedByIdAndFamilyId(id: number, familyId: number) {
+  async getDeceasedDetail(id: number, userData: IUserData) {
+    const { fid: familyId, role } = userData;
     return await this.deceasedRepository
       .createQueryBuilder('deceased')
-      .where(
-        'deceased.id = :id AND deceased.familyId = :familyId AND deceased.isDeleted = false',
-        {
-          id,
-          familyId,
-        },
-      )
+      .where({
+        id,
+        ...(role === ERole.TEMPLE_ADMIN || role === ERole.TEMPLE_MEMBER
+          ? {}
+          : { familyId, status: EStatus.APPROVED, isDeleted: false }),
+      })
       .leftJoinAndSelect('deceased.images', 'images')
       .leftJoinAndSelect('deceased.userDetail', 'userDetail')
       .leftJoinAndSelect('deceased.modifier', 'modifier')
@@ -164,6 +168,7 @@ export class DeceasedService {
         id: deceasedId,
         familyId,
         isDeleted: false,
+        status: EStatus.APPROVED,
       },
       relations: ['userDetail'],
     });
@@ -277,5 +282,112 @@ export class DeceasedService {
         return await deceasedRepository.update({ id }, { isDeleted: true });
       },
     );
+  }
+
+  async updateDeceasedStatus(
+    updateDeceasedStatusInput: VUpdateDeceasedStatusInput,
+    templeId: number,
+  ) {
+    const { id, status, rejectReason } = updateDeceasedStatusInput;
+    return await this.deceasedRepository.update(
+      { id, templeId },
+      { status, rejectReason },
+    );
+  }
+
+  async templeGetListDeceased(
+    templeId: number,
+    templeGetDeceasedListArgs: VTempleGetListDeceasedArgs,
+  ) {
+    const {
+      name,
+      address,
+      status,
+      isDeleted,
+      orderBy,
+      tombAddress,
+      familyKeyword,
+    } = templeGetDeceasedListArgs;
+
+    const query = this.deceasedRepository
+      .createQueryBuilder('deceased')
+      .where('deceased.templeId = :templeId', {
+        templeId,
+      })
+      .leftJoinAndSelect('deceased.userDetail', 'userDetail')
+      .leftJoinAndSelect('deceased.family', 'family')
+      .orderBy('deceased.createdAt', 'DESC');
+
+    if (name) {
+      query.andWhere('userDetail.name ILIKE :name', {
+        name: `%${name}%`,
+      });
+    }
+
+    if (address) {
+      query.andWhere('userDetail.address ILIKE :address', {
+        address: `%${address}%`,
+      });
+    }
+
+    if (status) {
+      query.andWhere('deceased.status = :status', { status });
+    }
+
+    if (isDeleted) {
+      query.andWhere('deceased.isDeleted = :isDeleted', { isDeleted });
+    } else {
+      query.andWhere('deceased.isDeleted = false');
+    }
+
+    if (familyKeyword) {
+      query.andWhere(
+        'family.name ILIKE :familyKeyword OR family.familyCode ILIKE :familyKeyword',
+        {
+          familyKeyword: `%${familyKeyword}%`,
+        },
+      );
+    }
+
+    if (tombAddress) {
+      query.andWhere('deceased.tombAddress ILIKE :tombAddress', {
+        tombAddress: `%${tombAddress}%`,
+      });
+    }
+
+    if (orderBy) {
+      orderBy.forEach((order) => {
+        if (order.column === 'birthday') {
+          query.addOrderBy(`userDetail.${order.column}`, order.sortOrder);
+        } else {
+          query.addOrderBy(`deceased.${order.column}`, order.sortOrder);
+        }
+      });
+    }
+
+    const [data, count] = await query.getManyAndCount();
+
+    return returnPagingData(data, count, templeGetDeceasedListArgs);
+  }
+
+  async restoreDeceased(id: number, userData: IUserData) {
+    const { tid } = userData;
+
+    const deceased = await this.deceasedRepository.findOne({
+      where: {
+        id,
+        templeId: tid[0],
+        isDeleted: true,
+      },
+    });
+
+    if (!deceased) {
+      throw new HttpException(
+        ErrorMessage.NO_PERMISSION,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    return await this.deceasedRepository.update({ id }, { isDeleted: false });
   }
 }
