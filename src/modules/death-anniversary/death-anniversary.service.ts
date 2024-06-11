@@ -68,6 +68,7 @@ export class DeathAnniversaryService {
           actualEndTime: MoreThan(new Date()),
         }),
         ...(isPending && { status: EStatus.PENDING }),
+        deceased: { isDeleted: false },
       },
       relations: ['deceased', 'deceased.userDetail'],
     });
