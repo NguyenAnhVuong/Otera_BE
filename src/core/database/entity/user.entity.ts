@@ -1,6 +1,6 @@
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { Deceased } from 'src/core/database/entity/deceased.entity';
-import { ERole } from 'src/core/enum/default.enum';
+import { EAccountStatus, ERole } from 'src/core/enum/default.enum';
 import {
   Column,
   Entity,
@@ -22,6 +22,11 @@ import { UserDetail } from './userDetail.entity';
 registerEnumType(ERole, {
   name: 'ERole',
 });
+
+registerEnumType(EAccountStatus, {
+  name: 'EAccountStatus',
+});
+
 @Entity('users')
 @ObjectType()
 export class User {
@@ -29,12 +34,21 @@ export class User {
   @Field(() => Int)
   id: number;
 
-  @Column({ name: 'email', type: 'varchar', length: 100 })
+  @Column({ name: 'email', type: 'varchar', length: 100, unique: true })
   @Field(() => String)
   email: string;
 
   @Column({ name: 'password', type: 'varchar', length: 100, select: false })
   password: string;
+
+  @Column({
+    name: 'status',
+    type: 'enum',
+    enum: EAccountStatus,
+    default: EAccountStatus.INACTIVE,
+  })
+  @Field(() => EAccountStatus, { defaultValue: EAccountStatus.INACTIVE })
+  status: EAccountStatus;
 
   @Column({
     name: 'role',

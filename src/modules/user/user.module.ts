@@ -9,6 +9,7 @@ import { UserDetailModule } from '../user-detail/user-detail.module';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { UserResolver } from './user.resolver';
+import { ValidationTokenModule } from '@modules/validation-token/validation-token.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { UserResolver } from './user.resolver';
       }),
     }),
     UserDetailModule,
+    ValidationTokenModule,
   ],
   controllers: [UserController],
   providers: [UserService, UserResolver, JwtStrategy],

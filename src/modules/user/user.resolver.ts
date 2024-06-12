@@ -7,6 +7,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserRes } from './entities/userRes.entity';
 import { UpdateRes } from '@core/global/entities/updateRes.entity';
 import { RemoveFamilyMemberInput } from './dto/remove-family-member.input';
+import { Public } from '@core/decorator/public.decorator';
 
 @Resolver(() => UserRes)
 export class UserResolver {
@@ -16,6 +17,12 @@ export class UserResolver {
   @GQLRoles(Object.values(ERole))
   getUser(@GQLUserData() userData: IUserData) {
     return this.userService.getUser(userData.id);
+  }
+
+  @Mutation(() => UpdateRes, { name: 'verifyRegister' })
+  @Public()
+  verifyRegister(@Args('token') token: string) {
+    return this.userService.verifyRegister(token);
   }
 
   @Mutation(() => UpdateRes, { name: 'removeFamilyMember' })

@@ -1,5 +1,5 @@
 import { IUserData } from '@core/interface/default.interface';
-import { returnPagingData } from '@helper/utils';
+import { getMailFormat, returnPagingData } from '@helper/utils';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -8,7 +8,12 @@ import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
 import { EConfiguration } from 'src/core/config/configuration.config';
 import { User } from 'src/core/database/entity/user.entity';
-import { ERole } from 'src/core/enum/default.enum';
+import {
+  EAccountStatus,
+  EMailType,
+  ERole,
+  EValidationTokenType,
+} from 'src/core/enum/default.enum';
 import { ErrorMessage } from 'src/core/enum/error.enum';
 import {
   IJwtPayload,
@@ -22,6 +27,9 @@ import { VUserLoginDto } from './dto/user-login.dto';
 import { VUserRegisterDto } from './dto/user-register.dto';
 import { GetFamilyMembersArgs } from '../family/dto/get-family-members.dto';
 import { VGetTempleMembersArgs } from '@modules/temple/dto/get-temple-members.args';
+import { ValidationTokenService } from '@modules/validation-token/validation-token.service';
+import { sendMail } from '@helper/mailtrap';
+import * as format from 'string-format';
 
 @Injectable()
 export class UserService {
@@ -31,48 +39,155 @@ export class UserService {
     private jwtService: JwtService,
     private configService: ConfigService,
     private userDetailService: UserDetailService,
+    private validationTokenService: ValidationTokenService,
     private dataSource: DataSource,
   ) {}
   async userRegister(userRegister: VUserRegisterDto) {
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(userRegister.password, salt);
+
+    userRegister.password = hashPassword;
+    userRegister.role = ERole.PUBLIC_USER;
+
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const user = await this.userRepository.findOne({
+          where: {
+            email: userRegister.email,
+          },
+        });
+
+        const userDetail = {
+          name: userRegister.name,
+          birthday: userRegister.birthday,
+          gender: userRegister.gender,
+        };
+
+        let verifyToken = null;
+        if (user) {
+          if (user.status === EAccountStatus.ACTIVE) {
+            throw new HttpException(
+              ErrorMessage.ACCOUNT_EXISTS,
+              HttpStatus.BAD_REQUEST,
+            );
+          } else if (user.status === EAccountStatus.INACTIVE) {
+            await this.userDetailService.updateUserDetail(
+              {
+                id: user.userDetailId,
+                ...userDetail,
+              },
+              entityManager,
+            );
+
+            await this.userRepository.update(
+              {
+                id: user.id,
+              },
+              {
+                password: hashPassword,
+                status: EAccountStatus.INACTIVE,
+              },
+            );
+
+            const validationToken =
+              await this.validationTokenService.getValidationTokenByEmailAndType(
+                {
+                  email: user.email,
+                  type: EValidationTokenType.VERIFY_EMAIL,
+                },
+              );
+
+            verifyToken = validationToken?.token;
+
+            if (!verifyToken) {
+              verifyToken = await this.jwtService.signAsync({
+                email: user.email,
+                type: EValidationTokenType.VERIFY_EMAIL,
+              });
+
+              await this.validationTokenService.createValidationToken(
+                {
+                  email: user.email,
+                  token: verifyToken,
+                  type: EValidationTokenType.VERIFY_EMAIL,
+                },
+                entityManager,
+              );
+            }
+          }
+        } else {
+          const newUserDetail = await this.userDetailService.createUserDetail(
+            userDetail,
+            entityManager,
+          );
+
+          const userRepository = entityManager.getRepository(User);
+          await userRepository.save({
+            userDetailId: newUserDetail.id,
+            ...userRegister,
+          });
+
+          verifyToken = await this.jwtService.signAsync({
+            email: userRegister.email,
+            type: EValidationTokenType.VERIFY_EMAIL,
+          });
+        }
+        const mailFormat = getMailFormat(EMailType.REGISTER);
+
+        sendMail({
+          to: userRegister.email,
+          title: mailFormat.title,
+          content: format(mailFormat.content, {
+            name: userDetail.name,
+            verifyUrl: `${this.configService.get<string>(
+              EConfiguration.CLIENT_URL,
+            )}/verify/register?token=${verifyToken}`,
+          }),
+        });
+
+        return true;
+      },
+    );
+  }
+
+  async verifyRegister(token: string) {
+    const payload = await this.jwtService.verifyAsync(token);
+
     const user = await this.userRepository.findOne({
       where: {
-        email: userRegister.email,
+        email: payload.email,
       },
     });
 
-    if (user) {
+    if (!user) {
+      throw new HttpException(
+        ErrorMessage.ACCOUNT_NOT_EXISTS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    if (user.status === EAccountStatus.ACTIVE) {
       throw new HttpException(
         ErrorMessage.ACCOUNT_EXISTS,
         HttpStatus.BAD_REQUEST,
       );
     }
 
-    const salt = await bcrypt.genSalt();
-    const hashPassword = await bcrypt.hash(userRegister.password, salt);
-
-    userRegister.password = hashPassword;
-    userRegister.role = ERole.PUBLIC_USER;
-    return await this.dataSource.transaction(
-      async (entityManager: EntityManager) => {
-        const userDetail = {
-          name: userRegister.name,
-          birthday: userRegister.birthday,
-          gender: userRegister.gender,
-        };
-        const newUserDetail = await this.userDetailService.createUserDetail(
-          userDetail,
-          entityManager,
-        );
-
-        const userRepository = entityManager.getRepository(User);
-        const newUser = await userRepository.save({
-          userDetailId: newUserDetail.id,
-          ...userRegister,
-        });
-
-        return newUser;
-      },
-    );
+    await this.dataSource.transaction(async (entityManager: EntityManager) => {
+      const userRepository = entityManager.getRepository(User);
+      await this.validationTokenService.deleteValidationTokenByToken(
+        token,
+        entityManager,
+      );
+      return await userRepository.update(
+        {
+          id: user.id,
+        },
+        {
+          status: EAccountStatus.ACTIVE,
+        },
+      );
+    });
   }
 
   async userLogin(

@@ -61,4 +61,16 @@ export enum ENotificationType {
 
 export enum EMailType {
   APPROVE_EVENT_PARTICIPANT = 'APPROVE_EVENT_PARTICIPANT',
+  VERIFY_EMAIL = 'VERIFY_EMAIL',
+  REGISTER = 'REGISTER',
+}
+
+export enum EValidationTokenType {
+  RESET_PASSWORD = 'RESET_PASSWORD',
+  VERIFY_EMAIL = 'VERIFY_EMAIL',
+}
+
+export enum EAccountStatus {
+  INACTIVE = 'INACTIVE',
+  ACTIVE = 'ACTIVE',
 }
