@@ -13,3 +13,4 @@
 - "!include public_temples.yaml"
 - "!include public_userDetails.yaml"
 - "!include public_users.yaml"
+- "!include public_validationTokens.yaml"

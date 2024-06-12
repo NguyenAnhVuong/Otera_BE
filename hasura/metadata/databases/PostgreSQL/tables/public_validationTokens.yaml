@@ -1,0 +1,3 @@
+table:
+  name: validationTokens
+  schema: public

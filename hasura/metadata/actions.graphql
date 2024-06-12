@@ -114,7 +114,7 @@ type ResponseFormat {
 
 type UserRegisterOutput {
   statusCode: Int
-  data: UserRegisterOutputData
+  data: Boolean
   errorMessage: String
   errorCode: String
   timestamp: String

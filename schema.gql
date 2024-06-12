@@ -261,6 +261,7 @@ type Deceased {
 type User {
   id: Int!
   email: String!
+  status: EAccountStatus!
   role: ERole!
   familyId: Int
   templeId: Int
@@ -276,6 +277,11 @@ type User {
   events: [Event!]!
   eventParticipants: [EventParticipant!]!
   modifiedDeceaseds: [Deceased!]!
+}
+
+enum EAccountStatus {
+  INACTIVE
+  ACTIVE
 }
 
 type GQLResponse {
@@ -702,6 +708,7 @@ input GetDeathAnniversariesInput {
 }
 
 type Mutation {
+  verifyRegister(token: String!): UpdateRes!
   removeFamilyMember(removeFamilyMemberInput: RemoveFamilyMemberInput!): UpdateRes!
   updateStatusTemple(updateStatusTempleInput: VUpdateStatusTempleInput!): UpdateRes!
   addTempleMember(addTempleMemberInput: VAddTempleMemberInput!): UpdateRes!
