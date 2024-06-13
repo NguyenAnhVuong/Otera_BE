@@ -266,6 +266,7 @@ type User {
   familyId: Int
   templeId: Int
   userDetailId: Int
+  passwordChangedAt: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
   temple: Temple!
@@ -341,6 +342,14 @@ type DeceasedListRes {
   errorCode: String
   timestamp: String!
   data: DeceasedPaging!
+}
+
+type CreateRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Boolean!
 }
 
 type UserRes {
@@ -437,14 +446,6 @@ type Notification {
 
 enum ENotificationType {
   INVITE_FAMILY
-}
-
-type CreateRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: Boolean!
 }
 
 type EventParticipantRes {
@@ -710,6 +711,8 @@ input GetDeathAnniversariesInput {
 type Mutation {
   verifyRegister(token: String!): UpdateRes!
   removeFamilyMember(removeFamilyMemberInput: RemoveFamilyMemberInput!): UpdateRes!
+  forgotPassword(forgotPasswordInput: VForgotPasswordInput!): CreateRes!
+  resetPassword(resetPasswordInput: VResetPasswordInput!): UpdateRes!
   updateStatusTemple(updateStatusTempleInput: VUpdateStatusTempleInput!): UpdateRes!
   addTempleMember(addTempleMemberInput: VAddTempleMemberInput!): UpdateRes!
   removeTempleMember(removeTempleMemberInput: VRemoveTempleMemberInput!): UpdateRes!
@@ -739,6 +742,15 @@ type Mutation {
 
 input RemoveFamilyMemberInput {
   id: Int!
+}
+
+input VForgotPasswordInput {
+  email: String!
+}
+
+input VResetPasswordInput {
+  token: String!
+  password: String!
 }
 
 input VUpdateStatusTempleInput {

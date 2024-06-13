@@ -154,7 +154,30 @@ export const getMailFormat = (type: EMailType) => {
         </tr>
       </table>`,
       };
-
+    case EMailType.RESET_PASSWORD:
+      return {
+        title: '【Otera】Yêu cầu đặt lại mật khẩu',
+        content: `
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+          <tr>
+              <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                  <p style="font-size: 16px; color: #333333;">Kính gửi {name},</p>
+  
+                  <p style="font-size: 16px; color: #333333;">Bạn đã yêu cầu đặt lại mật khẩu tài khoản trên hệ thống Otera.</p>
+      
+                  <p style="font-size: 16px; color: #333333;">Để đặt lại mật khẩu, vui lòng nhấn vào đường dẫn bên dưới.</p>
+  
+                  <p style="font-size: 16px; color: #333333;">
+                      <a href="{resetPasswordUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Đặt lại mật khẩu</a>
+                  </p>
+                      
+                  <p style="font-size: 16px; color: #333333;">Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
+  
+                  {footer}
+              </td>
+          </tr>
+        </table>`,
+      };
     default:
       throw new Error();
   }

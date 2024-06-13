@@ -20,5 +20,6 @@
   "NOTIFICATION_NOT_EXIST": "Thông báo không tồn tại",
   "INVITATION_EXPIRED": "Lời mời đã hết hạn",
   "SEND_MAIL_FAIL": "Gửi mail thất bại",
-  "PUBLIC_USER_TEMPLE_NOT_EXIST": "Người dùng không thuộc chùa"
+  "PUBLIC_USER_TEMPLE_NOT_EXIST": "Người dùng không thuộc chùa",
+  "INVALID_TOKEN": "Token không hợp lệ"
 }

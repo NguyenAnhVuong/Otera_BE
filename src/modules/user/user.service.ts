@@ -30,6 +30,7 @@ import { VGetTempleMembersArgs } from '@modules/temple/dto/get-temple-members.ar
 import { ValidationTokenService } from '@modules/validation-token/validation-token.service';
 import { sendMail } from '@helper/mailtrap';
 import * as format from 'string-format';
+import { VResetPasswordInput } from './dto/reset-password.input';
 
 @Injectable()
 export class UserService {
@@ -175,6 +176,15 @@ export class UserService {
 
     await this.dataSource.transaction(async (entityManager: EntityManager) => {
       const userRepository = entityManager.getRepository(User);
+      const isValidToken = await this.jwtService.verifyAsync(token);
+
+      if (!isValidToken) {
+        throw new HttpException(
+          ErrorMessage.INVALID_TOKEN,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       await this.validationTokenService.deleteValidationTokenByToken(
         token,
         entityManager,
@@ -378,6 +388,15 @@ export class UserService {
     return true;
   }
 
+  async removeRefreshToken(response: Response) {
+    response.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+    });
+    return true;
+  }
+
   async getUser(id: number) {
     const user = await this.userRepository.findOne({
       where: {
@@ -549,5 +568,133 @@ export class UserService {
     const [data, count] = await query.getManyAndCount();
 
     return returnPagingData(data, count, getTempleMembersArgs);
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+      relations: ['userDetail'],
+    });
+
+    if (!user) {
+      throw new HttpException(
+        ErrorMessage.ACCOUNT_NOT_EXISTS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    let verifyToken = null;
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const validationToken =
+          await this.validationTokenService.getValidationTokenByEmailAndType(
+            {
+              email,
+              type: EValidationTokenType.RESET_PASSWORD,
+            },
+            entityManager,
+          );
+
+        if (validationToken) {
+          verifyToken = validationToken.token;
+        } else {
+          const token = await this.jwtService.signAsync({
+            email,
+            type: EValidationTokenType.RESET_PASSWORD,
+          });
+          verifyToken = token;
+          await this.validationTokenService.createValidationToken(
+            {
+              email,
+              token,
+              type: EValidationTokenType.RESET_PASSWORD,
+            },
+            entityManager,
+          );
+        }
+
+        const mailFormat = getMailFormat(EMailType.RESET_PASSWORD);
+
+        sendMail({
+          to: email,
+          title: mailFormat.title,
+          content: format(mailFormat.content, {
+            name: user.userDetail.name,
+            resetPasswordUrl: `${this.configService.get<string>(
+              EConfiguration.CLIENT_URL,
+            )}/reset-password?token=${verifyToken}`,
+          }),
+        });
+
+        return true;
+      },
+    );
+  }
+
+  async resetPassword(resetPasswordInput: VResetPasswordInput) {
+    const { token, password: newPassword } = resetPasswordInput;
+    const payload = await this.jwtService.verifyAsync(token);
+
+    if (!payload) {
+      throw new HttpException(
+        ErrorMessage.INVALID_TOKEN,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const validationToken =
+      await this.validationTokenService.getValidationTokenByEmailAndType({
+        email: payload.email,
+        type: EValidationTokenType.RESET_PASSWORD,
+      });
+
+    if (!validationToken) {
+      throw new HttpException(
+        ErrorMessage.INVALID_TOKEN,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const user = await this.userRepository.findOne({
+      where: {
+        email: payload.email,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException(
+        ErrorMessage.ACCOUNT_NOT_EXISTS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const salt = await bcrypt.genSalt();
+
+    const hashPassword = await bcrypt.hash(newPassword, salt);
+
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const userRepository = entityManager.getRepository(User);
+
+        await userRepository.update(
+          {
+            id: user.id,
+          },
+          {
+            password: hashPassword,
+            passwordChangedAt: new Date(),
+          },
+        );
+
+        await this.validationTokenService.deleteValidationTokenByToken(
+          token,
+          entityManager,
+        );
+
+        return true;
+      },
+    );
   }
 }
