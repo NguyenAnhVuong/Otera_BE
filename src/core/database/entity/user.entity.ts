@@ -71,6 +71,10 @@ export class User {
   @Field(() => Int, { nullable: true })
   userDetailId: number | null;
 
+  @Column({ name: 'passwordChangedAt', type: 'timestamptz', nullable: true })
+  @Field(() => Date, { nullable: true })
+  passwordChangedAt: Date | null;
+
   @Column({
     name: 'createdAt',
     type: 'timestamptz',

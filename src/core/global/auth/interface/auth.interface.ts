@@ -23,6 +23,7 @@ export interface IJwtPayload {
   role: ERole;
   fid?: number;
   tid?: number[];
+  iat?: number;
 }
 
 export interface IResponseRefreshToken {

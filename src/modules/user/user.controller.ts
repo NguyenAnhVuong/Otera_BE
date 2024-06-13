@@ -47,4 +47,10 @@ export class UserController {
   ) {
     return this.userService.userLogout(userData, response);
   }
+
+  @Public()
+  @Post('/remove-refresh-token')
+  removeRefreshToken(@Res({ passthrough: true }) response: Response) {
+    return this.userService.removeRefreshToken(response);
+  }
 }
