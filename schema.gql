@@ -120,8 +120,8 @@ type Event {
   description: String
   startDateEvent: DateTime!
   endDateEvent: DateTime!
-  startDateBooking: DateTime!
-  endDateBooking: DateTime!
+  startDateBooking: DateTime
+  endDateBooking: DateTime
   address: String!
   phone: String
   email: String
@@ -129,6 +129,7 @@ type Event {
   priorityExpired: DateTime
   isDeleted: Boolean!
   maxParticipant: Int
+  isFreeOpen: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   eventParticipants: [EventParticipant!]!
@@ -320,14 +321,6 @@ type UpdateRes {
   data: AffectedResult
 }
 
-type DeceasedRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: Deceased!
-}
-
 type DeceasedPaging {
   totalItems: Int!
   page: Int!
@@ -342,6 +335,14 @@ type DeceasedListRes {
   errorCode: String
   timestamp: String!
   data: DeceasedPaging!
+}
+
+type DeceasedRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Deceased!
 }
 
 type CreateRes {
@@ -446,6 +447,7 @@ type Notification {
 
 enum ENotificationType {
   INVITE_FAMILY
+  NEW_EVENT
 }
 
 type EventParticipantRes {
@@ -483,6 +485,22 @@ type EventParticipantsRes {
   data: ListEventParticipant
 }
 
+type NotificationsPagingData {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [Notification!]!
+}
+
+type NotificationsRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: NotificationsPagingData!
+}
+
 type EventDetail {
   id: Int!
   templeId: Int
@@ -492,8 +510,8 @@ type EventDetail {
   description: String
   startDateEvent: DateTime!
   endDateEvent: DateTime!
-  startDateBooking: DateTime!
-  endDateBooking: DateTime!
+  startDateBooking: DateTime
+  endDateBooking: DateTime
   address: String!
   phone: String
   email: String
@@ -501,6 +519,7 @@ type EventDetail {
   priorityExpired: DateTime
   isDeleted: Boolean!
   maxParticipant: Int
+  isFreeOpen: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   eventParticipants: [EventParticipant!]!
@@ -529,8 +548,8 @@ type EventManagementInfo {
   description: String
   startDateEvent: DateTime!
   endDateEvent: DateTime!
-  startDateBooking: DateTime!
-  endDateBooking: DateTime!
+  startDateBooking: DateTime
+  endDateBooking: DateTime
   address: String!
   phone: String
   email: String
@@ -538,6 +557,7 @@ type EventManagementInfo {
   priorityExpired: DateTime
   isDeleted: Boolean!
   maxParticipant: Int
+  isFreeOpen: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
   eventParticipants: [EventParticipant!]!
@@ -580,22 +600,6 @@ type BookingEventsRes {
   errorCode: String
   timestamp: String!
   data: BookingEventsPagingData!
-}
-
-type NotificationsPagingData {
-  totalItems: Int!
-  page: Int!
-  totalPages: Int!
-  take: Int!
-  data: [Notification!]!
-}
-
-type NotificationsRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: NotificationsPagingData!
 }
 
 type Test {
@@ -680,11 +684,11 @@ type Query {
   getFamily(page: Int, take: Int, skip: Int, id: Int!): FamilyRes!
   getFamilyMembers(page: Int, take: Int, skip: Int, orderBy: [OrderBy!], id: Int!, name: String, address: String, email: String, phone: String, roleFilter: [ERole!]): FamilyMembersRes!
   templeGetDeceasedList(page: Int, take: Int, skip: Int, name: String, address: String, tombAddress: String, status: EStatus, isDeleted: Boolean, familyKeyword: String, orderBy: [OrderBy!]): DeceasedListRes!
-  getListDeceased(familyId: Int!): DeceasedListRes!
+  familyGetListDeceased(page: Int, take: Int, skip: Int): DeceasedListRes!
   getDeceased(id: Int!): DeceasedRes!
   getDeathAnniversaries(getDeathAnniversariesInput: GetDeathAnniversariesInput!): DeathAnniversariesRes!
   test123(id: Int!): Test2!
-  templeGetEvents(page: Int, take: Int, skip: Int, name: String, upcoming: Boolean, onGoing: Boolean, ended: Boolean, orderBy: [OrderBy!]): EventsRes!
+  templeGetEvents(page: Int, take: Int, skip: Int, name: String, upcoming: Boolean, onGoing: Boolean, ended: Boolean, isFreeOpen: Boolean, orderBy: [OrderBy!]): EventsRes!
   getEvents(page: Int, take: Int, skip: Int, templeId: Int): EventsRes!
   getBookingEvents(page: Int, take: Int, skip: Int, name: String, address: String, orderBy: [OrderBy!], bookingStatus: EBookingStatus): BookingEventsRes!
   getEventById(id: Int!): EventRes!
@@ -833,22 +837,24 @@ input UpdateTestInput {
 
 input VCreateEventInput {
   name: String!
+  isFreeOpen: Boolean!
   avatar: String
   images: [String!]
   description: String
   startDateEvent: DateTime!
   endDateEvent: DateTime!
-  startDateBooking: DateTime!
-  endDateBooking: DateTime!
+  startDateBooking: DateTime
+  endDateBooking: DateTime
   address: String!
-  phone: String
+  phone: String!
   email: String
   maxParticipant: Float
-  roles: [ERole!]!
+  roles: [ERole!]
 }
 
 input VUpdateEventInput {
   name: String
+  isFreeOpen: Boolean
   avatar: String
   images: [String!]
   description: String
@@ -883,8 +889,8 @@ input VEventParticipantCheckInInput {
 input UpdateNotificationInput {
   id: Int!
   isRead: Boolean!
-  isDeleted: Boolean!
-  createdAt: DateTime!
+  isDeleted: Boolean
+  createdAt: DateTime
 }
 
 input ResponseInviteFamilyInput {

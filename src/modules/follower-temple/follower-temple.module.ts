@@ -9,5 +9,6 @@ import { FollowerTempleService } from './follower-temple.service';
 @Module({
   imports: [TypeOrmModule.forFeature([FollowerTemple]), TempleModule],
   providers: [FollowerTempleResolver, FollowerTempleService],
+  exports: [FollowerTempleService],
 })
 export class FollowerTempleModule {}

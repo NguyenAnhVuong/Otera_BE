@@ -22,6 +22,7 @@ import { VUpdateDeceasedStatusInput } from './dto/update-deceased-status.input';
 import { VUpdateDeceasedInput } from './dto/update-deceased.input';
 import { VTempleGetListDeceasedArgs } from './dto/temple-get-deceased-list.args';
 import { returnPagingData } from '@helper/utils';
+import { VFamilyGetListDeceasedArgs } from './dto/family-get-list-deceased.dto';
 
 @Injectable()
 export class DeceasedService {
@@ -114,15 +115,23 @@ export class DeceasedService {
     });
   }
 
-  async getListDeceasedByFamilyId(familyId: number) {
-    return await this.deceasedRepository.find({
+  async getListDeceasedByFamilyId(
+    familyId: number,
+    query: VFamilyGetListDeceasedArgs,
+  ) {
+    const { skip, take } = query;
+    const [data, count] = await this.deceasedRepository.findAndCount({
       where: {
         familyId,
         isDeleted: false,
         status: EStatus.APPROVED,
       },
       relations: ['images', 'userDetail'],
+      skip,
+      take,
     });
+
+    return returnPagingData(data, count, query);
   }
 
   async getDeceasedDetail(id: number, userData: IUserData) {

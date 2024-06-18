@@ -1,3 +1,14 @@
+import { Event } from '@core/database/entity/event.entity';
+import { EventParticipant } from '@core/database/entity/eventParticipant.entity';
+import { EBookingStatus, ERole, ErrorMessage } from '@core/enum';
+import { QueueProcessorService } from '@core/global/queueProcessor/quequeProcessor.service';
+import { QUEUE_MODULE_OPTIONS } from '@core/global/queueProcessor/queueIdentity.constant';
+import { IUserData } from '@core/interface/default.interface';
+import { returnPagingData } from '@helper/utils';
+import { EventParticipantTypeService } from '@modules/event-participant-type/event-participant-type.service';
+import { EventParticipantService } from '@modules/event-participant/event-participant.service';
+import { ImageService } from '@modules/image/image.service';
+import { NotificationService } from '@modules/notification/notification.service';
 import {
   HttpException,
   HttpStatus,
@@ -8,19 +19,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import { VCreateEventInput } from './dto/create-event.input';
-import { IUserData } from '@core/interface/default.interface';
-import { Event } from '@core/database/entity/event.entity';
-import { EventParticipantTypeService } from '@modules/event-participant-type/event-participant-type.service';
-import { ImageService } from '@modules/image/image.service';
-import { VUpdateEventInput } from './dto/update-event.input';
-import { TempleGetEventArgs } from './dto/temple-get-event.args';
-import { returnPagingData } from '@helper/utils';
-import { EBookingStatus, ERole, ErrorMessage } from '@core/enum';
-import { GetEventArgs } from './dto/get-event.args';
-import { EventParticipantService } from '@modules/event-participant/event-participant.service';
 import { GetBookingEventsArgs } from './dto/get-booking-events.args';
-import { EventParticipant } from '@core/database/entity/eventParticipant.entity';
-import { NotificationService } from '@modules/notification/notification.service';
+import { GetEventArgs } from './dto/get-event.args';
+import { TempleGetEventArgs } from './dto/temple-get-event.args';
+import { VUpdateEventInput } from './dto/update-event.input';
 
 @Injectable()
 export class EventService {
@@ -36,6 +38,8 @@ export class EventService {
     private readonly eventParticipantService: EventParticipantService,
 
     private readonly notificationService: NotificationService,
+
+    private readonly queueProcessorService: QueueProcessorService,
 
     private readonly dataSource: DataSource,
   ) {}
@@ -83,7 +87,9 @@ export class EventService {
 
   async templeGetEvents(userData: IUserData, args: TempleGetEventArgs) {
     const { tid: templeId } = userData;
-    const { take, skip, name, upcoming, onGoing, ended, orderBy } = args;
+    const { take, skip, name, upcoming, onGoing, ended, orderBy, isFreeOpen } =
+      args;
+
     const queryBuilder = this.eventRepository
       .createQueryBuilder('event')
       .where('event.isDeleted = :isDeleted', { isDeleted: false })
@@ -127,6 +133,10 @@ export class EventService {
 
     if (name) {
       queryBuilder.andWhere('event.name ILIKE :name', { name: `%${name}%` });
+    }
+
+    if (isFreeOpen) {
+      queryBuilder.andWhere('event.isFreeOpen = :isFreeOpen', { isFreeOpen });
     }
 
     if (upcoming) {
@@ -263,22 +273,25 @@ export class EventService {
 
   async createEvent(userData: IUserData, createEventInput: VCreateEventInput) {
     const { id: userId, tid: templeIds } = userData;
-    const { roles, images } = createEventInput;
+    const { roles, images, isFreeOpen } = createEventInput;
 
     const newEvent: DeepPartial<Event> = {
       name: createEventInput.name,
       description: createEventInput.description,
       startDateEvent: createEventInput.startDateEvent,
       endDateEvent: createEventInput.endDateEvent,
-      startDateBooking: createEventInput.startDateBooking,
-      endDateBooking: createEventInput.endDateBooking,
       address: createEventInput.address,
       phone: createEventInput.phone,
       email: createEventInput.email,
-      maxParticipant: createEventInput.maxParticipant,
       creatorId: userId,
       templeId: templeIds[0],
       avatar: createEventInput.avatar,
+      ...(isFreeOpen && {
+        maxParticipant: createEventInput.maxParticipant,
+        startDateBooking: createEventInput.startDateBooking,
+        endDateBooking: createEventInput.endDateBooking,
+        isFreeOpen,
+      }),
     };
 
     return await this.dataSource.transaction(
@@ -286,18 +299,19 @@ export class EventService {
         const createdEvent = await entityManager
           .getRepository(Event)
           .save(newEvent);
+        if (roles && roles.length > 0) {
+          const participantTypes = roles.map((role) => {
+            return {
+              eventId: createdEvent.id,
+              role,
+            };
+          });
 
-        const participantTypes = roles.map((role) => {
-          return {
-            eventId: createdEvent.id,
-            role,
-          };
-        });
-
-        await this.eventParticipantTypeService.createParticipantTypes(
-          participantTypes,
-          entityManager,
-        );
+          await this.eventParticipantTypeService.createParticipantTypes(
+            participantTypes,
+            entityManager,
+          );
+        }
 
         if (images && images.length > 0) {
           await this.imageService.createImages(
@@ -310,6 +324,21 @@ export class EventService {
             entityManager,
           );
         }
+
+        await this.queueProcessorService.handleAddQueue(
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CREATE_EVENT.NAME,
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CREATE_EVENT.JOBS.SEND_MAIL,
+          {
+            templeId: templeIds[0],
+            startDateEvent: createEventInput.startDateEvent,
+            eventAddress: createEventInput.address,
+            eventName: createEventInput.name,
+            phone: createEventInput.phone,
+            email: createEventInput.email,
+            eventId: createdEvent.id,
+          },
+        );
+
         return createdEvent;
       },
     );
@@ -377,6 +406,11 @@ export class EventService {
                 role,
               };
             }),
+            entityManager,
+          );
+        } else {
+          await this.eventParticipantTypeService.deleteParticipantTypeByEventId(
+            id,
             entityManager,
           );
         }

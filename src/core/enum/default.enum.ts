@@ -57,6 +57,7 @@ export enum ESortOrder {
 
 export enum ENotificationType {
   INVITE_FAMILY = 'INVITE_FAMILY',
+  NEW_EVENT = 'NEW_EVENT',
 }
 
 export enum EMailType {
@@ -64,6 +65,7 @@ export enum EMailType {
   VERIFY_EMAIL = 'VERIFY_EMAIL',
   REGISTER = 'REGISTER',
   RESET_PASSWORD = 'RESET_PASSWORD',
+  CREATE_EVENT = 'CREATE_EVENT',
 }
 
 export enum EValidationTokenType {

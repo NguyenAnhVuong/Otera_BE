@@ -1,5 +1,5 @@
 import { Temple } from '@core/database/entity/temple.entity';
-import { GQLArgsPaging } from '@core/decorator/gqlQueryPaging.decorator';
+import { GQLArgsPaging } from '@core/decorator/gqlArgsPaging.decorator';
 import { GQLRoles } from '@core/decorator/gqlRoles.decorator';
 import { GQLUserData } from '@core/decorator/gqlUser.decorator';
 import { IsPublicOrAuth } from '@core/decorator/publicOrAuth.decorator';

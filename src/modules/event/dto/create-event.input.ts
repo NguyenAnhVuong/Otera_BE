@@ -5,6 +5,7 @@ import {
   ArrayMinSize,
   ArrayUnique,
   IsArray,
+  IsBoolean,
   IsDate,
   IsEnum,
   IsNotEmpty,
@@ -19,6 +20,10 @@ export class VCreateEventInput {
   @IsNotEmpty()
   @Field(() => String)
   name: string;
+
+  @IsBoolean()
+  @Field(() => Boolean)
+  isFreeOpen: boolean;
 
   @IsString()
   @IsOptional()
@@ -49,15 +54,15 @@ export class VCreateEventInput {
   endDateEvent: Date;
 
   @IsDate()
-  @IsNotEmpty()
   @Type(() => Date)
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
   startDateBooking: Date;
 
   @IsDate()
-  @IsNotEmpty()
   @Type(() => Date)
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
+  @IsOptional()
   endDateBooking: Date;
 
   @IsString()
@@ -66,8 +71,7 @@ export class VCreateEventInput {
   address: string;
 
   @IsString()
-  @IsOptional()
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   phone: string;
 
   @IsString()
@@ -77,13 +81,13 @@ export class VCreateEventInput {
 
   @IsNumber()
   @Field(() => Number, { nullable: true })
+  @IsOptional()
   maxParticipant?: number;
 
-  @IsNotEmpty()
   @IsArray()
-  @ArrayMinSize(1)
   @ArrayUnique()
   @IsEnum(ERole, { each: true })
-  @Field(() => [ERole])
-  roles: ERole[];
+  @Field(() => [ERole], { nullable: true })
+  @IsOptional()
+  roles?: ERole[];
 }

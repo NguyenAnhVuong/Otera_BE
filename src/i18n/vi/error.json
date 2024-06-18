@@ -21,5 +21,6 @@
   "INVITATION_EXPIRED": "Lời mời đã hết hạn",
   "SEND_MAIL_FAIL": "Gửi mail thất bại",
   "PUBLIC_USER_TEMPLE_NOT_EXIST": "Người dùng không thuộc chùa",
-  "INVALID_TOKEN": "Token không hợp lệ"
+  "INVALID_TOKEN": "Token không hợp lệ",
+  "CAN_NOTE_FIND_QUEUE": "Không tìm thấy hàng đợi"
 }

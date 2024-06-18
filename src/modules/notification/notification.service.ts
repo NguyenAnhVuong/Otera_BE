@@ -1,11 +1,11 @@
 import { Notification } from '@core/database/entity/notification.entity';
+import { ErrorMessage } from '@core/enum';
 import { IUserData } from '@core/interface/default.interface';
+import { returnPagingData } from '@helper/utils';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, In, Repository, EntityManager } from 'typeorm';
+import { DeepPartial, EntityManager, Repository } from 'typeorm';
 import { GetNotificationsArgs } from './dto/get-notifications.args';
-import { returnPagingData } from '@helper/utils';
-import { ErrorMessage } from '@core/enum';
 import { UpdateNotificationInput } from './dto/update-notification.input';
 
 @Injectable()

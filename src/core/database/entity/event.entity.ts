@@ -70,16 +70,18 @@ export class Event {
   @Column({
     name: 'startDateBooking',
     type: 'timestamptz',
+    nullable: true,
   })
-  @Field(() => Date)
-  startDateBooking: Date;
+  @Field(() => Date, { nullable: true })
+  startDateBooking?: Date;
 
   @Column({
     name: 'endDateBooking',
     type: 'timestamptz',
+    nullable: true,
   })
-  @Field(() => Date)
-  endDateBooking: Date;
+  @Field(() => Date, { nullable: true })
+  endDateBooking?: Date;
 
   @Column({ name: 'address', type: 'varchar', length: 250 })
   @Field(() => String)
@@ -113,6 +115,10 @@ export class Event {
   @Column({ name: 'maxParticipant', type: 'int', nullable: true })
   @Field(() => Int, { nullable: true })
   maxParticipant: number | null;
+
+  @Column({ name: 'isFreeOpen', type: 'boolean', default: false })
+  @Field(() => Boolean)
+  isFreeOpen: boolean;
 
   @Column({
     name: 'createdAt',
