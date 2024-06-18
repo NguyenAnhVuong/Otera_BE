@@ -178,6 +178,42 @@ export const getMailFormat = (type: EMailType) => {
           </tr>
         </table>`,
       };
+    case EMailType.CREATE_EVENT:
+      return {
+        title: '【Otera】Chùa {templeName} đã tạo sự kiện mới',
+        content: `
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+        <tr>
+            <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+
+                <p style="font-size: 16px; color: #333333;">Chùa {templeName} vừa mới tạo sự kiện <strong>{eventName}</strong>.</p>
+    
+                <p style="font-size: 16px; color: #333333;">Thời gian: {startDateEvent}</p>
+
+                <p style="font-size: 16px; color: #333333;">Địa điểm: {eventAddress}</p>
+
+                <p style="font-size: 16px; color: #333333;">Để xem thông tin chi tiết về sự kiện và cách thức đăng ký tham gia vui lòng truy cập vào đường dẫn dưới đây</p>
+
+                <p style="font-size: 16px; color: #333333;">
+                    <a href="{eventDetailUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Chi tiết thông tin sự kiện {eventName}</a>
+                </p>
+
+                <p style="font-size: 16px; color: #333333;">Rất mong có sự góp mặt của bạn.</p>
+
+                <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi:</p>
+
+                <p style="font-size: 16px; color: #333333;">
+                    <span>{eventPhone}</span><br>
+                    <span>{eventEmail}</span>
+                </p>
+
+                {footer}
+            </td>
+        </tr>
+    </table>`,
+      };
+
     default:
       throw new Error();
   }

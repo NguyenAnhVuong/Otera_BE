@@ -231,7 +231,7 @@ export class UserService {
       );
     }
 
-    let templeIds = null;
+    let templeIds = [user.templeId];
 
     if (user.followerTemples.length > 0) {
       templeIds = user.followerTemples.map((temple) => temple.templeId);

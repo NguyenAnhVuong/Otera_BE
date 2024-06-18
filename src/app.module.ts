@@ -29,6 +29,8 @@ import { UserModule } from './modules/user/user.module';
 import { NotificationModule } from '@modules/notification/notification.module';
 import { InviteFamilyModule } from '@modules/invite-family/invite-family.module';
 import { FollowerTempleModule } from '@modules/follower-temple/follower-temple.module';
+import { BullModule } from '@nestjs/bull';
+import { QueueProcessorModule } from '@core/global/queueProcessor/queueProcessor.module';
 
 @Module({
   imports: [
@@ -60,6 +62,16 @@ import { FollowerTempleModule } from '@modules/follower-temple/follower-temple.m
         logger: new DatabaseMysqlLogger(),
       }),
     }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        redis: {
+          host: configService.get(EConfiguration.REDIS_HOST),
+          port: configService.get(EConfiguration.REDIS_PORT),
+        },
+      }),
+    }),
     I18nCustomModule,
     ConstanceModule,
     UserModule,
@@ -76,6 +88,7 @@ import { FollowerTempleModule } from '@modules/follower-temple/follower-temple.m
     InviteFamilyModule,
     NotificationModule,
     FollowerTempleModule,
+    QueueProcessorModule,
   ],
   controllers: [AppController],
   providers: [

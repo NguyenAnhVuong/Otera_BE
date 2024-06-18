@@ -1,6 +1,7 @@
 import { OrderBy } from '@core/global/entities/order.entity';
 import { PaginationQuery } from '@core/global/entities/paginationQuery.entity';
 import { ArgsType, Field } from '@nestjs/graphql';
+import { Type } from 'class-transformer';
 import { IsBoolean, IsOptional, IsString, ValidateIf } from 'class-validator';
 
 // @InputType()
@@ -65,6 +66,11 @@ export class TempleGetEventArgs extends PaginationQuery {
   @IsOptional()
   @ValidateIf((o) => !o.upcoming && !o.happening)
   ended?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsBoolean()
+  @IsOptional()
+  isFreeOpen?: boolean;
 
   @Field(() => [OrderBy], { nullable: true })
   @IsOptional()

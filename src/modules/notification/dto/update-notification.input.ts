@@ -20,12 +20,12 @@ export class UpdateNotificationInput {
   @IsOptional()
   isRead?: boolean;
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: true })
   @IsBoolean()
   @IsOptional()
   isDeleted?: boolean;
 
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   @IsDate()
   @IsOptional()
   @Type(() => Date)

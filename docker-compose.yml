@@ -54,5 +54,14 @@ services:
       timeout: 10s
       retries: 5
       start_period: 5s
+  redis:
+    image: redis:7.2-rc2-alpine
+    hostname: redis
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    volumes:
+      - redis:/data
 volumes:
   db_data:
+  redis:
+    driver: local

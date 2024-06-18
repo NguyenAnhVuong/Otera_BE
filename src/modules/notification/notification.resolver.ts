@@ -4,7 +4,7 @@ import { GQLRoles } from '@core/decorator/gqlRoles.decorator';
 import { ERole } from '@core/enum';
 import { NotificationsRes } from './entities/notificationsRes.entity';
 import { GQLUserData } from '@core/decorator/gqlUser.decorator';
-import { GQLArgsPaging } from '@core/decorator/gqlQueryPaging.decorator';
+import { GQLArgsPaging } from '@core/decorator/gqlArgsPaging.decorator';
 import { IUserData } from '@core/interface/default.interface';
 import { GetNotificationsArgs } from './dto/get-notifications.args';
 import { UpdateRes } from '@core/global/entities/updateRes.entity';

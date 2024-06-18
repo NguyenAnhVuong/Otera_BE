@@ -256,4 +256,14 @@ export class TempleService {
       role: ERole.PUBLIC_USER,
     });
   }
+
+  async getTempleAndTempleFollowers(templeId: number) {
+    return await this.templeRepository
+      .createQueryBuilder('temple')
+      .where({ id: templeId })
+      .leftJoinAndSelect('temple.followerTemples', 'followerTemples')
+      .leftJoinAndSelect('followerTemples.user', 'user')
+      .leftJoinAndSelect('user.userDetail', 'userDetail')
+      .getOne();
+  }
 }

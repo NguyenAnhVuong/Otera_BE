@@ -34,4 +34,16 @@ export class EventParticipantTypeService {
     await eventParticipantTypeRepository.save(eventParticipantType);
     return true;
   }
+
+  async deleteParticipantTypeByEventId(
+    eventId: number,
+    entityManager?: EntityManager,
+  ) {
+    const eventParticipantTypeRepository = entityManager
+      ? entityManager.getRepository(EventParticipantType)
+      : this.eventParticipantTypeRepository;
+
+    await eventParticipantTypeRepository.delete({ eventId });
+    return true;
+  }
 }

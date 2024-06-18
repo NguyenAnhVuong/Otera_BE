@@ -21,5 +21,6 @@
   "INVITATION_EXPIRED": "Invitation expired",
   "SEND_MAIL_FAIL": "Send mail fail",
   "PUBLIC_USER_TEMPLE_NOT_EXIST": "Public user temple not exist",
-  "INVALID_TOKEN": "Invalid token"
+  "INVALID_TOKEN": "Invalid token",
+  "CAN_NOTE_FIND_QUEUE": "Can not find queue"
 }

@@ -8,7 +8,7 @@ import { GetFamilyMembersArgs } from './dto/get-family-members.dto';
 import { FamilyMembersRes } from './entity/familyMembersRes.entity';
 import { GQLUserData } from '@core/decorator/gqlUser.decorator';
 import { IUserData } from '@core/interface/default.interface';
-import { GQLArgsPaging } from '@core/decorator/gqlQueryPaging.decorator';
+import { GQLArgsPaging } from '@core/decorator/gqlArgsPaging.decorator';
 
 @Resolver(() => FamilyRes)
 export class FamilyResolver {

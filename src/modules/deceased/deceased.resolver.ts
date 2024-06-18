@@ -2,17 +2,19 @@ import { Deceased } from '@core/database/entity/deceased.entity';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { DeceasedService } from './deceased.service';
 
+import { GQLArgsPaging } from '@core/decorator/gqlArgsPaging.decorator';
 import { GQLRoles } from '@core/decorator/gqlRoles.decorator';
 import { GQLUserData } from '@core/decorator/gqlUser.decorator';
 import { ERole } from '@core/enum';
 import { UpdateRes } from '@core/global/entities/updateRes.entity';
 import { IUserData } from '@core/interface/default.interface';
 import { HttpStatus, ParseIntPipe } from '@nestjs/common';
+import { VFamilyGetListDeceasedArgs } from './dto/family-get-list-deceased.dto';
+import { VTempleGetListDeceasedArgs } from './dto/temple-get-deceased-list.args';
 import { VUpdateDeceasedStatusInput } from './dto/update-deceased-status.input';
 import { VUpdateDeceasedInput } from './dto/update-deceased.input';
-import { DeceasedRes } from './entities/deceasedRes.entity';
 import { DeceasedListRes } from './entities/deceasedListRes.entity';
-import { VTempleGetListDeceasedArgs } from './dto/temple-get-deceased-list.args';
+import { DeceasedRes } from './entities/deceasedRes.entity';
 // TODO temple add deceased and redo deceased
 @Resolver(() => Deceased)
 export class DeceasedResolver {
@@ -31,16 +33,12 @@ export class DeceasedResolver {
   }
 
   @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
-  @Query(() => DeceasedListRes, { name: 'getListDeceased' })
-  getListDeceasedByFamilyId(
-    @Args(
-      'familyId',
-      { type: () => Int },
-      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
-    )
-    familyId: number,
+  @Query(() => DeceasedListRes, { name: 'familyGetListDeceased' })
+  familyGetListDeceased(
+    @GQLUserData() userData: IUserData,
+    @GQLArgsPaging() @Args() query: VFamilyGetListDeceasedArgs,
   ) {
-    return this.deceasedService.getListDeceasedByFamilyId(familyId);
+    return this.deceasedService.getListDeceasedByFamilyId(userData.fid, query);
   }
 
   @GQLRoles([
