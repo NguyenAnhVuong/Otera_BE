@@ -1,5 +1,5 @@
 import { OrderBy } from '@core/global/entities/order.entity';
-import { PaginationQuery } from '@core/global/entities/paginationQuery.entity';
+import { GQLPaginationArgs } from '@core/global/entities/paginationQuery.entity';
 import { ArgsType, Field } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsOptional, IsString, ValidateIf } from 'class-validator';
@@ -43,7 +43,7 @@ import { IsBoolean, IsOptional, IsString, ValidateIf } from 'class-validator';
 // }
 
 @ArgsType()
-export class TempleGetEventArgs extends PaginationQuery {
+export class TempleGetEventArgs extends GQLPaginationArgs {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()

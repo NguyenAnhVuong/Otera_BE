@@ -327,8 +327,8 @@ export class EventService {
         }
 
         await this.queueProcessorService.handleAddQueue(
-          QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CREATE_EVENT.NAME,
-          QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CREATE_EVENT.JOBS.SEND_MAIL,
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.NAME,
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.JOBS.SEND_CREATE_EVENT_MAIL,
           {
             templeId: templeIds[0],
             startDateEvent: createEventInput.startDateEvent,
@@ -454,14 +454,11 @@ export class EventService {
         }
 
         await this.queueProcessorService.handleAddQueue(
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.NAME,
           updateEventInput.isDeleted &&
             new Date(event.startDateEvent) > new Date()
-            ? QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CANCEL_EVENT.NAME
-            : QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_UPDATE_EVENT.NAME,
-          updateEventInput.isDeleted &&
-            new Date(event.startDateEvent) > new Date()
-            ? QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CANCEL_EVENT.JOBS.SEND_MAIL
-            : QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_UPDATE_EVENT.JOBS.SEND_MAIL,
+            ? QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.JOBS.SEND_CANCEL_EVENT_MAIL
+            : QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.JOBS.SEND_UPDATE_EVENT_MAIL,
           {
             templeId: userData.tid[0],
             eventName: updateEventInput.name ?? event.name,

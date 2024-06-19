@@ -22,5 +22,6 @@
   "SEND_MAIL_FAIL": "Gửi mail thất bại",
   "PUBLIC_USER_TEMPLE_NOT_EXIST": "Người dùng không thuộc chùa",
   "INVALID_TOKEN": "Token không hợp lệ",
-  "CAN_NOTE_FIND_QUEUE": "Không tìm thấy hàng đợi"
+  "CAN_NOTE_FIND_QUEUE": "Không tìm thấy hàng đợi",
+  "DEATH_ANNIVERSARY_REQUEST_EXIST": "Yêu cầu đã tồn tại"
 }

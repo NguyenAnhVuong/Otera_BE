@@ -2,72 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type FamilyTemple {
-  id: Int!
-  familyId: Int
-  templeId: Int
-  isDeleted: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  family: Family!
-  temple: Temple!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type Family {
-  id: Int!
-  familyCode: String!
-  adminId: Int!
-  name: String!
-  description: String!
-  address: String!
-  phone: String!
-  avatar: String!
-  status: EStatus!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  users: [User!]!
-  deceaseds: [Deceased!]!
-  familyTemples: [FamilyTemple!]!
-  deathAnniversaries: [DeathAnniversary!]!
-}
-
-enum EStatus {
-  REJECTED
-  PENDING
-  APPROVED
-  BLOCKED
-}
-
-type DeathAnniversary {
-  id: Int!
-  deceasedId: Int!
-  familyId: Int!
-  templeId: Int!
-  desiredStartTime: DateTime!
-  desiredEndTime: DateTime!
-  actualStartTime: DateTime
-  actualEndTime: DateTime
-  status: EStatus!
-  enableUpdate: Boolean!
-  creatorId: Int!
-  note: String
-  rejectReason: String
-  isDeleted: Boolean!
-  isLiveStream: Boolean!
-  linkLiveStream: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  deceased: Deceased!
-  temple: Temple!
-  user: User!
-  family: Family!
-}
-
 type EventParticipant {
   id: Int!
   eventId: Int!
@@ -92,6 +26,11 @@ enum EBookingStatus {
   CANCEL
 }
 
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type EventParticipantType {
   id: Int!
   eventId: Int!
@@ -109,6 +48,19 @@ enum ERole {
   TEMPLE_ADMIN
   TEMPLE_MEMBER
   PUBLIC_USER
+}
+
+type Image {
+  id: Int!
+  deceasedId: Int
+  templeId: Int
+  eventId: Int
+  image: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deceased: Deceased!
+  temple: Temple!
+  event: Event!
 }
 
 type Event {
@@ -145,14 +97,40 @@ enum EPriority {
   HIGH
 }
 
-type FollowerTemple {
+type FamilyTemple {
   id: Int!
-  templeId: Int!
-  userId: Int!
+  familyId: Int
+  templeId: Int
+  isDeleted: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  user: User!
+  family: Family!
   temple: Temple!
+}
+
+type Family {
+  id: Int!
+  familyCode: String!
+  adminId: Int!
+  name: String!
+  description: String!
+  address: String!
+  phone: String!
+  avatar: String!
+  status: EStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  users: [User!]!
+  deceaseds: [Deceased!]!
+  familyTemples: [FamilyTemple!]!
+  deathAnniversaries: [DeathAnniversary!]!
+}
+
+enum EStatus {
+  REJECTED
+  PENDING
+  APPROVED
+  BLOCKED
 }
 
 type Review {
@@ -166,6 +144,149 @@ type Review {
   updatedAt: DateTime!
   temple: Temple!
   user: User!
+}
+
+type FollowerTemple {
+  id: Int!
+  templeId: Int!
+  userId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  temple: Temple!
+}
+
+type UserDetail {
+  id: Int!
+  avatar: String!
+  name: String!
+  phone: String
+  birthday: String!
+  address: String
+  gender: EGender!
+  citizenNumber: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  user: User!
+  deceased: Deceased!
+}
+
+enum EGender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+type User {
+  id: Int!
+  email: String!
+  status: EAccountStatus!
+  role: ERole!
+  familyId: Int
+  templeId: Int
+  userDetailId: Int
+  passwordChangedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  temple: Temple!
+  userDetail: UserDetail!
+  family: Family
+  reviews: [Review!]!
+  deathAnniversaries: [DeathAnniversary!]!
+  followerTemples: FollowerTemple!
+  events: [Event!]!
+  eventParticipants: [EventParticipant!]!
+  modifiedDeceaseds: [Deceased!]!
+}
+
+enum EAccountStatus {
+  INACTIVE
+  ACTIVE
+}
+
+type Deceased {
+  id: Int!
+  dateOfDeath: String!
+  tombAddress: String
+  description: String
+  rejectReason: String
+  userDetailId: Int
+  templeId: Int!
+  familyId: Int
+  creatorId: Int!
+  modifierId: Int
+  isDeleted: Boolean!
+  status: EStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  temple: Temple!
+  family: Family!
+  images: [Image!]!
+  userDetail: UserDetail!
+  deathAnniversaries: [DeathAnniversary!]!
+  modifier: User
+}
+
+type Offering {
+  id: Int!
+  name: String!
+  image: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deathAnniversaryOfferings: [DeathAnniversaryOffering!]!
+}
+
+type DeathAnniversaryOffering {
+  id: Int!
+  deathAnniversaryId: Int!
+  offeringId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type DeathAnniversary {
+  id: Int!
+  deceasedId: Int!
+  familyId: Int!
+  templeId: Int!
+  desiredStartTime: DateTime!
+  desiredEndTime: DateTime!
+  actualStartTime: DateTime
+  actualEndTime: DateTime
+  status: EDeathAnniversaryStatus!
+  enableUpdate: Boolean!
+  creatorId: Int!
+  note: String
+  rejectReason: String
+  isDeleted: Boolean!
+  isLiveStream: Boolean!
+  linkLiveStream: String
+  deathAnniversaryType: EDeathAnniversaryType!
+  graveAddress: String
+  readyImage: String
+  finishImage: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deceased: Deceased!
+  temple: Temple!
+  user: User!
+  family: Family!
+  deathAnniversaryOfferings: [DeathAnniversaryOffering!]!
+}
+
+enum EDeathAnniversaryStatus {
+  REJECTED
+  PENDING
+  APPROVED
+  READY
+  CANCEL
+  FINISHED
+}
+
+enum EDeathAnniversaryType {
+  FIRST_ANNIVERSARY
+  SECOND_ANNIVERSARY
+  REGULAR_ANNIVERSARY
 }
 
 type Temple {
@@ -202,90 +323,6 @@ enum EPlan {
   PREMIUM
 }
 
-type Image {
-  id: Int!
-  deceasedId: Int
-  templeId: Int
-  eventId: Int
-  image: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  deceased: Deceased!
-  temple: Temple!
-  event: Event!
-}
-
-type UserDetail {
-  id: Int!
-  avatar: String!
-  name: String!
-  phone: String
-  birthday: String!
-  address: String
-  gender: EGender!
-  citizenNumber: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  user: User!
-  deceased: Deceased!
-}
-
-enum EGender {
-  MALE
-  FEMALE
-  OTHER
-}
-
-type Deceased {
-  id: Int!
-  dateOfDeath: String!
-  tombAddress: String
-  description: String
-  rejectReason: String
-  userDetailId: Int
-  templeId: Int!
-  familyId: Int
-  creatorId: Int!
-  modifierId: Int
-  isDeleted: Boolean!
-  status: EStatus!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  temple: Temple!
-  family: Family!
-  images: [Image!]!
-  userDetail: UserDetail!
-  deathAnniversaries: [DeathAnniversary!]!
-  modifier: User
-}
-
-type User {
-  id: Int!
-  email: String!
-  status: EAccountStatus!
-  role: ERole!
-  familyId: Int
-  templeId: Int
-  userDetailId: Int
-  passwordChangedAt: DateTime
-  createdAt: DateTime!
-  updatedAt: DateTime!
-  temple: Temple!
-  userDetail: UserDetail!
-  family: Family
-  reviews: [Review!]!
-  deathAnniversaries: [DeathAnniversary!]!
-  followerTemples: FollowerTemple!
-  events: [Event!]!
-  eventParticipants: [EventParticipant!]!
-  modifiedDeceaseds: [Deceased!]!
-}
-
-enum EAccountStatus {
-  INACTIVE
-  ACTIVE
-}
-
 type GQLResponse {
   statusCode: Int!
   errorMessage: String
@@ -293,20 +330,12 @@ type GQLResponse {
   timestamp: String!
 }
 
-type DeathAnniversariesRes {
+type CreateRes {
   statusCode: Int!
   errorMessage: String
   errorCode: String
   timestamp: String!
-  data: [DeathAnniversary!]!
-}
-
-type DeathAnniversaryRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: DeathAnniversary!
+  data: Boolean!
 }
 
 type AffectedResult {
@@ -319,38 +348,6 @@ type UpdateRes {
   errorCode: String
   timestamp: String!
   data: AffectedResult
-}
-
-type DeceasedPaging {
-  totalItems: Int!
-  page: Int!
-  totalPages: Int!
-  take: Int!
-  data: [Deceased!]!
-}
-
-type DeceasedListRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: DeceasedPaging!
-}
-
-type DeceasedRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: Deceased!
-}
-
-type CreateRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: Boolean!
 }
 
 type UserRes {
@@ -452,6 +449,23 @@ enum ENotificationType {
   CANCEL_EVENT
   APPROVE_EVENT_PARTICIPANT
   REJECT_EVENT_PARTICIPANT
+  REQUEST_DEATH_ANNIVERSARY
+}
+
+type NotificationsPagingData {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [Notification!]!
+}
+
+type NotificationsRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: NotificationsPagingData!
 }
 
 type EventParticipantRes {
@@ -487,22 +501,6 @@ type EventParticipantsRes {
   errorCode: String
   timestamp: String!
   data: ListEventParticipant
-}
-
-type NotificationsPagingData {
-  totalItems: Int!
-  page: Int!
-  totalPages: Int!
-  take: Int!
-  data: [Notification!]!
-}
-
-type NotificationsRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: NotificationsPagingData!
 }
 
 type EventDetail {
@@ -606,50 +604,44 @@ type BookingEventsRes {
   data: BookingEventsPagingData!
 }
 
-type Test {
-  """Example field (placeholder)"""
-  exampleField: Int!
-}
-
-type Test2 {
-  """Example field (placeholder)"""
-  statusCode: Int!
-
-  """Example field (placeholder)"""
-  errorMessage: String
-
-  """Example field (placeholder)"""
-  errorCode: String
-
-  """Example field (placeholder)"""
-  timestamp: String!
-
-  """Example field (placeholder)"""
-  data: Test!
-}
-
-type FamilyRes {
+type DeathAnniversariesRes {
   statusCode: Int!
   errorMessage: String
   errorCode: String
   timestamp: String!
-  data: Family!
+  data: [DeathAnniversary!]!
 }
 
-type FamilyMembers {
+type DeathAnniversaryRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: DeathAnniversary!
+}
+
+type DeceasedPaging {
   totalItems: Int!
   page: Int!
   totalPages: Int!
   take: Int!
-  data: [User!]!
+  data: [Deceased!]!
 }
 
-type FamilyMembersRes {
+type DeceasedListRes {
   statusCode: Int!
   errorMessage: String
   errorCode: String
   timestamp: String!
-  data: FamilyMembers!
+  data: DeceasedPaging!
+}
+
+type DeceasedRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Deceased!
 }
 
 type DeleteRes {
@@ -676,6 +668,68 @@ type FollowerTemplesRes {
   data: FollowerTemplesPagingData!
 }
 
+type FamilyRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Family!
+}
+
+type FamilyMembers {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [User!]!
+}
+
+type FamilyMembersRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: FamilyMembers!
+}
+
+type Test {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+type Test2 {
+  """Example field (placeholder)"""
+  statusCode: Int!
+
+  """Example field (placeholder)"""
+  errorMessage: String
+
+  """Example field (placeholder)"""
+  errorCode: String
+
+  """Example field (placeholder)"""
+  timestamp: String!
+
+  """Example field (placeholder)"""
+  data: Test!
+}
+
+type ListOffering {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [Offering!]!
+}
+
+type OfferingsRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: ListOffering!
+}
+
 type IsBookedEvent {
   isBooked: Boolean!
 }
@@ -691,6 +745,7 @@ type Query {
   familyGetListDeceased(page: Int, take: Int, skip: Int): DeceasedListRes!
   getDeceased(id: Int!): DeceasedRes!
   getDeathAnniversaries(getDeathAnniversariesInput: GetDeathAnniversariesInput!): DeathAnniversariesRes!
+  checkIsExistedRequestDeathAnniversary(deceasedId: Int!): CreateRes!
   test123(id: Int!): Test2!
   templeGetEvents(page: Int, take: Int, skip: Int, name: String, upcoming: Boolean, onGoing: Boolean, ended: Boolean, isFreeOpen: Boolean, orderBy: [OrderBy!]): EventsRes!
   getEvents(page: Int, take: Int, skip: Int, templeId: Int): EventsRes!
@@ -698,6 +753,7 @@ type Query {
   getEventById(id: Int!): EventRes!
   getEventParticipants(page: Int, take: Int, skip: Int, eventId: Int!, name: String, email: String, address: String, familyName: String, bookingStatus: EBookingStatus!, isFollowing: Boolean, orderBy: [OrderBy!]): EventParticipantsRes!
   templeGetFollowers(page: Int, take: Int, skip: Int, name: String, email: String, phone: String, address: String, familyName: String, orderBy: [OrderBy!], isInFamily: Boolean): FollowerTemplesRes!
+  getOfferings(page: Int, take: Int, skip: Int): OfferingsRes!
 }
 
 input OrderBy {
@@ -802,11 +858,13 @@ input CreateDeathAnniversaryInput {
   desiredEndTime: DateTime!
   note: String
   isLiveStream: Boolean!
+  deathAnniversaryType: EDeathAnniversaryType!
+  offeringIds: [Int!]!
 }
 
 input TempleUpdateDeathAnniversaryInput {
   id: Int!
-  status: EStatus!
+  status: EDeathAnniversaryStatus!
   enableUpdate: Boolean
   desiredStartTime: DateTime
   desiredEndTime: DateTime
@@ -822,6 +880,9 @@ input UpdateDeathAnniversaryInput {
   desiredStartTime: DateTime
   desiredEndTime: DateTime
   note: String
+  offeringIds: [Int!]
+  deathAnniversaryType: EDeathAnniversaryType
+  isLiveStream: Boolean
 }
 
 input CancelDeathAnniversaryInput {

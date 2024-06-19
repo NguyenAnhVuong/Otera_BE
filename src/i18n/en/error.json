@@ -22,5 +22,6 @@
   "SEND_MAIL_FAIL": "Send mail fail",
   "PUBLIC_USER_TEMPLE_NOT_EXIST": "Public user temple not exist",
   "INVALID_TOKEN": "Invalid token",
-  "CAN_NOTE_FIND_QUEUE": "Can not find queue"
+  "CAN_NOTE_FIND_QUEUE": "Can not find queue",
+  "DEATH_ANNIVERSARY_REQUEST_EXIST": "Death anniversary request exist"
 }

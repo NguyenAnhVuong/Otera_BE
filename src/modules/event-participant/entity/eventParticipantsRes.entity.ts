@@ -1,6 +1,6 @@
 import { EventParticipant } from '@core/database/entity/eventParticipant.entity';
 import { GQLResponse } from '@core/global/entities/gqlRes.entity';
-import { PagingData } from '@core/global/entities/pagingData.entity';
+import { GQLPagingData } from '@core/global/entities/pagingData.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
@@ -13,7 +13,7 @@ export class EventParticipantRes extends EventParticipant {
 }
 
 @ObjectType()
-export class ListEventParticipant extends PagingData {
+export class ListEventParticipant extends GQLPagingData {
   @Field(() => [EventParticipantRes], { nullable: true })
   data: EventParticipantRes[];
 }

@@ -1,0 +1,11 @@
+table:
+  name: offerings
+  schema: public
+array_relationships:
+  - name: deathAnniversaryOfferings
+    using:
+      foreign_key_constraint_on:
+        column: offeringId
+        table:
+          name: deathAnniversaryOfferings
+          schema: public

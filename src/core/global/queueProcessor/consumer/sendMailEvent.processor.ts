@@ -21,10 +21,10 @@ import { NotificationService } from '@modules/notification/notification.service'
 import { Notifications } from '@core/constants';
 import { EventParticipantService } from '@modules/event-participant/event-participant.service';
 
-@Processor(QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CREATE_EVENT.NAME)
+@Processor(QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.NAME)
 export class SendMailEventConsumer {
   private readonly logger = new Logger(
-    QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CREATE_EVENT.NAME,
+    QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.NAME,
   );
 
   constructor(
@@ -49,7 +49,7 @@ export class SendMailEventConsumer {
     this.logger.log(`********OnQueueFailed Job: ${job.name}`, err);
   }
 
-  @Process(QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CREATE_EVENT.JOBS.SEND_MAIL)
+  @Process(QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.JOBS.SEND_CREATE_EVENT_MAIL)
   async handleSendMailTempleCreateEvent(job: Job) {
     this.logger.log(`********OnQueueConsumer Job: ${JSON.stringify(job)}`);
 
@@ -101,7 +101,7 @@ export class SendMailEventConsumer {
     );
   }
 
-  @Process(QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_UPDATE_EVENT.JOBS.SEND_MAIL)
+  @Process(QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.JOBS.SEND_UPDATE_EVENT_MAIL)
   async handleSendMailTempleUpdateEvent(job: Job) {
     this.logger.log(`********OnQueueConsumer Job: ${JSON.stringify(job)}`);
 
@@ -199,7 +199,7 @@ export class SendMailEventConsumer {
     );
   }
 
-  @Process(QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CANCEL_EVENT.JOBS.SEND_MAIL)
+  @Process(QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.JOBS.SEND_CANCEL_EVENT_MAIL)
   async handleSendMailTempleCancelEvent(job: Job) {
     this.logger.log(`********OnQueueConsumer Job: ${JSON.stringify(job)}`);
 

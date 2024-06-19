@@ -1,4 +1,4 @@
-import { EStatus } from '@core/enum';
+import { EDeathAnniversaryStatus, EStatus } from '@core/enum';
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
@@ -16,9 +16,9 @@ export class TempleUpdateDeathAnniversaryInput {
   @Field(() => Int)
   id: number;
 
-  @IsEnum(EStatus)
-  @Field(() => EStatus)
-  status: EStatus;
+  @IsEnum(EDeathAnniversaryStatus)
+  @Field(() => EDeathAnniversaryStatus)
+  status: EDeathAnniversaryStatus;
 
   @IsBoolean()
   @Field(() => Boolean, { nullable: true })

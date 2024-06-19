@@ -30,7 +30,7 @@ export class NotificationResolver {
 
   @GQLRoles(Object.values(ERole))
   @Mutation(() => UpdateRes, { name: 'updateNotification' })
-  async updateNotification(
+  updateNotification(
     @GQLUserData() userData: IUserData,
     @Args('updateNotificationInput')
     updateNotificationInput: UpdateNotificationInput,

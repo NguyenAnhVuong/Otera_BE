@@ -1,10 +1,10 @@
 import { FollowerTemple } from '@core/database/entity/followerTemple.entity';
 import { GQLResponse } from '@core/global/entities/gqlRes.entity';
-import { PagingData } from '@core/global/entities/pagingData.entity';
+import { GQLPagingData } from '@core/global/entities/pagingData.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class FollowerTemplesPagingData extends PagingData {
+export class FollowerTemplesPagingData extends GQLPagingData {
   @Field(() => [FollowerTemple])
   data: FollowerTemple[];
 }

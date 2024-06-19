@@ -1,4 +1,5 @@
 - "!include public_deathAnniversaries.yaml"
+- "!include public_deathAnniversaryOfferings.yaml"
 - "!include public_deceaseds.yaml"
 - "!include public_eventParticipantTypes.yaml"
 - "!include public_eventParticipants.yaml"
@@ -9,6 +10,7 @@
 - "!include public_images.yaml"
 - "!include public_inviteFamilies.yaml"
 - "!include public_notifications.yaml"
+- "!include public_offerings.yaml"
 - "!include public_reviews.yaml"
 - "!include public_temples.yaml"
 - "!include public_userDetails.yaml"

@@ -33,4 +33,10 @@ export const Notifications = {
       `Bạn đã bị từ chối tham gia ${eventName}`,
     redirectTo: (eventId: number) => `/event/${eventId}`,
   },
+  requestDeathAnniversary: {
+    title: 'Có yêu cầu tổ chức lễ giỗ mới',
+    description: (deceasedName: string) =>
+      `Có yêu cầu tổ chức lễ giỗ cho ${deceasedName}`,
+    redirectTo: 'death-anniversary',
+  },
 };

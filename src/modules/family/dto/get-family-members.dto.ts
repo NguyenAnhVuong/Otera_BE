@@ -1,6 +1,6 @@
 import { ERole } from '@core/enum';
 import { OrderBy } from '@core/global/entities/order.entity';
-import { PaginationQuery } from '@core/global/entities/paginationQuery.entity';
+import { GQLPaginationArgs } from '@core/global/entities/paginationQuery.entity';
 import { ArgsType, Field, Int } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
@@ -13,7 +13,7 @@ import {
 } from 'class-validator';
 
 @ArgsType()
-export class GetFamilyMembersArgs extends PaginationQuery {
+export class GetFamilyMembersArgs extends GQLPaginationArgs {
   @Field(() => [OrderBy], { nullable: true })
   @IsOptional()
   @IsArray()

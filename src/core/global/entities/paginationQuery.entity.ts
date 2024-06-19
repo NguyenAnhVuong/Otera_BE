@@ -2,7 +2,7 @@ import { ArgsType, Field, Int } from '@nestjs/graphql';
 import { IsNumber, IsOptional } from 'class-validator';
 
 @ArgsType()
-export class PaginationQuery {
+export class GQLPaginationArgs {
   @IsNumber()
   @IsOptional()
   @Field(() => Int, { nullable: true })

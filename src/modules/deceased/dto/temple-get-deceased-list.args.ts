@@ -1,6 +1,6 @@
 import { EStatus } from '@core/enum';
 import { OrderBy } from '@core/global/entities/order.entity';
-import { PaginationQuery } from '@core/global/entities/paginationQuery.entity';
+import { GQLPaginationArgs } from '@core/global/entities/paginationQuery.entity';
 import { ArgsType, Field } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 
 @ArgsType()
-export class VTempleGetListDeceasedArgs extends PaginationQuery {
+export class VTempleGetListDeceasedArgs extends GQLPaginationArgs {
   @Field(() => String, { nullable: true })
   @IsString()
   @IsOptional()
