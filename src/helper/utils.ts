@@ -99,7 +99,7 @@ export const getMailFormat = (type: EMailType) => {
             <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
                 <p style="font-size: 16px; color: #333333;">Kính gửi {eventParticipantName},</p>
 
-                <p style="font-size: 16px; color: #333333;">Cảm ơn bạn đã đăng ký tham gia sự kiện <strong>{eventName}</strong> của {templeName}.</p>
+                <p style="font-size: 16px; color: #333333;">Cảm ơn bạn đã đăng ký tham gia sự kiện <strong>{eventName}</strong> của chùa {templeName}.</p>
     
                 <p style="font-size: 16px; color: #333333;">Chúng tôi xin trân trọng thông báo rằng đăng ký tham gia sự kiện <strong>{eventName}</strong> đã được chấp thuận bởi thầy <strong>{approverName}</strong>.</p>
                     
@@ -117,7 +117,7 @@ export const getMailFormat = (type: EMailType) => {
                     <a href="{eventDetailUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Chi tiết thông tin sự kiện {eventName}</a>
                 </p>
 
-                <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi:</p>
+                <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi.</p>
 
                 <p style="font-size: 16px; color: #333333;">
                     <span>{eventPhone}</span><br>
@@ -128,6 +128,34 @@ export const getMailFormat = (type: EMailType) => {
             </td>
         </tr>
     </table>`,
+      };
+
+    case EMailType.REJECT_EVENT_PARTICIPANT:
+      return {
+        title: '【Otera】Đăng ký tham gia sự kiện bị từ chối',
+        content: `
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+          <tr>
+              <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                  <p style="font-size: 16px; color: #333333;">Kính gửi {eventParticipantName},</p>
+
+                  <p style="font-size: 16px; color: #333333;">Cảm ơn bạn đã đăng ký tham gia sự kiện <strong>{eventName}</strong> của chùa {templeName}.</p>
+      
+                  <p style="font-size: 16px; color: #333333;">Chúng tôi xin thông báo rằng đăng ký tham gia sự kiện <strong>{eventName}</strong> đã bị từ chối bởi thầy <strong>{approverName}</strong>.</p>
+                      
+                  <p style="font-size: 16px; color: #333333;">{rejectReason}</p>
+
+                  <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi.</p>
+
+                  <p style="font-size: 16px; color: #333333;">
+                      <span>{eventPhone}</span><br>
+                      <span>{eventEmail}</span>
+                  </p>
+
+                  {footer}
+              </td>
+          </tr>
+        </table>`,
       };
 
     case EMailType.REGISTER:
@@ -201,7 +229,7 @@ export const getMailFormat = (type: EMailType) => {
 
                 <p style="font-size: 16px; color: #333333;">Rất mong có sự góp mặt của bạn.</p>
 
-                <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi:</p>
+                <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi.</p>
 
                 <p style="font-size: 16px; color: #333333;">
                     <span>{eventPhone}</span><br>
@@ -213,7 +241,63 @@ export const getMailFormat = (type: EMailType) => {
         </tr>
     </table>`,
       };
+    case EMailType.UPDATE_EVENT:
+      return {
+        title: '【Otera】Chùa {templeName} đã cập nhật thông tin sự kiện',
+        content: `
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+          <tr>
+              <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                  <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+  
+                  <p style="font-size: 16px; color: #333333;">Chùa {templeName} vừa mới cập nhật thông tin sự kiện <strong>{eventName}</strong>.</p>
+  
+                  <p style="font-size: 16px; color: #333333;">Để xem thông tin chi tiết về sự kiện và cách thức đăng ký tham gia vui lòng truy cập vào đường dẫn dưới đây</p>
+  
+                  <p style="font-size: 16px; color: #333333;">
+                      <a href="{eventDetailUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Chi tiết thông tin sự kiện {eventName}</a>
+                  </p>
+  
+                  <p style="font-size: 16px; color: #333333;">Rất mong có sự góp mặt của bạn.</p>
+  
+                  <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi.</p>
+  
+                  <p style="font-size: 16px; color: #333333;">
+                      <span>{eventPhone}</span><br>
+                      <span>{eventEmail}</span>
+                  </p>
 
+                  {footer}
+              </td>
+          </tr>
+      </table>`,
+      };
+
+    case EMailType.CANCEL_EVENT:
+      return {
+        title: '【Otera】Chùa {templeName} đã hủy sự kiện',
+        content: `
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+          <tr>
+              <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                  <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+
+                  <p style="font-size: 16px; color: #333333;">Chùa {templeName} đã hủy sự kiện <strong>{eventName}</strong>.</p>
+
+                  <p style="font-size: 16px; color: #333333;">Rất mong nhận được sự thông cảm của bạn vì sự bất tiện này.</p>
+
+                  <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi.</p>
+
+                  <p style="font-size: 16px; color: #333333;">
+                      <span>{eventPhone}</span><br>
+                      <span>{eventEmail}</span>
+                  </p>
+
+                  {footer}
+              </td>
+          </tr>
+       </table>`,
+      };
     default:
       throw new Error();
   }

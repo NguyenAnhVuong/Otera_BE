@@ -1,4 +1,9 @@
-import { EBookingStatus, EMailType, ErrorMessage } from '@core/enum';
+import {
+  EBookingStatus,
+  EMailType,
+  ENotificationType,
+  ErrorMessage,
+} from '@core/enum';
 import { IUserData } from '@core/interface/default.interface';
 import { EventService } from '@modules/event/event.service';
 import { UserService } from '@modules/user/user.service';
@@ -10,7 +15,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
+import { In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { EventParticipant } from './../../core/database/entity/eventParticipant.entity';
 import { VBookingEventInput } from './dto/booking-event.entity';
 import { VGetEventParticipantsArgs } from './dto/get-event-participants.args';
@@ -20,7 +25,7 @@ import {
   getMailFormat,
   returnPagingData,
 } from '@helper/utils';
-import { EVENT_PARTICIPANT_CODE_LENGTH } from '@core/constants';
+import { EVENT_PARTICIPANT_CODE_LENGTH, Notifications } from '@core/constants';
 import { VEventParticipantCheckInInput } from './dto/event-participant-check-in.input';
 import { sendMail } from '@helper/mailtrap';
 import * as format from 'string-format';
@@ -28,6 +33,7 @@ import * as dayjs from 'dayjs';
 import { FormatDate } from '@core/constants/formatDate';
 import { ConfigService } from '@nestjs/config';
 import { EConfiguration } from '@core/config';
+import { NotificationService } from '@modules/notification/notification.service';
 
 @Injectable()
 export class EventParticipantService {
@@ -39,6 +45,8 @@ export class EventParticipantService {
     private readonly eventService: EventService,
 
     private readonly configService: ConfigService,
+
+    private readonly notificationService: NotificationService,
 
     private readonly userService: UserService,
   ) {}
@@ -158,8 +166,35 @@ export class EventParticipantService {
 
     let randomCode = null;
     if (newEventParticipant.bookingStatus === EBookingStatus.APPROVED) {
+      const event = await this.eventService.getEventAndParticipantById(
+        eventParticipant.eventId,
+      );
+
+      if (!event) {
+        throw new HttpException(
+          ErrorMessage.EVENT_NOT_EXIST,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (event.maxParticipant >= event.eventParticipants.length) {
+        throw new HttpException(
+          ErrorMessage.EVENT_PARTICIPANT_FULL,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       randomCode = generateRandomCode(EVENT_PARTICIPANT_CODE_LENGTH);
       const mailFormat = getMailFormat(EMailType.APPROVE_EVENT_PARTICIPANT);
+
+      await this.notificationService.createNotification({
+        userId: eventParticipant.userId,
+        title: Notifications.approveBookingEvent.title,
+        description: Notifications.approveBookingEvent.description(event.name),
+        redirectTo: Notifications.approveBookingEvent.redirectTo(event.id),
+        type: ENotificationType.APPROVE_EVENT_PARTICIPANT,
+      });
+
       sendMail({
         to: eventParticipant.user.email,
         title: mailFormat.title,
@@ -188,6 +223,45 @@ export class EventParticipantService {
       while (await this.checkExistedCode(eventParticipantId, randomCode)) {
         randomCode = generateRandomCode(EVENT_PARTICIPANT_CODE_LENGTH);
       }
+    }
+
+    if (newEventParticipant.bookingStatus === EBookingStatus.REJECTED) {
+      const mailFormat = getMailFormat(EMailType.REJECT_EVENT_PARTICIPANT);
+      await this.notificationService.createNotification({
+        userId: eventParticipant.userId,
+        title: Notifications.rejectBookingEvent.title,
+        description: Notifications.rejectBookingEvent.description(
+          eventParticipant.event.name,
+        ),
+        redirectTo: Notifications.rejectBookingEvent.redirectTo(
+          eventParticipant.eventId,
+        ),
+        type: ENotificationType.REJECT_EVENT_PARTICIPANT,
+      });
+
+      sendMail({
+        to: eventParticipant.user.email,
+        title: mailFormat.title,
+        content: format(mailFormat.content, {
+          eventParticipantName: eventParticipant.user.userDetail.name,
+          eventName: eventParticipant.event.name,
+          templeName: eventParticipant.event.temple.name,
+          approverName: userData.name,
+          rejectReason: newEventParticipant.rejectReason
+            ? 'Lý do từ chối: ' + newEventParticipant.rejectReason
+            : '',
+          eventPhone: eventParticipant.event.phone
+            ? 'Điện thoại: ' + eventParticipant.event.phone
+            : '',
+          eventEmail: eventParticipant.event.email
+            ? 'Email: ' + eventParticipant.event.email
+            : '',
+          eventDetailUrl:
+            this.configService.get(EConfiguration.CLIENT_URL) +
+            '/event/' +
+            eventParticipant.event.id,
+        }),
+      });
     }
 
     return await this.eventParticipantRepository.update(
@@ -360,5 +434,16 @@ export class EventParticipantService {
         isDeleted: true,
       },
     );
+  }
+
+  getBookingAndApproveEventParticipants(eventId: number) {
+    return this.eventParticipantRepository.find({
+      where: {
+        eventId,
+        isDeleted: false,
+        bookingStatus: In([EBookingStatus.APPROVED, EBookingStatus.BOOKING]),
+      },
+      relations: ['user', 'user.userDetail'],
+    });
   }
 }
