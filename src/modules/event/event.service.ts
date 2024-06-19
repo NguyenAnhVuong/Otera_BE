@@ -77,7 +77,8 @@ export class EventService {
             familyRoles: [ERole.FAMILY_MEMBER, ERole.FAMILY_ADMIN],
             userTempleIDs: userData.tid,
           },
-        );
+        )
+        .orWhere('event.isFreeOpen = :isFreeOpen', { isFreeOpen: true });
     }
 
     const [events, count] = await queryBuilder.getManyAndCount();
@@ -286,11 +287,11 @@ export class EventService {
       creatorId: userId,
       templeId: templeIds[0],
       avatar: createEventInput.avatar,
-      ...(isFreeOpen && {
+      isFreeOpen: !!isFreeOpen,
+      ...(!isFreeOpen && {
         maxParticipant: createEventInput.maxParticipant,
         startDateBooking: createEventInput.startDateBooking,
         endDateBooking: createEventInput.endDateBooking,
-        isFreeOpen,
       }),
     };
 
@@ -333,8 +334,8 @@ export class EventService {
             startDateEvent: createEventInput.startDateEvent,
             eventAddress: createEventInput.address,
             eventName: createEventInput.name,
-            phone: createEventInput.phone,
-            email: createEventInput.email,
+            eventPhone: createEventInput.phone,
+            eventEmail: createEventInput.email,
             eventId: createdEvent.id,
           },
         );
@@ -348,6 +349,20 @@ export class EventService {
     return await this.eventRepository.findOne({
       where: { id, isDeleted: false },
     });
+  }
+
+  async getEventAndParticipantById(id: number) {
+    return await this.eventRepository
+      .createQueryBuilder('event')
+      .where('event.id = :id', { id })
+      .andWhere('event.isDeleted = :isDeleted', { isDeleted: false })
+      .leftJoinAndSelect(
+        'event.eventParticipants',
+        'eventParticipants',
+        'eventParticipants.isDeleted = false AND eventParticipants.bookingStatus = :approveStatus',
+        { approveStatus: EBookingStatus.APPROVED },
+      )
+      .getOne();
   }
 
   async getEventDetailById(id: number, userData?: IUserData) {
@@ -397,6 +412,16 @@ export class EventService {
           );
         }
 
+        if (
+          updateEventInput.isDeleted &&
+          new Date(event.startDateEvent) < new Date()
+        ) {
+          throw new HttpException(
+            ErrorMessage.INVALID_PARAM,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
         if (roles && roles.length) {
           await this.eventParticipantTypeService.updateParticipantTypeByEventId(
             id,
@@ -428,6 +453,23 @@ export class EventService {
           );
         }
 
+        await this.queueProcessorService.handleAddQueue(
+          updateEventInput.isDeleted &&
+            new Date(event.startDateEvent) > new Date()
+            ? QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CANCEL_EVENT.NAME
+            : QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_UPDATE_EVENT.NAME,
+          updateEventInput.isDeleted &&
+            new Date(event.startDateEvent) > new Date()
+            ? QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CANCEL_EVENT.JOBS.SEND_MAIL
+            : QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_UPDATE_EVENT.JOBS.SEND_MAIL,
+          {
+            templeId: userData.tid[0],
+            eventName: updateEventInput.name ?? event.name,
+            eventPhone: updateEventInput.phone ?? event.phone,
+            eventEmail: updateEventInput.email ?? event.email,
+            eventId: id,
+          },
+        );
         return await eventRepository.update(
           {
             id,

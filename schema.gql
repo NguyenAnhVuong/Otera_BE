@@ -448,6 +448,10 @@ type Notification {
 enum ENotificationType {
   INVITE_FAMILY
   NEW_EVENT
+  UPDATE_EVENT
+  CANCEL_EVENT
+  APPROVE_EVENT_PARTICIPANT
+  REJECT_EVENT_PARTICIPANT
 }
 
 type EventParticipantRes {

@@ -1,9 +1,10 @@
 import { Global, Module } from '@nestjs/common';
-import { SendMailTempleCreateEventConsumer } from './consumer/sendMailTempleCreateEvent.processor';
 import { BullModule } from '@nestjs/bull';
 import { TempleModule } from '@modules/temple/temple.module';
 import { QueueProcessorService } from './quequeProcessor.service';
 import { NotificationModule } from '@modules/notification/notification.module';
+import { SendMailEventConsumer } from './consumer/sendMailEvent.processor';
+import { EventParticipantModule } from '@modules/event-participant/event-participant.module';
 
 @Global()
 @Module({
@@ -13,8 +14,9 @@ import { NotificationModule } from '@modules/notification/notification.module';
     }),
     TempleModule,
     NotificationModule,
+    EventParticipantModule,
   ],
-  providers: [SendMailTempleCreateEventConsumer, QueueProcessorService],
+  providers: [SendMailEventConsumer, QueueProcessorService],
   exports: [QueueProcessorService],
 })
 export class QueueProcessorModule {}
