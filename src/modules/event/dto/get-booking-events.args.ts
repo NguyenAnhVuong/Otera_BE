@@ -1,11 +1,11 @@
 import { EBookingStatus } from '@core/enum';
 import { OrderBy } from '@core/global/entities/order.entity';
-import { PaginationQuery } from '@core/global/entities/paginationQuery.entity';
+import { GQLPaginationArgs } from '@core/global/entities/paginationQuery.entity';
 import { ArgsType, Field } from '@nestjs/graphql';
 import { IsEnum, IsOptional } from 'class-validator';
 
 @ArgsType()
-export class GetBookingEventsArgs extends PaginationQuery {
+export class GetBookingEventsArgs extends GQLPaginationArgs {
   @Field(() => String, { nullable: true })
   @IsOptional()
   name?: string;

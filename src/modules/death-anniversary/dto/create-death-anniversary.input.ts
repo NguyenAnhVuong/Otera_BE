@@ -1,8 +1,10 @@
+import { EDeathAnniversaryType } from '@core/enum';
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -38,4 +40,13 @@ export class CreateDeathAnniversaryInput {
   @Field(() => Boolean)
   @IsNotEmpty()
   isLiveStream: boolean;
+
+  @IsEnum(EDeathAnniversaryType)
+  @Field(() => EDeathAnniversaryType)
+  deathAnniversaryType: EDeathAnniversaryType;
+
+  @IsNumber({}, { each: true })
+  @Field(() => [Int])
+  @IsNotEmpty()
+  offeringIds: number[];
 }

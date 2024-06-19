@@ -1,18 +1,31 @@
-import { EStatus } from '@core/enum';
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import {
+  EDeathAnniversaryStatus,
+  EDeathAnniversaryType,
+  EStatus,
+} from '@core/enum';
+import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Deceased } from './deceased.entity';
 import { Temple } from './temple.entity';
 import { User } from './user.entity';
 import { Family } from './family.entity';
+import { DeathAnniversaryOffering } from './deathAnniversaryOffering.entity';
 
-// TODO dia chi phan mo
+registerEnumType(EDeathAnniversaryStatus, {
+  name: 'EDeathAnniversaryStatus',
+});
+
+registerEnumType(EDeathAnniversaryType, {
+  name: 'EDeathAnniversaryType',
+});
+
 @Entity('deathAnniversaries')
 @ObjectType()
 export class DeathAnniversary {
@@ -58,10 +71,10 @@ export class DeathAnniversary {
     name: 'status',
     type: 'varchar',
     length: 255,
-    default: EStatus.PENDING,
+    default: EDeathAnniversaryStatus.PENDING,
   })
-  @Field(() => EStatus)
-  status: EStatus;
+  @Field(() => EDeathAnniversaryStatus)
+  status: EDeathAnniversaryStatus;
 
   @Column({
     name: 'enableUpdate',
@@ -106,6 +119,44 @@ export class DeathAnniversary {
   linkLiveStream: string | null;
 
   @Column({
+    name: 'deathAnniversaryType',
+    type: 'enum',
+    enum: EDeathAnniversaryType,
+    default: EDeathAnniversaryType.REGULAR_ANNIVERSARY,
+  })
+  @Field(() => EDeathAnniversaryType, {
+    defaultValue: EDeathAnniversaryType.REGULAR_ANNIVERSARY,
+  })
+  deathAnniversaryType: EDeathAnniversaryType;
+
+  @Column({
+    name: 'graveAddress',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  graveAddress: string | null;
+
+  @Column({
+    name: 'readyImage',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  readyImage: string | null;
+
+  @Column({
+    name: 'finishImage',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
+  finishImage: string | null;
+
+  @Column({
     name: 'createdAt',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -140,4 +191,11 @@ export class DeathAnniversary {
   @JoinColumn({ name: 'familyId' })
   @Field(() => Family)
   family: Family;
+
+  @OneToMany(
+    () => DeathAnniversaryOffering,
+    (deathAnniversaryOffering) => deathAnniversaryOffering.deathAnniversary,
+  )
+  @Field(() => [DeathAnniversaryOffering])
+  deathAnniversaryOfferings: DeathAnniversaryOffering[];
 }

@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class PagingData {
+export class GQLPagingData {
   @Field(() => Int)
   totalItems: number;
 

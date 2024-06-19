@@ -152,12 +152,13 @@ export class DeceasedService {
         'deceased.deathAnniversaries',
         'deathAnniversaries',
         `deathAnniversaries.isDeleted = false AND deathAnniversaries.desiredStartTime > :now AND 
-        (deathAnniversaries.status = :pendingStatus OR 
+        (deathAnniversaries.status = :pendingStatus OR deathAnniversaries.status = :approvedStatus OR
           (deathAnniversaries.status = :rejectStatus AND deathAnniversaries.enableUpdate = false))`,
         {
           now: new Date(),
           pendingStatus: EStatus.PENDING,
           rejectStatus: EStatus.REJECTED,
+          approvedStatus: EStatus.APPROVED,
         },
       )
       .getOne();

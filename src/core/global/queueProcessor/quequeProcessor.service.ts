@@ -11,8 +11,11 @@ import { ErrorMessage } from '@core/enum';
 @Injectable()
 export class QueueProcessorService {
   constructor(
-    @InjectQueue(QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CREATE_EVENT.NAME)
+    @InjectQueue(QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.NAME)
     private readonly sendMailTempleUpdateEventQueue: Queue,
+
+    @InjectQueue(QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME)
+    private readonly sendMailDeathAnniversaryQueue: Queue,
   ) {}
   private logger: Logger = new Logger('QueueProcessorService');
 
@@ -57,8 +60,12 @@ export class QueueProcessorService {
     let queue = null;
 
     switch (queueName) {
-      case QUEUE_MODULE_OPTIONS.SEND_MAIL_TEMPLE_CREATE_EVENT.NAME:
+      case QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.NAME:
         queue = this.sendMailTempleUpdateEventQueue;
+        break;
+
+      case QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME:
+        queue = this.sendMailDeathAnniversaryQueue;
         break;
 
       default:

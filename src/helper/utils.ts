@@ -298,6 +298,29 @@ export const getMailFormat = (type: EMailType) => {
           </tr>
        </table>`,
       };
+
+    case EMailType.REQUEST_DEATH_ANNIVERSARY:
+      return {
+        title: '【Otera】Có yêu cầu tổ chức lễ giỗ mới',
+        content: `
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+          <tr>
+              <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                  <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+  
+                  <p style="font-size: 16px; color: #333333;">Phật tử {requesterName} đã yêu cầu tổ chức lễ giỗ cho {deceasedName}.</p>
+      
+                  <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết và duyệt yêu cầu.</p>
+  
+                  <p style="font-size: 16px; color: #333333;">
+                      <a href="{deathAnniversaryUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Chi tiết yêu cầu</a>
+                  </p>
+
+                  {footer}
+              </td>
+          </tr>
+      </table>`,
+      };
     default:
       throw new Error();
   }

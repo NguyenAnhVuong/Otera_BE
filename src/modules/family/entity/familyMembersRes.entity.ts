@@ -1,10 +1,10 @@
 import { User } from '@core/database/entity/user.entity';
 import { GQLResponse } from '@core/global/entities/gqlRes.entity';
-import { PagingData } from '@core/global/entities/pagingData.entity';
+import { GQLPagingData } from '@core/global/entities/pagingData.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class FamilyMembers extends PagingData {
+export class FamilyMembers extends GQLPagingData {
   @Field(() => [User])
   data: User[];
 }

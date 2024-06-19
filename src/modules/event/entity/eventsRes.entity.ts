@@ -1,6 +1,6 @@
 import { Event } from '@core/database/entity/event.entity';
 import { GQLResponse } from '@core/global/entities/gqlRes.entity';
-import { PagingData } from '@core/global/entities/pagingData.entity';
+import { GQLPagingData } from '@core/global/entities/pagingData.entity';
 import { Field, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
@@ -16,7 +16,7 @@ export class EventManagementInfo extends Event {
 }
 
 @ObjectType()
-export class EventsPagingData extends PagingData {
+export class EventsPagingData extends GQLPagingData {
   @Field(() => [EventManagementInfo])
   data: [EventManagementInfo];
 }

@@ -1,0 +1,10 @@
+table:
+  name: deathAnniversaryOfferings
+  schema: public
+object_relationships:
+  - name: deathAnniversary
+    using:
+      foreign_key_constraint_on: deathAnniversaryId
+  - name: offering
+    using:
+      foreign_key_constraint_on: offeringId

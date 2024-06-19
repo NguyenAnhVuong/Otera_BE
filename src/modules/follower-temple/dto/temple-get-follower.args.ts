@@ -1,11 +1,11 @@
 import { OrderBy } from '@core/global/entities/order.entity';
-import { PaginationQuery } from '@core/global/entities/paginationQuery.entity';
+import { GQLPaginationArgs } from '@core/global/entities/paginationQuery.entity';
 import { ArgsType, Field } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 @ArgsType()
-export class VGetFollowerArgs extends PaginationQuery {
+export class VGetFollowerArgs extends GQLPaginationArgs {
   @Field(() => String, { nullable: true })
   @IsString()
   @IsOptional()

@@ -1,13 +1,18 @@
 import { GQLRolesGuard } from '@core/global/auth/guards/gqlRoles.guard';
 import { ConstanceModule } from '@core/global/constance/constance.module';
 import { I18nCustomModule } from '@core/global/i18nCustom/i18nCustom.module';
+import { QueueProcessorModule } from '@core/global/queueProcessor/queueProcessor.module';
 import { HttpExceptionFilter } from '@helper/httpException.filter';
 import DatabaseMysqlLogger from '@helper/typeorm.logger';
 import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
 import { EventParticipantModule } from '@modules/event-participant/event-participant.module';
 import { EventModule } from '@modules/event/event.module';
+import { FollowerTempleModule } from '@modules/follower-temple/follower-temple.module';
+import { InviteFamilyModule } from '@modules/invite-family/invite-family.module';
+import { NotificationModule } from '@modules/notification/notification.module';
 import { TestModule } from '@modules/test/test.module';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { BullModule } from '@nestjs/bull';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
@@ -26,11 +31,8 @@ import { DeceasedModule } from './modules/deceased/deceased.module';
 import { FamilyModule } from './modules/family/family.module';
 import { TempleModule } from './modules/temple/temple.module';
 import { UserModule } from './modules/user/user.module';
-import { NotificationModule } from '@modules/notification/notification.module';
-import { InviteFamilyModule } from '@modules/invite-family/invite-family.module';
-import { FollowerTempleModule } from '@modules/follower-temple/follower-temple.module';
-import { BullModule } from '@nestjs/bull';
-import { QueueProcessorModule } from '@core/global/queueProcessor/queueProcessor.module';
+import { OfferingModule } from '@modules/offering/offering.module';
+import { DeathAnniversaryOfferingModule } from '@modules/death-anniversary-offering/death-anniversary-offering.module';
 
 @Module({
   imports: [
@@ -89,6 +91,8 @@ import { QueueProcessorModule } from '@core/global/queueProcessor/queueProcessor
     NotificationModule,
     FollowerTempleModule,
     QueueProcessorModule,
+    OfferingModule,
+    DeathAnniversaryOfferingModule,
   ],
   controllers: [AppController],
   providers: [

@@ -266,4 +266,13 @@ export class TempleService {
       .leftJoinAndSelect('user.userDetail', 'userDetail')
       .getOne();
   }
+
+  async getTempleAndTempleMembers(templeId: number) {
+    return await this.templeRepository
+      .createQueryBuilder('temple')
+      .where({ id: templeId })
+      .leftJoinAndSelect('temple.users', 'users')
+      .leftJoinAndSelect('users.userDetail', 'userDetail')
+      .getOne();
+  }
 }
