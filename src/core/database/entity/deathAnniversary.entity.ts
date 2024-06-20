@@ -130,15 +130,6 @@ export class DeathAnniversary {
   deathAnniversaryType: EDeathAnniversaryType;
 
   @Column({
-    name: 'graveAddress',
-    type: 'varchar',
-    length: 500,
-    nullable: true,
-  })
-  @Field(() => String, { nullable: true })
-  graveAddress: string | null;
-
-  @Column({
     name: 'readyImage',
     type: 'varchar',
     length: 255,

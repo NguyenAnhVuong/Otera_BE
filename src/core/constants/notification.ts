@@ -37,6 +37,18 @@ export const Notifications = {
     title: 'Có yêu cầu tổ chức lễ giỗ mới',
     description: (deceasedName: string) =>
       `Có yêu cầu tổ chức lễ giỗ cho ${deceasedName}`,
-    redirectTo: 'death-anniversary',
+    redirectTo: '/death-anniversary',
+  },
+  approveDeathAnniversary: {
+    title: 'Yêu cầu tổ chức lễ giỗ đã được chấp nhận',
+    description: (deceasedName: string) =>
+      `Yêu cầu tổ chức lễ giỗ cho ${deceasedName} đã được chấp nhận`,
+    redirectTo: '/death-anniversary',
+  },
+  rejectDeathAnniversary: {
+    title: 'Yêu cầu tổ chức lễ giỗ đã bị từ chối',
+    description: (deceasedName: string) =>
+      `Yêu cầu tổ chức lễ giỗ cho ${deceasedName} đã bị từ chối`,
+    redirectTo: '/death-anniversary',
   },
 };

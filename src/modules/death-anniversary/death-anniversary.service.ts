@@ -1,30 +1,20 @@
 import { DeathAnniversary } from '@core/database/entity/deathAnniversary.entity';
-import { EDeathAnniversaryStatus, EStatus, ErrorMessage } from '@core/enum';
-import { IUserData } from '@core/interface/default.interface';
-import { DeceasedService } from '@modules/deceased/deceased.service';
-import { TempleService } from '@modules/temple/temple.service';
-import {
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  forwardRef,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import {
-  DataSource,
-  DeepPartial,
-  EntityManager,
-  LessThan,
-  MoreThan,
-  Repository,
-} from 'typeorm';
-import { CreateDeathAnniversaryInput } from './dto/create-death-anniversary.input';
-import { GetDeathAnniversariesInput } from './dto/get-death-anniversaries.input';
+import { EDeathAnniversaryStatus, EStatus } from '@core/enum';
 import { QueueProcessorService } from '@core/global/queueProcessor/quequeProcessor.service';
 import { QUEUE_MODULE_OPTIONS } from '@core/global/queueProcessor/queueIdentity.constant';
+import { IUserData } from '@core/interface/default.interface';
+import { returnPagingData } from '@helper/utils';
 import { DeathAnniversaryOfferingService } from '@modules/death-anniversary-offering/death-anniversary-offering.service';
+import { DeceasedService } from '@modules/deceased/deceased.service';
+import { TempleService } from '@modules/temple/temple.service';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
+import { CreateDeathAnniversaryInput } from './dto/create-death-anniversary.input';
+import { VFamilyGetDeathAnniversariesInput } from './dto/family-get-death-anniversaries.args';
+import { TempleUpdateDeathAnniversaryInput } from './dto/temple-update-death-anniversary.input';
 import { UpdateDeathAnniversaryInput } from './dto/update-death-anniversary.input';
+import { VTempleGetDeathAnniversariesInput } from './dto/temple-get-death-anniversaries.args';
 
 @Injectable()
 export class DeathAnniversaryService {
@@ -104,6 +94,7 @@ export class DeathAnniversaryService {
         QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
           .SEND_REQUEST_DEATH_ANNIVERSARY,
         {
+          familyId,
           templeId,
           requesterName,
           deceasedName: name,
@@ -126,33 +117,165 @@ export class DeathAnniversaryService {
     });
   }
 
-  async getDeathAnniversaries(
-    deathAnniversaryQuery: GetDeathAnniversariesInput,
+  async familyGetDeathAnniversaries(
+    deathAnniversaryQuery: VFamilyGetDeathAnniversariesInput,
     userData: IUserData,
   ) {
-    const { isEnd, isStart, isPending } = deathAnniversaryQuery;
-    const { id: adminId, fid: familyId } = userData;
-    const temple = await this.templeService.getTempleById(adminId);
-    return await this.deathAnniversaryRepository.find({
-      where: {
-        isDeleted: false,
-        ...(familyId ? { familyId } : { templeId: temple.id }),
-        ...(isEnd && {
-          actualEndTime: LessThan(new Date()),
-        }),
-        ...(isStart && {
-          actualStartTime: LessThan(new Date()),
-          actualEndTime: MoreThan(new Date()),
-        }),
-        ...(isPending && { status: EDeathAnniversaryStatus.PENDING }),
-        deceased: { isDeleted: false },
-      },
-      relations: [
-        'deceased',
-        'deceased.userDetail',
+    const {
+      name,
+      status,
+      tombAddress,
+      requesterName,
+      deathAnniversaryTypes,
+      orderBy,
+      skip,
+      take,
+    } = deathAnniversaryQuery;
+    const { fid: familyId } = userData;
+
+    const query = this.deathAnniversaryRepository
+      .createQueryBuilder('deathAnniversary')
+      .where('deathAnniversary.isDeleted = false')
+      .andWhere('deceased.isDeleted = false')
+      .andWhere('deathAnniversary.familyId = :familyId', { familyId })
+      .leftJoinAndSelect('deathAnniversary.deceased', 'deceased')
+      .leftJoinAndSelect('deceased.userDetail', 'userDetail')
+      .leftJoinAndSelect(
+        'deathAnniversary.deathAnniversaryOfferings',
         'deathAnniversaryOfferings',
-      ],
-    });
+      )
+      .leftJoinAndSelect('deathAnniversaryOfferings.offering', 'offering')
+      .leftJoinAndSelect('deathAnniversary.temple', 'temple')
+      .leftJoinAndSelect('deathAnniversary.user', 'requester')
+      .leftJoinAndSelect('requester.userDetail', 'requesterDetail')
+      .skip(skip)
+      .take(take)
+      .orderBy('deathAnniversary.createdAt', 'DESC');
+
+    if (status) {
+      query.andWhere('deathAnniversary.status = :status', { status });
+    }
+
+    if (name) {
+      query.andWhere('userDetail.name ILIKE :name', {
+        name: `%${name}%`,
+      });
+    }
+
+    if (tombAddress) {
+      query.andWhere('deceased.tombAddress ILIKE :tombAddress', {
+        tombAddress: `%${tombAddress}%`,
+      });
+    }
+
+    if (requesterName) {
+      query.andWhere('requesterDetail.name ILIKE :requesterName', {
+        requesterName: `%${requesterName}%`,
+      });
+    }
+
+    if (deathAnniversaryTypes && deathAnniversaryTypes.length) {
+      query.andWhere(
+        'deathAnniversary.deathAnniversaryType IN (:...deathAnniversaryTypes)',
+        { deathAnniversaryTypes },
+      );
+    }
+
+    if (orderBy && orderBy.length) {
+      orderBy.forEach((order) => {
+        query.addOrderBy(`deathAnniversary.${order.column}`, order.sortOrder);
+      });
+    }
+
+    const [data, count] = await query.getManyAndCount();
+
+    return returnPagingData(data, count, deathAnniversaryQuery);
+  }
+
+  async templeGetDeathAnniversaries(
+    deathAnniversaryQuery: VTempleGetDeathAnniversariesInput,
+    userData: IUserData,
+  ) {
+    const {
+      name,
+      status,
+      tombAddress,
+      requesterName,
+      familyKeyword,
+      deathAnniversaryTypes,
+      orderBy,
+      skip,
+      take,
+    } = deathAnniversaryQuery;
+    const { tid } = userData;
+
+    const query = this.deathAnniversaryRepository
+      .createQueryBuilder('deathAnniversary')
+      .where('deathAnniversary.isDeleted = false')
+      .andWhere('deceased.isDeleted = false')
+      .andWhere('deathAnniversary.templeId = :templeId', { templeId: tid[0] })
+      .leftJoinAndSelect('deathAnniversary.deceased', 'deceased')
+      .leftJoinAndSelect('deceased.userDetail', 'userDetail')
+      .leftJoinAndSelect(
+        'deathAnniversary.deathAnniversaryOfferings',
+        'deathAnniversaryOfferings',
+      )
+      .leftJoinAndSelect('deathAnniversaryOfferings.offering', 'offering')
+      .leftJoinAndSelect('deathAnniversary.temple', 'temple')
+      .leftJoinAndSelect('deathAnniversary.user', 'requester')
+      .leftJoinAndSelect('requester.userDetail', 'requesterDetail')
+      .leftJoinAndSelect('deathAnniversary.family', 'family')
+      .skip(skip)
+      .take(take)
+      .orderBy('deathAnniversary.createdAt', 'DESC');
+
+    if (status) {
+      query.andWhere('deathAnniversary.status = :status', { status });
+    }
+
+    if (name) {
+      query.andWhere('userDetail.name ILIKE :name', {
+        name: `%${name}%`,
+      });
+    }
+
+    if (tombAddress) {
+      query.andWhere('deceased.tombAddress ILIKE :tombAddress', {
+        tombAddress: `%${tombAddress}%`,
+      });
+    }
+
+    if (requesterName) {
+      query.andWhere('requesterDetail.name ILIKE :requesterName', {
+        requesterName: `%${requesterName}%`,
+      });
+    }
+
+    if (deathAnniversaryTypes && deathAnniversaryTypes.length) {
+      query.andWhere(
+        'deathAnniversary.deathAnniversaryType IN (:...deathAnniversaryTypes)',
+        { deathAnniversaryTypes },
+      );
+    }
+
+    if (familyKeyword) {
+      query.andWhere(
+        'family.name ILIKE :familyKeyword OR family.familyCode ILIKE :familyKeyword',
+        {
+          familyKeyword: `%${familyKeyword}%`,
+        },
+      );
+    }
+
+    if (orderBy && orderBy.length) {
+      orderBy.forEach((order) => {
+        query.addOrderBy(`deathAnniversary.${order.column}`, order.sortOrder);
+      });
+    }
+
+    const [data, count] = await query.getManyAndCount();
+
+    return returnPagingData(data, count, deathAnniversaryQuery);
   }
 
   async familyUpdateDeathAnniversary(
@@ -179,18 +302,46 @@ export class DeathAnniversaryService {
         );
       }
 
+      // TODO send mail to temple if enableUpdate is true
+
       return await deathAnniversaryRepository.update(
         { id },
-        newDeathAnniversaryData,
+        { ...newDeathAnniversaryData, status: EDeathAnniversaryStatus.PENDING },
       );
     });
   }
 
   async updateStatusDeathAnniversary(
-    updateStatusDeathAnniversaryInput: DeepPartial<DeathAnniversary>,
+    userData: IUserData,
+    templeUpdateDeathAnniversaryInput: TempleUpdateDeathAnniversaryInput,
   ) {
     const { id, ...newDeathAnniversaryData } =
-      updateStatusDeathAnniversaryInput;
+      templeUpdateDeathAnniversaryInput;
+
+    if (newDeathAnniversaryData.status === EDeathAnniversaryStatus.APPROVED) {
+      this.queueProcessService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
+          .TEMPLE_APPROVE_DEATH_ANNIVERSARY,
+        {
+          approverId: userData.id,
+          deathAnniversaryId: id,
+        },
+      );
+    } else if (
+      newDeathAnniversaryData.status === EDeathAnniversaryStatus.REJECTED
+    ) {
+      this.queueProcessService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
+          .TEMPLE_REJECT_DEATH_ANNIVERSARY,
+        {
+          approverId: userData.id,
+          deathAnniversaryId: id,
+        },
+      );
+    }
+
     return await this.deathAnniversaryRepository.update(
       { id },
       newDeathAnniversaryData,
@@ -215,5 +366,16 @@ export class DeathAnniversaryService {
       { deceasedId },
       { isDeleted: true },
     );
+  }
+
+  async getDeathAnniversaryById(id: number) {
+    return await this.deathAnniversaryRepository.findOne({
+      where: { id },
+      relations: [
+        'deceased',
+        'deathAnniversaryOfferings',
+        'deceased.userDetail',
+      ],
+    });
   }
 }

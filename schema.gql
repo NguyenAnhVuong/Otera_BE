@@ -207,7 +207,7 @@ enum EAccountStatus {
 type Deceased {
   id: Int!
   dateOfDeath: String!
-  tombAddress: String
+  tombAddress: String!
   description: String
   rejectReason: String
   userDetailId: Int
@@ -242,6 +242,8 @@ type DeathAnniversaryOffering {
   offeringId: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
+  deathAnniversary: DeathAnniversary!
+  offering: Offering!
 }
 
 type DeathAnniversary {
@@ -262,7 +264,6 @@ type DeathAnniversary {
   isLiveStream: Boolean!
   linkLiveStream: String
   deathAnniversaryType: EDeathAnniversaryType!
-  graveAddress: String
   readyImage: String
   finishImage: String
   createdAt: DateTime!
@@ -450,6 +451,8 @@ enum ENotificationType {
   APPROVE_EVENT_PARTICIPANT
   REJECT_EVENT_PARTICIPANT
   REQUEST_DEATH_ANNIVERSARY
+  APPROVE_DEATH_ANNIVERSARY
+  REJECT_DEATH_ANNIVERSARY
 }
 
 type NotificationsPagingData {
@@ -604,12 +607,20 @@ type BookingEventsRes {
   data: BookingEventsPagingData!
 }
 
+type ListDeathAnniversary {
+  totalItems: Int!
+  page: Int!
+  totalPages: Int!
+  take: Int!
+  data: [DeathAnniversary!]!
+}
+
 type DeathAnniversariesRes {
   statusCode: Int!
   errorMessage: String
   errorCode: String
   timestamp: String!
-  data: [DeathAnniversary!]!
+  data: ListDeathAnniversary!
 }
 
 type DeathAnniversaryRes {
@@ -744,7 +755,8 @@ type Query {
   templeGetDeceasedList(page: Int, take: Int, skip: Int, name: String, address: String, tombAddress: String, status: EStatus, isDeleted: Boolean, familyKeyword: String, orderBy: [OrderBy!]): DeceasedListRes!
   familyGetListDeceased(page: Int, take: Int, skip: Int): DeceasedListRes!
   getDeceased(id: Int!): DeceasedRes!
-  getDeathAnniversaries(getDeathAnniversariesInput: GetDeathAnniversariesInput!): DeathAnniversariesRes!
+  familyGetDeathAnniversaries(page: Int, take: Int, skip: Int, name: String, tombAddress: String, requesterName: String, deathAnniversaryTypes: [EDeathAnniversaryType!], status: EDeathAnniversaryStatus, orderBy: [OrderBy!]): DeathAnniversariesRes!
+  templeGetDeathAnniversaries(page: Int, take: Int, skip: Int, name: String, familyKeyword: String, tombAddress: String, requesterName: String, deathAnniversaryTypes: [EDeathAnniversaryType!], status: EDeathAnniversaryStatus, orderBy: [OrderBy!]): DeathAnniversariesRes!
   checkIsExistedRequestDeathAnniversary(deceasedId: Int!): CreateRes!
   test123(id: Int!): Test2!
   templeGetEvents(page: Int, take: Int, skip: Int, name: String, upcoming: Boolean, onGoing: Boolean, ended: Boolean, isFreeOpen: Boolean, orderBy: [OrderBy!]): EventsRes!
@@ -764,12 +776,6 @@ input OrderBy {
 enum ESortOrder {
   ASC
   DESC
-}
-
-input GetDeathAnniversariesInput {
-  isEnd: Boolean
-  isStart: Boolean
-  isPending: Boolean
 }
 
 type Mutation {

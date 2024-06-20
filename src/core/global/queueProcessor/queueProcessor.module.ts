@@ -7,6 +7,8 @@ import { SendMailEventConsumer } from './consumer/sendMailEvent.processor';
 import { EventParticipantModule } from '@modules/event-participant/event-participant.module';
 import { QUEUE_MODULE_OPTIONS } from './queueIdentity.constant';
 import { SendMailDeathAnniversaryConsumer } from './consumer/sendMailDeathAnniversary.processor';
+import { UserModule } from '@modules/user/user.module';
+import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
 
 @Global()
 @Module({
@@ -22,6 +24,8 @@ import { SendMailDeathAnniversaryConsumer } from './consumer/sendMailDeathAnnive
     TempleModule,
     NotificationModule,
     EventParticipantModule,
+    UserModule,
+    DeathAnniversaryModule,
   ],
   providers: [
     SendMailEventConsumer,

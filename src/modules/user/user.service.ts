@@ -697,4 +697,22 @@ export class UserService {
       },
     );
   }
+
+  async getFamilyMembersByFamilyId(familyId: number) {
+    return await this.userRepository.find({
+      where: {
+        familyId,
+      },
+      relations: ['userDetail'],
+    });
+  }
+
+  async getTempleMembersByTempleId(templeId: number) {
+    return await this.userRepository.find({
+      where: {
+        templeId,
+      },
+      relations: ['userDetail'],
+    });
+  }
 }

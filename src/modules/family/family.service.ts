@@ -36,8 +36,15 @@ export class FamilyService {
     return await this.dataSource.transaction(async (manager: EntityManager) => {
       const familyRepository = manager.getRepository(Family);
       const uploadedAvatar = await this.cloudinaryService.uploadImage(avatar);
+      // get biggest family id
+      const family = await familyRepository.findOne({
+        order: {
+          id: 'DESC',
+        },
+      });
       const newFamily = await familyRepository.save({
         ...familyParams,
+        familyCode: `FM${family.id + 1}`,
         avatar: uploadedAvatar.url,
         adminId,
       });
