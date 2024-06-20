@@ -31,9 +31,8 @@ export class Deceased {
     name: 'tombAddress',
     type: 'varchar',
     length: 100,
-    nullable: true,
   })
-  @Field(() => String, { nullable: true })
+  @Field(() => String)
   tombAddress: string;
 
   @Column({

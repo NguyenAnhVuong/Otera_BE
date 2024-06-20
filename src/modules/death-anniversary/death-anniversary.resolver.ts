@@ -5,17 +5,19 @@ import { CreateDeathAnniversaryInput } from './dto/create-death-anniversary.inpu
 import { DeathAnniversary } from '@core/database/entity/deathAnniversary.entity';
 import { GQLRoles } from '@core/decorator/gqlRoles.decorator';
 import { GQLUserData } from '@core/decorator/gqlUser.decorator';
-import { EDeathAnniversaryStatus, ERole } from '@core/enum';
+import { ERole } from '@core/enum';
 import { CreateRes } from '@core/global/entities/createRes.entity';
 import { GQLResponse } from '@core/global/entities/gqlRes.entity';
 import { IUserData } from '@core/interface/default.interface';
 import { HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { CancelDeathAnniversaryInput } from './dto/cancel-death-anniversary.input';
-import { GetDeathAnniversariesInput } from './dto/get-death-anniversaries.input';
+import { VFamilyGetDeathAnniversariesInput } from './dto/family-get-death-anniversaries.args';
 import { TempleUpdateDeathAnniversaryInput } from './dto/temple-update-death-anniversary.input';
 import { UpdateDeathAnniversaryInput } from './dto/update-death-anniversary.input';
 import { DeathAnniversariesRes } from './entities/death-anniversaries-res.entity';
 import { DeathAnniversaryRes } from './entities/death-anniversary-res.entity';
+import { GQLArgsPaging } from '@core/decorator/gqlArgsPaging.decorator';
+import { VTempleGetDeathAnniversariesInput } from './dto/temple-get-death-anniversaries.args';
 
 @Resolver(() => DeathAnniversary)
 export class DeathAnniversaryResolver {
@@ -36,14 +38,29 @@ export class DeathAnniversaryResolver {
     );
   }
 
-  @GQLRoles([ERole.TEMPLE_ADMIN, ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
-  @Query(() => DeathAnniversariesRes, { name: 'getDeathAnniversaries' })
-  getDeathAnniversaries(
-    @Args('getDeathAnniversariesInput')
-    getDeathAnniversariesInput: GetDeathAnniversariesInput,
+  @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
+  @Query(() => DeathAnniversariesRes, { name: 'familyGetDeathAnniversaries' })
+  familyGetDeathAnniversaries(
+    @GQLArgsPaging()
+    @Args()
+    getDeathAnniversariesInput: VFamilyGetDeathAnniversariesInput,
     @GQLUserData() userData: IUserData,
   ) {
-    return this.deathAnniversaryService.getDeathAnniversaries(
+    return this.deathAnniversaryService.familyGetDeathAnniversaries(
+      getDeathAnniversariesInput,
+      userData,
+    );
+  }
+
+  @GQLRoles([ERole.TEMPLE_ADMIN, ERole.TEMPLE_MEMBER])
+  @Query(() => DeathAnniversariesRes, { name: 'templeGetDeathAnniversaries' })
+  templeGetDeathAnniversaries(
+    @GQLArgsPaging()
+    @Args()
+    getDeathAnniversariesInput: VTempleGetDeathAnniversariesInput,
+    @GQLUserData() userData: IUserData,
+  ) {
+    return this.deathAnniversaryService.templeGetDeathAnniversaries(
       getDeathAnniversariesInput,
       userData,
     );
@@ -52,10 +69,12 @@ export class DeathAnniversaryResolver {
   @GQLRoles([ERole.TEMPLE_ADMIN])
   @Mutation(() => GQLResponse, { name: 'templeUpdateDeathAnniversary' })
   templeUpdateDeathAnniversary(
+    @GQLUserData() userData: IUserData,
     @Args('templeUpdateDeathAnniversaryInput')
     templeUpdateDeathAnniversaryInput: TempleUpdateDeathAnniversaryInput,
   ) {
     return this.deathAnniversaryService.updateStatusDeathAnniversary(
+      userData,
       templeUpdateDeathAnniversaryInput,
     );
   }

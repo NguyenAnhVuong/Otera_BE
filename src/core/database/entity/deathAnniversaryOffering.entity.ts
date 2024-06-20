@@ -45,9 +45,11 @@ export class DeathAnniversaryOffering {
     (deathAnniversary) => deathAnniversary.deathAnniversaryOfferings,
   )
   @JoinColumn({ name: 'deathAnniversaryId' })
+  @Field(() => DeathAnniversary)
   deathAnniversary: DeathAnniversary;
 
   @ManyToOne(() => Offering, (offering) => offering.deathAnniversaryOfferings)
   @JoinColumn({ name: 'offeringId' })
+  @Field(() => Offering)
   offering: Offering;
 }
