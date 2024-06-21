@@ -1,5 +1,6 @@
 import { EMailType, EPriority } from '@core/enum';
 import * as bcrypt from 'bcrypt';
+import { title } from 'process';
 import { IPaginationResponse } from 'src/core/interface/default.interface';
 import * as winston from 'winston';
 
@@ -308,7 +309,7 @@ export const getMailFormat = (type: EMailType) => {
               <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
                   <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
   
-                  <p style="font-size: 16px; color: #333333;">Phật tử {requesterName} đã yêu cầu tổ chức lễ giỗ cho {deceasedName}.</p>
+                  <p style="font-size: 16px; color: #333333;">Phật tử {requesterName} đã yêu cầu tổ chức lễ giỗ tưởng nhớ {deceasedName}.</p>
       
                   <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết yêu cầu.</p>
   
@@ -330,7 +331,7 @@ export const getMailFormat = (type: EMailType) => {
                   <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
                       <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
       
-                      <p style="font-size: 16px; color: #333333;">Yêu cầu tổ chức lễ giỗ cho {deceasedName} đã được chấp nhận.</p>
+                      <p style="font-size: 16px; color: #333333;">Yêu cầu tổ chức lễ giỗ tưởng nhớ {deceasedName} đã được chấp nhận.</p>
           
                       <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết yêu cầu.</p>
       
@@ -353,7 +354,7 @@ export const getMailFormat = (type: EMailType) => {
                     <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
                         <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
         
-                        <p style="font-size: 16px; color: #333333;">Yêu cầu tổ chức lễ giỗ cho {deceasedName} đã bị từ chối.</p>
+                        <p style="font-size: 16px; color: #333333;">Yêu cầu tổ chức lễ giỗ tưởng nhớ {deceasedName} đã bị từ chối.</p>
             
                         <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết yêu cầu.</p>
         
@@ -365,6 +366,57 @@ export const getMailFormat = (type: EMailType) => {
                     </td>
                 </tr>
               </table>`,
+      };
+
+    case EMailType.READY_DEATH_ANNIVERSARY:
+      return {
+        title: '【Otera】Lễ giỗ đã được chuẩn bị sẵn sàng',
+        content: `
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                  <tr>
+                      <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                          <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+          
+                          <p style="font-size: 16px; color: #333333;">Lễ giỗ tưởng nhớ {deceasedName} đã sẵn sàng.</p>
+              
+                          <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết lễ giỗ.</p>
+          
+                          <p style="font-size: 16px; color: #333333;">
+                              <a href="{deathAnniversaryUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Chi tiết lễ giỗ</a>
+                          </p>
+          
+                          {footer}
+                      </td>
+                  </tr>
+                </table>`,
+      };
+
+    case EMailType.FINISH_DEATH_ANNIVERSARY:
+      return {
+        title: '【Otera】Lễ giỗ đã được hoàn thành',
+        content: `
+                  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                    <tr>
+                        <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                            <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+                
+                            <p style="font-size: 16px; color: #333333;">Lễ giỗ tưởng nhớ {deceasedName} đã được tổ chức thành công.</p>
+                
+                           <p style="font-size: 16px; color: #333333;">
+                              <a href="{deathAnniversaryUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Chi tiết lễ giỗ</a>
+                          </p>
+                
+                            <p style="font-size: 16px; color: #333333;">Nếu bạn có bất kỳ thắc mắc hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi.</p>
+                
+                            <p style="font-size: 16px; color: #333333;">
+                                <span>{eventPhone}</span><br>
+                                <span>{eventEmail}</span>
+                            </p>
+                
+                            {footer}
+                        </td>
+                    </tr>
+                  </table>`,
       };
 
     default:

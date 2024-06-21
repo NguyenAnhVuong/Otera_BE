@@ -23,6 +23,9 @@ import { VUpdateDeceasedInput } from './dto/update-deceased.input';
 import { VTempleGetListDeceasedArgs } from './dto/temple-get-deceased-list.args';
 import { returnPagingData } from '@helper/utils';
 import { VFamilyGetListDeceasedArgs } from './dto/family-get-list-deceased.dto';
+import { VAddDeceasedImageInput } from './dto/add-deceased-image.input';
+import { QueueProcessorService } from '@core/global/queueProcessor/quequeProcessor.service';
+import { QUEUE_MODULE_OPTIONS } from '@core/global/queueProcessor/queueIdentity.constant';
 
 @Injectable()
 export class DeceasedService {
@@ -40,6 +43,8 @@ export class DeceasedService {
 
     @Inject(forwardRef(() => DeathAnniversaryService))
     private readonly deathAnniversaryService: DeathAnniversaryService,
+
+    private readonly queueProcessorService: QueueProcessorService,
 
     private readonly dataSource: DataSource,
   ) {}
@@ -112,6 +117,41 @@ export class DeceasedService {
       await this.imageService.createImages(imagesParams, manager);
 
       return deceased;
+    });
+  }
+
+  async addDeceasedImage(
+    userData: IUserData,
+    addDeceasedImageInput: VAddDeceasedImageInput,
+  ) {
+    const { id: deceasedId, images } = addDeceasedImageInput;
+    const { fid } = userData;
+
+    return await this.dataSource.transaction(async (manager: EntityManager) => {
+      const deceased = await this.checkDeceasedInFamily(
+        deceasedId,
+        fid,
+        manager,
+      );
+
+      const newImages = images.map((image) => ({
+        image,
+        deceasedId,
+      }));
+
+      await this.queueProcessorService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.JOBS.CONTRIBUTE_DECEASED_IMAGE,
+        {
+          userId: userData.id,
+          deceasedId,
+          familyId: fid,
+          userName: userData.name,
+          deceasedName: deceased.userDetail.name,
+        },
+      );
+
+      return await this.imageService.createImages(newImages, manager);
     });
   }
 

@@ -15,6 +15,7 @@ import { VUpdateDeceasedStatusInput } from './dto/update-deceased-status.input';
 import { VUpdateDeceasedInput } from './dto/update-deceased.input';
 import { DeceasedListRes } from './entities/deceasedListRes.entity';
 import { DeceasedRes } from './entities/deceasedRes.entity';
+import { VAddDeceasedImageInput } from './dto/add-deceased-image.input';
 // TODO temple add deceased and redo deceased
 @Resolver(() => Deceased)
 export class DeceasedResolver {
@@ -67,6 +68,19 @@ export class DeceasedResolver {
     @Args('updateDeceasedInput') updateDeceasedInput: VUpdateDeceasedInput,
   ) {
     return this.deceasedService.updateDeceased(userData, updateDeceasedInput);
+  }
+
+  @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
+  @Mutation(() => UpdateRes, { name: 'addDeceasedImage' })
+  addDeceasedImage(
+    @GQLUserData() userData: IUserData,
+    @Args('addDeceasedImageInput')
+    addDeceasedImageInput: VAddDeceasedImageInput,
+  ) {
+    return this.deceasedService.addDeceasedImage(
+      userData,
+      addDeceasedImageInput,
+    );
   }
 
   @GQLRoles([ERole.TEMPLE_ADMIN, ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])

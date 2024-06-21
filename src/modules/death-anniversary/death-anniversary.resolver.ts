@@ -66,7 +66,7 @@ export class DeathAnniversaryResolver {
     );
   }
 
-  @GQLRoles([ERole.TEMPLE_ADMIN])
+  @GQLRoles([ERole.TEMPLE_ADMIN, ERole.TEMPLE_MEMBER])
   @Mutation(() => GQLResponse, { name: 'templeUpdateDeathAnniversary' })
   templeUpdateDeathAnniversary(
     @GQLUserData() userData: IUserData,

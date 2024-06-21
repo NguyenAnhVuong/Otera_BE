@@ -340,6 +340,30 @@ export class DeathAnniversaryService {
           deathAnniversaryId: id,
         },
       );
+    } else if (
+      newDeathAnniversaryData.status === EDeathAnniversaryStatus.READY
+    ) {
+      this.queueProcessService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
+          .TEMPLE_READY_DEATH_ANNIVERSARY,
+        {
+          approverId: userData.id,
+          deathAnniversaryId: id,
+        },
+      );
+    } else if (
+      newDeathAnniversaryData.status === EDeathAnniversaryStatus.FINISHED
+    ) {
+      this.queueProcessService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
+          .TEMPLE_FINISH_DEATH_ANNIVERSARY,
+        {
+          approverId: userData.id,
+          deathAnniversaryId: id,
+        },
+      );
     }
 
     return await this.deathAnniversaryRepository.update(

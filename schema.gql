@@ -265,7 +265,7 @@ type DeathAnniversary {
   linkLiveStream: String
   deathAnniversaryType: EDeathAnniversaryType!
   readyImage: String
-  finishImage: String
+  finishedImage: String
   createdAt: DateTime!
   updatedAt: DateTime!
   deceased: Deceased!
@@ -453,6 +453,9 @@ enum ENotificationType {
   REQUEST_DEATH_ANNIVERSARY
   APPROVE_DEATH_ANNIVERSARY
   REJECT_DEATH_ANNIVERSARY
+  READY_DEATH_ANNIVERSARY
+  FINISH_DEATH_ANNIVERSARY
+  CONTRIBUTE_DECEASED_IMAGE
 }
 
 type NotificationsPagingData {
@@ -787,6 +790,7 @@ type Mutation {
   addTempleMember(addTempleMemberInput: VAddTempleMemberInput!): UpdateRes!
   removeTempleMember(removeTempleMemberInput: VRemoveTempleMemberInput!): UpdateRes!
   updateDeceased(updateDeceasedInput: VUpdateDeceasedInput!): UpdateRes!
+  addDeceasedImage(addDeceasedImageInput: VAddDeceasedImageInput!): UpdateRes!
   deleteDeceased(id: Int!): UpdateRes!
   restoreDeceased(id: Int!): UpdateRes!
   updateDeceasedStatus(updateDeceasedStatusInput: VUpdateDeceasedStatusInput!): UpdateRes!
@@ -852,6 +856,11 @@ input VUpdateDeceasedInput {
   templeId: Int
 }
 
+input VAddDeceasedImageInput {
+  id: Int!
+  images: [String!]!
+}
+
 input VUpdateDeceasedStatusInput {
   id: Int!
   status: EStatus!
@@ -879,6 +888,8 @@ input TempleUpdateDeathAnniversaryInput {
   actualEndTime: DateTime
   linkLiveStream: String
   rejectReason: String
+  readyImage: String
+  finishedImage: String
 }
 
 input UpdateDeathAnniversaryInput {

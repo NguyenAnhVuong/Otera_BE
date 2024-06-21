@@ -139,13 +139,13 @@ export class DeathAnniversary {
   readyImage: string | null;
 
   @Column({
-    name: 'finishImage',
+    name: 'finishedImage',
     type: 'varchar',
     length: 255,
     nullable: true,
   })
   @Field(() => String, { nullable: true })
-  finishImage: string | null;
+  finishedImage: string | null;
 
   @Column({
     name: 'createdAt',

@@ -8,7 +8,7 @@ import {
 import { Family } from './family.entity';
 import { Temple } from './temple.entity';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-
+// TODO remove this table
 @Entity('familyTemples')
 @ObjectType()
 export class FamilyTemple {
