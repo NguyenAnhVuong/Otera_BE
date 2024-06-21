@@ -1,4 +1,4 @@
-import { EDeathAnniversaryStatus, EStatus } from '@core/enum';
+import { EDeathAnniversaryStatus } from '@core/enum';
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
@@ -63,4 +63,14 @@ export class TempleUpdateDeathAnniversaryInput {
   @IsOptional()
   @Field(() => String, { nullable: true })
   rejectReason?: string;
+
+  @IsString()
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  readyImage?: string;
+
+  @IsString()
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  finishedImage?: string;
 }

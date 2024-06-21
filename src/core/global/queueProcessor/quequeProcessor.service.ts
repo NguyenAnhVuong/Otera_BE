@@ -16,6 +16,9 @@ export class QueueProcessorService {
 
     @InjectQueue(QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME)
     private readonly sendMailDeathAnniversaryQueue: Queue,
+
+    @InjectQueue(QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME)
+    private readonly sendMailDeceasedQueue: Queue,
   ) {}
   private logger: Logger = new Logger('QueueProcessorService');
 
@@ -67,6 +70,9 @@ export class QueueProcessorService {
       case QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME:
         queue = this.sendMailDeathAnniversaryQueue;
         break;
+
+      case QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME:
+        queue = this.sendMailDeceasedQueue;
 
       default:
         break;

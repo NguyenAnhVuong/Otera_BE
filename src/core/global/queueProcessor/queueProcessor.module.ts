@@ -9,6 +9,7 @@ import { QUEUE_MODULE_OPTIONS } from './queueIdentity.constant';
 import { SendMailDeathAnniversaryConsumer } from './consumer/sendMailDeathAnniversary.processor';
 import { UserModule } from '@modules/user/user.module';
 import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
+import { SendMailDeceasedConsumer } from './consumer/sendMailDeceased.processor';
 
 @Global()
 @Module({
@@ -20,6 +21,9 @@ import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniver
       {
         name: QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME,
       },
+      {
+        name: QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME,
+      },
     ),
     TempleModule,
     NotificationModule,
@@ -30,6 +34,7 @@ import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniver
   providers: [
     SendMailEventConsumer,
     SendMailDeathAnniversaryConsumer,
+    SendMailDeceasedConsumer,
     QueueProcessorService,
   ],
   exports: [QueueProcessorService],
