@@ -1,7 +1,6 @@
 import { ERole, EStatus, ErrorMessage } from '@core/enum';
 import { IUserData } from '@core/interface/default.interface';
 import { DeathAnniversaryService } from '@modules/death-anniversary/death-anniversary.service';
-import { FamilyTempleService } from '@modules/family-temple/family-temple.service';
 import {
   HttpException,
   HttpStatus,
@@ -26,6 +25,7 @@ import { VFamilyGetListDeceasedArgs } from './dto/family-get-list-deceased.dto';
 import { VAddDeceasedImageInput } from './dto/add-deceased-image.input';
 import { QueueProcessorService } from '@core/global/queueProcessor/quequeProcessor.service';
 import { QUEUE_MODULE_OPTIONS } from '@core/global/queueProcessor/queueIdentity.constant';
+import { TempleService } from '@modules/temple/temple.service';
 
 @Injectable()
 export class DeceasedService {
@@ -39,10 +39,10 @@ export class DeceasedService {
 
     private readonly imageService: ImageService,
 
-    private readonly familyTempleService: FamilyTempleService,
-
     @Inject(forwardRef(() => DeathAnniversaryService))
     private readonly deathAnniversaryService: DeathAnniversaryService,
+
+    private readonly templeService: TempleService,
 
     private readonly queueProcessorService: QueueProcessorService,
 
@@ -55,23 +55,13 @@ export class DeceasedService {
     userData: IUserData,
   ) {
     const { fid, id } = userData;
-    const familyTemple = await this.familyTempleService.checkFamilyInTemple(
-      fid,
-      deceasedParams.templeId,
-    );
-
-    if (!familyTemple) {
-      throw new HttpException(
-        ErrorMessage.FAMILY_NOT_IN_TEMPLE,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
     return await this.dataSource.transaction(async (manager: EntityManager) => {
       const uploadedAvatar = await this.cloudinaryService.uploadImage(avatar);
 
       const {
         name,
+        tombAddress,
         birthday,
         address,
         gender,
@@ -95,6 +85,15 @@ export class DeceasedService {
         manager,
       );
 
+      const temple = await this.templeService.getTempleById(templeId);
+
+      if (!temple) {
+        throw new HttpException(
+          ErrorMessage.TEMPLE_NOT_EXIST,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       const newDeceasedParams: DeepPartial<Deceased> = {
         dateOfDeath: dayjs(dateOfDeath).format('YYYY-MM-DD'),
         templeId,
@@ -102,6 +101,7 @@ export class DeceasedService {
         userDetailId: userDetail.id,
         creatorId: id,
         description,
+        tombAddress,
       };
 
       const deceasedRepository = manager.getRepository(Deceased);
@@ -116,6 +116,19 @@ export class DeceasedService {
 
       await this.imageService.createImages(imagesParams, manager);
 
+      await this.queueProcessorService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.JOBS.DECLARE_DECEASED,
+        {
+          userId: id,
+          deceasedId: deceased.id,
+          userName: userData.name,
+          deceasedName: name,
+          templeId,
+          templeName: temple.name,
+        },
+      );
+
       return deceased;
     });
   }
@@ -125,7 +138,7 @@ export class DeceasedService {
     addDeceasedImageInput: VAddDeceasedImageInput,
   ) {
     const { id: deceasedId, images } = addDeceasedImageInput;
-    const { fid } = userData;
+    const { id: modifierId, fid } = userData;
 
     return await this.dataSource.transaction(async (manager: EntityManager) => {
       const deceased = await this.checkDeceasedInFamily(
@@ -151,7 +164,25 @@ export class DeceasedService {
         },
       );
 
+      const deceasedRepository = manager.getRepository(Deceased);
+
+      await deceasedRepository.update({ id: deceasedId }, { modifierId });
+
       return await this.imageService.createImages(newImages, manager);
+    });
+  }
+
+  async getDeceasedById(id: number, entityManager?: EntityManager) {
+    const deceasedRepository = entityManager
+      ? entityManager.getRepository(Deceased)
+      : this.deceasedRepository;
+
+    return await deceasedRepository.findOne({
+      where: {
+        id,
+        isDeleted: false,
+      },
+      relations: ['userDetail'],
     });
   }
 
@@ -172,6 +203,15 @@ export class DeceasedService {
     });
 
     return returnPagingData(data, count, query);
+  }
+
+  async getPendingDeceasedById(id: number) {
+    return await this.deceasedRepository.findOne({
+      where: {
+        id,
+      },
+      relations: ['userDetail'],
+    });
   }
 
   async getDeceasedDetail(id: number, userData: IUserData) {
@@ -201,6 +241,7 @@ export class DeceasedService {
           approvedStatus: EStatus.APPROVED,
         },
       )
+      .leftJoinAndSelect('deceased.temple', 'temple')
       .getOne();
   }
 
@@ -248,7 +289,6 @@ export class DeceasedService {
       address,
       gender,
       citizenNumber,
-      templeId,
     } = updateDeceasedInput;
 
     return await this.dataSource.transaction(
@@ -273,7 +313,7 @@ export class DeceasedService {
         await this.userDetailService.updateUserDetail({
           id: deceased.userDetailId,
           ...(name && { name }),
-          ...(birthday && { birthday: dayjs(birthday).format('YYYY-MM-DD') }),
+          ...(birthday && { birthday }),
           ...(address && { address }),
           ...(gender && {
             gender,
@@ -290,45 +330,65 @@ export class DeceasedService {
           );
         }
 
+        await this.queueProcessorService.handleAddQueue(
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME,
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.JOBS.UPDATE_DECEASED,
+          {
+            userId: userData.id,
+            familyId: fid,
+            deceasedId: id,
+            userName: userData.name,
+            deceasedName: name,
+          },
+        );
+
         return await deceasedRepository.update(
           { id },
           {
             modifierId,
             ...(dateOfDeath && {
-              dateOfDeath: dayjs(dateOfDeath).format('YYYY-MM-DD'),
+              dateOfDeath,
             }),
             ...(description && { description }),
-            ...(templeId && { templeId }),
           },
         );
       },
     );
   }
 
-  // TODO required approve by temple
+  // TODO delete reason
   async deleteDeceased(userData: IUserData, id: number) {
-    const { fid } = userData;
+    const { fid, tid } = userData;
 
     return await this.dataSource.transaction(
       async (entityManager: EntityManager) => {
         const deceasedRepository = entityManager.getRepository(Deceased);
 
-        const deceased = await this.checkDeceasedInFamily(
-          id,
-          fid,
-          entityManager,
-        );
+        const deceased = await this.getDeceasedById(id, entityManager);
 
         if (!deceased) {
           throw new HttpException(
-            ErrorMessage.NO_PERMISSION,
+            ErrorMessage.DECEASED_NOT_EXIST,
             HttpStatus.BAD_REQUEST,
           );
         }
-        this.deathAnniversaryService.deleteDeathAnniversaryByDeceasedId(
+
+        await this.deathAnniversaryService.deleteDeathAnniversaryByDeceasedId(
           id,
           entityManager,
         );
+
+        await this.queueProcessorService.handleAddQueue(
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME,
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.JOBS.DELETE_DECEASED,
+          {
+            userId: userData.id,
+            deceasedId: id,
+            userName: userData.name,
+            deceasedName: deceased.userDetail.name,
+          },
+        );
+
         return await deceasedRepository.update({ id }, { isDeleted: true });
       },
     );
@@ -336,11 +396,35 @@ export class DeceasedService {
 
   async updateDeceasedStatus(
     updateDeceasedStatusInput: VUpdateDeceasedStatusInput,
-    templeId: number,
+    userData: IUserData,
   ) {
+    const { id: userId, tid } = userData;
     const { id, status, rejectReason } = updateDeceasedStatusInput;
+    if (status === EStatus.APPROVED) {
+      await this.queueProcessorService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.JOBS.APPROVE_DECEASED,
+        {
+          userId,
+          deceasedId: id,
+          templeId: tid[0],
+        },
+      );
+    } else if (status === EStatus.REJECTED) {
+      await this.queueProcessorService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.JOBS.REJECT_DECEASED,
+        {
+          userId,
+          deceasedId: id,
+          templeId: tid[0],
+          rejectReason,
+        },
+      );
+    }
+
     return await this.deceasedRepository.update(
-      { id, templeId },
+      { id, templeId: tid[0] },
       { status, rejectReason },
     );
   }
@@ -429,14 +513,28 @@ export class DeceasedService {
         templeId: tid[0],
         isDeleted: true,
       },
+      relations: ['userDetail'],
     });
 
     if (!deceased) {
       throw new HttpException(
-        ErrorMessage.NO_PERMISSION,
+        ErrorMessage.DECEASED_NOT_EXIST,
         HttpStatus.BAD_REQUEST,
       );
     }
+
+    await this.queueProcessorService.handleAddQueue(
+      QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME,
+      QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.JOBS.RESTORE_DECEASED,
+      {
+        userId: userData.id,
+        userName: userData.name,
+        deceasedId: id,
+        familyId: deceased.familyId,
+        templeId: tid[0],
+        deceasedName: deceased.userDetail.name,
+      },
+    );
 
     return await this.deceasedRepository.update({ id }, { isDeleted: false });
   }

@@ -2,11 +2,13 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { EPriority } from 'src/core/enum/default.enum';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { EventParticipant } from './eventParticipant.entity';
 import { EventParticipantType } from './eventParticipantType.entity';
@@ -120,7 +122,7 @@ export class Event {
   @Field(() => Boolean)
   isFreeOpen: boolean;
 
-  @Column({
+  @CreateDateColumn({
     name: 'createdAt',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -128,12 +130,13 @@ export class Event {
   @Field(() => Date)
   createdAt: Date;
 
-  @Column({
+  @UpdateDateColumn({
     name: 'updatedAt',
     type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: null,
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
   @OneToMany(

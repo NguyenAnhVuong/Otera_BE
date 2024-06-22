@@ -1,10 +1,9 @@
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { EStatus } from 'src/core/enum/default.enum';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './user.entity';
-import { FamilyTemple } from './familyTemple.entity';
-import { Deceased } from './deceased.entity';
-import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { DeathAnniversary } from './deathAnniversary.entity';
+import { Deceased } from './deceased.entity';
+import { User } from './user.entity';
 
 @Entity('families')
 @ObjectType()
@@ -78,10 +77,6 @@ export class Family {
   @OneToMany(() => Deceased, (deceased) => deceased.family)
   @Field(() => [Deceased])
   deceaseds: Deceased[];
-
-  @OneToMany(() => FamilyTemple, (familyTemple) => familyTemple.family)
-  @Field(() => [FamilyTemple])
-  familyTemples: FamilyTemple[];
 
   @OneToMany(
     () => DeathAnniversary,

@@ -1,5 +1,4 @@
-import { Type } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class VCreateFamilyDto {
   @IsString()
@@ -17,9 +16,4 @@ export class VCreateFamilyDto {
   @IsString()
   @IsNotEmpty()
   phone: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  @Type(() => Number)
-  templeId: number;
 }

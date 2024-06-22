@@ -118,15 +118,10 @@ export class TempleService {
   }
 
   async getTemples(query: VGetTemplesDto) {
-    const { skip, take, keyword, familyId } = query;
+    const { skip, take, keyword } = query;
     const [items, totalItems] = await this.templeRepository.findAndCount({
       where: {
         ...(keyword && { name: ILike(`%${keyword}%`) }),
-        ...(familyId && {
-          familyTemples: {
-            familyId,
-          },
-        }),
         status: EStatus.APPROVED,
       },
       skip,

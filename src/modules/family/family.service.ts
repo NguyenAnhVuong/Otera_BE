@@ -6,7 +6,6 @@ import { Family } from 'src/core/database/entity/family.entity';
 import { ERole } from 'src/core/enum/default.enum';
 import { DataSource, EntityManager, Repository } from 'typeorm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-import { FamilyTempleService } from './../family-temple/family-temple.service';
 import { UserService } from './../user/user.service';
 import { VCreateFamilyDto } from './dto/create-family.dto';
 import { GetFamilyMembersArgs } from './dto/get-family-members.dto';
@@ -21,8 +20,6 @@ export class FamilyService {
     private readonly cloudinaryService: CloudinaryService,
 
     private readonly userService: UserService,
-
-    private readonly familyTempleService: FamilyTempleService,
 
     private readonly dataSource: DataSource,
   ) {}
@@ -58,14 +55,6 @@ export class FamilyService {
         manager,
       );
 
-      await this.familyTempleService.createFamilyTemple(
-        {
-          familyId: newFamily.id,
-          templeId: familyParams.templeId,
-        },
-        manager,
-      );
-
       return newFamily;
     });
   }
@@ -83,21 +72,6 @@ export class FamilyService {
     userData: IUserData,
     getFamilyMembersArgs: GetFamilyMembersArgs,
   ) {
-    const { tid, fid } = userData;
-    if (tid[0]) {
-      const familyInTemple = await this.familyTempleService.checkFamilyInTemple(
-        getFamilyMembersArgs.id,
-        tid[0],
-      );
-
-      if (!familyInTemple && fid !== getFamilyMembersArgs.id) {
-        throw new HttpException(
-          ErrorMessage.NO_PERMISSION,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    }
-
     return await this.userService.getUserInFamily(getFamilyMembersArgs);
   }
 }

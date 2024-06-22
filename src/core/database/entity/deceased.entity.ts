@@ -1,12 +1,14 @@
 import { User } from '@core/database/entity/user.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Image } from './image.entity';
 import { Temple } from './temple.entity';
@@ -37,8 +39,7 @@ export class Deceased {
 
   @Column({
     name: 'description',
-    type: 'varchar',
-    length: 5000,
+    type: 'text',
     nullable: true,
   })
   @Field(() => String, { nullable: true })
@@ -97,7 +98,7 @@ export class Deceased {
   @Field(() => EStatus)
   status: EStatus;
 
-  @Column({
+  @CreateDateColumn({
     name: 'createdAt',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -105,12 +106,13 @@ export class Deceased {
   @Field(() => Date)
   createdAt: Date;
 
-  @Column({
+  @UpdateDateColumn({
     name: 'updatedAt',
     type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: null,
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
   @ManyToOne(() => Temple, (temple) => temple.deceaseds)

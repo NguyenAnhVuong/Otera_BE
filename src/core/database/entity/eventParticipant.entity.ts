@@ -1,10 +1,12 @@
 import { EBookingStatus } from 'src/core/enum/default.enum';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Event } from './event.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
@@ -62,7 +64,7 @@ export class EventParticipant {
   @Field(() => Date, { nullable: true })
   checkInAt: Date;
 
-  @Column({
+  @CreateDateColumn({
     name: 'createdAt',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -70,12 +72,13 @@ export class EventParticipant {
   @Field(() => Date)
   createdAt: Date;
 
-  @Column({
+  @UpdateDateColumn({
     name: 'updatedAt',
     type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: null,
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
   @ManyToOne(() => Event, (event) => event.eventParticipants)

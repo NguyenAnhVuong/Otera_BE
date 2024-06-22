@@ -212,7 +212,6 @@ export class UserService {
       .leftJoinAndSelect('user.temple', 'temple')
       .leftJoinAndSelect('user.followerTemples', 'followerTemples')
       .leftJoinAndSelect('user.family', 'family')
-      .leftJoinAndSelect('family.familyTemples', 'familyTemples')
       .getOne();
 
     if (!user) {
@@ -240,10 +239,6 @@ export class UserService {
     // if (user.temple) {
     //   templeIds = [user.temple.id];
     // }
-
-    if (user.family && user.family.familyTemples.length > 0) {
-      templeIds = user.family.familyTemples.map((temple) => temple.templeId);
-    }
 
     const authUserData: IResponseAuthUser = {
       id: user.id,
@@ -282,7 +277,7 @@ export class UserService {
         'temple',
         'templeMember',
         'family',
-        'family.familyTemples',
+        'followerTemples',
       ],
     });
 
@@ -300,9 +295,9 @@ export class UserService {
       name: user.userDetail.name,
       role: user.role,
       familyId: user.familyId,
-      templeIds: user.temple
-        ? [user.temple.id]
-        : user.family.familyTemples.map((temple) => temple.templeId),
+      templeIds: user.templeId
+        ? [user.templeId]
+        : user.followerTemples.map((temple) => temple.templeId),
     };
 
     const data = await this.returnResponseAuthUser(authUserData, response);
@@ -352,7 +347,10 @@ export class UserService {
   }
 
   async getUserById(id: number) {
-    return this.userRepository.findOne({ where: { id } });
+    return this.userRepository.findOne({
+      where: { id },
+      relations: ['userDetail'],
+    });
   }
 
   async updateUserById(
@@ -405,41 +403,6 @@ export class UserService {
       relations: ['userDetail'],
     });
     return user;
-  }
-
-  async getFamilyNameAndIsBelongToTemple(userId: number, templeId: number) {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where({
-        id: userId,
-      })
-      .leftJoinAndSelect('user.family', 'family')
-      .leftJoinAndSelect(
-        'family.familyTemples',
-        'familyTemples',
-        'familyTemples.templeId = :templeId AND familyTemples.isDeleted = false',
-        { templeId },
-      )
-      .getOne();
-
-    if (!user) {
-      throw new HttpException(
-        ErrorMessage.ACCOUNT_NOT_EXISTS,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-
-    if (!user.family) {
-      return {
-        familyName: null,
-        isBelongToTemple: false,
-      };
-    }
-
-    return {
-      familyName: user.family.name,
-      isBelongToTemple: !!user.family.familyTemples.length,
-    };
   }
 
   async getUserByEmail(email: string) {

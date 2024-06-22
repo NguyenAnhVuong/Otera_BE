@@ -1,6 +1,12 @@
 import { EStatus } from '@core/enum';
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 @InputType()
 export class VUpdateDeceasedStatusInput {
@@ -15,7 +21,7 @@ export class VUpdateDeceasedStatusInput {
   status: EStatus;
 
   @Field(() => String, { nullable: true })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   rejectReason?: string;
 }

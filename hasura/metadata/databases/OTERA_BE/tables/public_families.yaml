@@ -16,13 +16,6 @@ array_relationships:
         table:
           name: deceaseds
           schema: public
-  - name: familyTemples
-    using:
-      foreign_key_constraint_on:
-        column: familyId
-        table:
-          name: familyTemples
-          schema: public
   - name: users
     using:
       foreign_key_constraint_on:

@@ -1,9 +1,11 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Deceased } from './deceased.entity';
 import { Temple } from './temple.entity';
@@ -33,7 +35,7 @@ export class Image {
   @Field(() => String)
   image: string;
 
-  @Column({
+  @CreateDateColumn({
     name: 'createdAt',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -41,12 +43,13 @@ export class Image {
   @Field(() => Date)
   createdAt: Date;
 
-  @Column({
+  @UpdateDateColumn({
     name: 'updatedAt',
     type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: null,
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
   @ManyToOne(() => Deceased, (deceased) => deceased.images)

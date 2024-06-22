@@ -69,4 +69,40 @@ export const Notifications = {
       `${userName} đã đóng góp ảnh cho ${deceasedName}`,
     redirectTo: (id: number) => `/deceased/${id}`,
   },
+  declareDeceased: {
+    title: 'Có khai báo phần mộ và tro cốt mới',
+    description: (userName: string, deceasedName: string) =>
+      `${userName} đã khai báo thông tin cho ${deceasedName}`,
+    redirectTo: '/temple/deceased',
+  },
+  updateDeceased: {
+    title: 'Có cập nhật phần mộ và tro cốt mới',
+    description: (userName: string, deceasedName: string) =>
+      `${userName} đã cập nhật thông tin cho ${deceasedName}`,
+    redirectTo: (id: number) => `/deceased/${id}`,
+  },
+  approveDeceased: {
+    title: 'Yêu cầu khai báo phần mộ và tro cốt đã được chấp nhận',
+    description: (deceasedName: string) =>
+      `Yêu cầu khai báo thông tin cho ${deceasedName} đã được chấp nhận`,
+    redirectTo: (id: number) => `/deceased${id}`,
+  },
+  rejectDeceased: {
+    title: 'Yêu cầu khai báo phần mộ và tro cốt đã bị từ chối',
+    description: (deceasedName: string) =>
+      `Yêu cầu khai báo thông tin cho ${deceasedName} đã bị từ chối`,
+    redirectTo: '/temple/deceased',
+  },
+  deleteDeceased: {
+    title: 'Phần mộ và tro cốt đã bị xoá',
+    description: (userName: string, deceasedName: string) =>
+      `${userName} đã xóa phần mộ và tro cốt của ${deceasedName} khỏi hệ thống`,
+    redirectTo: '/temple/deceased',
+  },
+  restoreDeceased: {
+    title: 'Phần mộ và tro cốt đã được khôi phục',
+    description: (userName: string, deceasedName: string) =>
+      `${userName} đã khôi phục phần mộ và tro cốt của ${deceasedName}`,
+    redirectTo: (id: number) => `/deceased${id}`,
+  },
 };
