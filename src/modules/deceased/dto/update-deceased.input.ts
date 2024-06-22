@@ -61,7 +61,4 @@ export class VUpdateDeceasedInput {
   @Field(() => String, { nullable: true })
   @IsOptional()
   citizenNumber?: string;
-  // TODO ???
-  @Field(() => Int, { nullable: true })
-  templeId: number;
 }

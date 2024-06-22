@@ -1,9 +1,16 @@
-import { EGender } from 'src/core/enum/default.enum';
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './user.entity';
-import { Deceased } from './deceased.entity';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import 'dotenv/config.js';
+import { EGender } from 'src/core/enum/default.enum';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Deceased } from './deceased.entity';
+import { User } from './user.entity';
 
 registerEnumType(EGender, {
   name: 'EGender',
@@ -62,7 +69,7 @@ export class UserDetail {
   @Field(() => String, { nullable: true })
   citizenNumber: string | null;
 
-  @Column({
+  @CreateDateColumn({
     name: 'createdAt',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -70,12 +77,13 @@ export class UserDetail {
   @Field(() => Date)
   createdAt: Date;
 
-  @Column({
+  @UpdateDateColumn({
     name: 'updatedAt',
     type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: null,
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
   @OneToOne(() => User, (user) => user.userDetail)

@@ -3,12 +3,14 @@ import { Deceased } from 'src/core/database/entity/deceased.entity';
 import { EAccountStatus, ERole } from 'src/core/enum/default.enum';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { DeathAnniversary } from './deathAnniversary.entity';
 import { Event } from './event.entity';
@@ -75,7 +77,7 @@ export class User {
   @Field(() => Date, { nullable: true })
   passwordChangedAt: Date | null;
 
-  @Column({
+  @CreateDateColumn({
     name: 'createdAt',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -83,12 +85,13 @@ export class User {
   @Field(() => Date)
   createdAt: Date;
 
-  @Column({
+  @UpdateDateColumn({
     name: 'updatedAt',
     type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: null,
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
   @ManyToOne(() => Temple, (temple) => temple.users)

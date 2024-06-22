@@ -23,13 +23,6 @@ array_relationships:
         table:
           name: events
           schema: public
-  - name: familyTemples
-    using:
-      foreign_key_constraint_on:
-        column: templeId
-        table:
-          name: familyTemples
-          schema: public
   - name: followerTemples
     using:
       foreign_key_constraint_on:

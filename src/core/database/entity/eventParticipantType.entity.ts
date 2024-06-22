@@ -2,10 +2,12 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ERole } from 'src/core/enum/default.enum';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Event } from './event.entity';
 
@@ -29,7 +31,7 @@ export class EventParticipantType {
   @Field(() => Boolean)
   isDeleted: boolean;
 
-  @Column({
+  @CreateDateColumn({
     name: 'createdAt',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -37,12 +39,13 @@ export class EventParticipantType {
   @Field(() => Date)
   createdAt: Date;
 
-  @Column({
+  @UpdateDateColumn({
     name: 'updatedAt',
     type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: null,
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
   @ManyToOne(() => Event, (event) => event.eventParticipantTypes)

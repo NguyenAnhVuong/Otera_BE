@@ -4,7 +4,6 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { DeathAnniversary } from './deathAnniversary.entity';
 import { Deceased } from './deceased.entity';
 import { Event } from './event.entity';
-import { FamilyTemple } from './familyTemple.entity';
 import { FollowerTemple } from './followerTemple.entity';
 import { Image } from './image.entity';
 import { Review } from './review.entity';
@@ -129,10 +128,6 @@ export class Temple {
   @OneToMany(() => Deceased, (deceased) => deceased.temple)
   @Field(() => [Deceased])
   deceaseds: Deceased[];
-
-  @OneToMany(() => FamilyTemple, (familyTemple) => familyTemple.temple)
-  @Field(() => [FamilyTemple])
-  familyTemples: FamilyTemple[];
 
   @OneToMany(() => Image, (image) => image.temple)
   @Field(() => [Image])

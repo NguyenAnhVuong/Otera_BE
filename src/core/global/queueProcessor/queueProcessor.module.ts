@@ -10,6 +10,7 @@ import { SendMailDeathAnniversaryConsumer } from './consumer/sendMailDeathAnnive
 import { UserModule } from '@modules/user/user.module';
 import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
 import { SendMailDeceasedConsumer } from './consumer/sendMailDeceased.processor';
+import { DeceasedModule } from '@modules/deceased/deceased.module';
 
 @Global()
 @Module({
@@ -30,6 +31,7 @@ import { SendMailDeceasedConsumer } from './consumer/sendMailDeceased.processor'
     EventParticipantModule,
     UserModule,
     DeathAnniversaryModule,
+    DeceasedModule,
   ],
   providers: [
     SendMailEventConsumer,

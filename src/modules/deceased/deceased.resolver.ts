@@ -83,7 +83,7 @@ export class DeceasedResolver {
     );
   }
 
-  @GQLRoles([ERole.TEMPLE_ADMIN, ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
+  @GQLRoles([ERole.TEMPLE_ADMIN, ERole.TEMPLE_MEMBER, ERole.FAMILY_ADMIN])
   @Mutation(() => UpdateRes, { name: 'deleteDeceased' })
   deleteDeceased(
     @GQLUserData() userData: IUserData,
@@ -99,7 +99,7 @@ export class DeceasedResolver {
     return this.deceasedService.deleteDeceased(userData, id);
   }
 
-  @GQLRoles([ERole.TEMPLE_ADMIN])
+  @GQLRoles([ERole.TEMPLE_ADMIN, ERole.TEMPLE_MEMBER])
   @Mutation(() => UpdateRes, { name: 'restoreDeceased' })
   restoreDeceased(
     @GQLUserData() userData: IUserData,
@@ -115,7 +115,7 @@ export class DeceasedResolver {
     return this.deceasedService.restoreDeceased(id, userData);
   }
 
-  @GQLRoles([ERole.TEMPLE_ADMIN])
+  @GQLRoles([ERole.TEMPLE_ADMIN, ERole.FAMILY_MEMBER])
   @Mutation(() => UpdateRes, { name: 'updateDeceasedStatus' })
   updateDeceasedStatus(
     @GQLUserData() userData: IUserData,
@@ -124,7 +124,7 @@ export class DeceasedResolver {
   ) {
     return this.deceasedService.updateDeceasedStatus(
       updateDeceasedStatusInput,
-      userData.tid[0],
+      userData,
     );
   }
 }

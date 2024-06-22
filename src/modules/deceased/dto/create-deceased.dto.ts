@@ -11,6 +11,10 @@ import { EGender } from 'src/core/enum/default.enum';
 export class VCreateDeceasedDto {
   @IsString()
   @IsNotEmpty()
+  tombAddress: string;
+
+  @IsString()
+  @IsNotEmpty()
   @Type(() => String)
   dateOfDeath: string;
 

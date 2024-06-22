@@ -25,12 +25,7 @@ export class FamilyResolver {
     return await this.familyService.getFamilyById(getFamilyArgs);
   }
 
-  @GQLRoles([
-    ERole.TEMPLE_ADMIN,
-    ERole.FAMILY_ADMIN,
-    ERole.FAMILY_ADMIN,
-    ERole.FAMILY_MEMBER,
-  ])
+  @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
   @Query(() => FamilyMembersRes, { name: 'getFamilyMembers' })
   async getFamilyMembers(
     @GQLUserData() userData: IUserData,

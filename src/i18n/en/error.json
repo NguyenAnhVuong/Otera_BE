@@ -23,5 +23,6 @@
   "PUBLIC_USER_TEMPLE_NOT_EXIST": "Public user temple not exist",
   "INVALID_TOKEN": "Invalid token",
   "CAN_NOTE_FIND_QUEUE": "Can not find queue",
-  "DEATH_ANNIVERSARY_REQUEST_EXIST": "Death anniversary request exist"
+  "DEATH_ANNIVERSARY_REQUEST_EXIST": "Death anniversary request exist",
+  "DECEASED_NOT_EXIST": "Deceased not exist"
 }

@@ -419,6 +419,119 @@ export const getMailFormat = (type: EMailType) => {
                   </table>`,
       };
 
+    case EMailType.DECLARE_DECEASED:
+      return {
+        title: '【Otera】Yêu cầu khai báo thông tin phần mộ và tro cốt mới',
+        content: `
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                      <tr>
+                          <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                              <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+                  
+                              <p style="font-size: 16px; color: #333333;">{deceasedName} đã được khai báo thông tin phần mộ và tro cốt mới.</p>
+                  
+                              <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết thông tin.</p>
+                  
+                              <p style="font-size: 16px; color: #333333;">
+                                  <a href="{deceasedUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Danh sách phần mộ và tro cốt</a>
+                              </p>
+                  
+                              {footer}
+                          </td>
+                      </tr>
+                    </table>`,
+      };
+
+    case EMailType.APPROVE_DECEASED:
+      return {
+        title:
+          '【Otera】Yêu cầu khai báo thông tin phần mộ và tro cốt đã được chấp nhận',
+        content: `
+                      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                        <tr>
+                            <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                                <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+                    
+                                <p style="font-size: 16px; color: #333333;">Yêu cầu khai báo thông tin phần mộ và tro cốt {deceasedName} đã được chấp nhận.</p>
+                    
+                                <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết thông tin.</p>
+                    
+                                <p style="font-size: 16px; color: #333333;">
+                                    <a href="{deceasedUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">{deceasedName}</a>
+                                </p>
+                    
+                                {footer}
+                            </td>
+                        </tr>
+                      </table>`,
+      };
+
+    case EMailType.REJECT_DECEASED:
+      return {
+        title:
+          '【Otera】Yêu cầu khai báo thông tin phần mộ và tro cốt đã bị từ chối',
+        content: `
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                  <tr>
+                      <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                          <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+              
+                          <p style="font-size: 16px; color: #333333;">Yêu cầu khai báo thông tin phần mộ và tro cốt {deceasedName} đã bị từ chối với lý do {rejectReason}.</p>
+              
+                          <p style="font-size: 16px; color: #333333;">
+                              Rất mong nhận được sự thông cảm của bạn.
+                          </p>           
+              
+                          {footer}
+                      </td>
+                  </tr>
+                </table>`,
+      };
+
+    case EMailType.DELETE_DECEASED:
+      return {
+        title: '【Otera】Phần mộ và tro cốt đã bị xoá',
+        content: `
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                <tr>
+                    <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                        <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+            
+                        <p style="font-size: 16px; color: #333333;">{deleterName} đã xóa phần mộ và tro cốt {deceasedName} khỏi hệ thống.</p>
+            
+                        <p style="font-size: 16px; color: #333333;">
+                            Rất mong nhận được sự thông cảm của bạn.
+                        </p>           
+            
+                        {footer}
+                    </td>
+                </tr>
+              </table>`,
+      };
+
+    case EMailType.RESTORE_DECEASED:
+      return {
+        title: '【Otera】Phần mộ và tro cốt đã được khôi phục',
+        content: `
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                  <tr>
+                      <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                          <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+              
+                          <p style="font-size: 16px; color: #333333;">{restorerName} đã khôi phục phần mộ và tro cốt {deceasedName} vào hệ thống.</p>
+
+                         <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết thông tin.</p>
+
+                         <p style="font-size: 16px; color: #333333;">
+                            <a href="{deceasedUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">{deceasedName}</a>
+                          </p>         
+            
+                          {footer}
+                      </td>
+                  </tr>
+                </table>`,
+      };
+
     default:
       throw new Error();
   }

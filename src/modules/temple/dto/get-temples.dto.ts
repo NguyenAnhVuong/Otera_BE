@@ -6,10 +6,6 @@ export class VGetTemplesDto implements IPaginationQuery {
   @IsString()
   keyword?: string;
 
-  @IsOptional()
-  @IsNumber()
-  familyId?: number;
-
   @IsNumber()
   page: number;
 

@@ -6,11 +6,13 @@ import {
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Deceased } from './deceased.entity';
 import { Temple } from './temple.entity';
@@ -147,7 +149,7 @@ export class DeathAnniversary {
   @Field(() => String, { nullable: true })
   finishedImage: string | null;
 
-  @Column({
+  @CreateDateColumn({
     name: 'createdAt',
     type: 'timestamptz',
     default: () => 'CURRENT_TIMESTAMP',
@@ -155,12 +157,13 @@ export class DeathAnniversary {
   @Field(() => Date)
   createdAt: Date;
 
-  @Column({
+  @UpdateDateColumn({
     name: 'updatedAt',
     type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
+    default: null,
+    onUpdate: 'CURRENT_TIMESTAMP',
   })
-  @Field(() => Date)
+  @Field(() => Date, { nullable: true })
   updatedAt: Date;
 
   @ManyToOne(() => Deceased, (deceased) => deceased.deathAnniversaries)
