@@ -11,6 +11,7 @@ import { RemoveFamilyMemberInput } from './dto/remove-family-member.input';
 import { VForgotPasswordInput } from './dto/forgot-password.input';
 import { UserRes } from './entities/userRes.entity';
 import { VResetPasswordInput } from './dto/reset-password.input';
+import { VChangePasswordInput } from './dto/change-password.input';
 
 @Resolver(() => UserRes)
 export class UserResolver {
@@ -55,5 +56,14 @@ export class UserResolver {
     @Args('resetPasswordInput') resetPasswordInput: VResetPasswordInput,
   ) {
     return this.userService.resetPassword(resetPasswordInput);
+  }
+
+  @GQLRoles(Object.values(ERole))
+  @Mutation(() => UpdateRes, { name: 'changePassword' })
+  changePassword(
+    @GQLUserData() userData: IUserData,
+    @Args('changePasswordInput') changePasswordInput: VChangePasswordInput,
+  ) {
+    return this.userService.changePassword(userData, changePasswordInput);
   }
 }

@@ -16,8 +16,9 @@ export class ImageService {
     imageParams: DeepPartial<Image>[],
     entityManager?: EntityManager,
   ): Promise<Image[]> {
-    const imageRepository =
-      entityManager?.getRepository(Image) || this.imageRepository;
+    const imageRepository = entityManager
+      ? entityManager.getRepository(Image)
+      : this.imageRepository;
     return await imageRepository.save(imageParams);
   }
 
@@ -26,8 +27,9 @@ export class ImageService {
     imageParams: DeepPartial<Image>[],
     entityManager?: EntityManager,
   ): Promise<boolean> {
-    const imageRepository =
-      entityManager?.getRepository(Image) || this.imageRepository;
+    const imageRepository = entityManager
+      ? entityManager.getRepository(Image)
+      : this.imageRepository;
 
     const images = await imageRepository.find({ where: { eventId } });
 
@@ -45,8 +47,9 @@ export class ImageService {
     imageParams: DeepPartial<Image>[],
     entityManager?: EntityManager,
   ): Promise<boolean> {
-    const imageRepository =
-      entityManager?.getRepository(Image) || this.imageRepository;
+    const imageRepository = entityManager
+      ? entityManager.getRepository(Image)
+      : this.imageRepository;
     const images = await imageRepository.find({ where: { deceasedId } });
 
     await this.cloudinaryService.deleteImagesByUrls(
@@ -62,8 +65,9 @@ export class ImageService {
     deceasedId: number,
     entityManager?: EntityManager,
   ): Promise<boolean> {
-    const imageRepository =
-      entityManager?.getRepository(Image) || this.imageRepository;
+    const imageRepository = entityManager
+      ? entityManager.getRepository(Image)
+      : this.imageRepository;
     const images = await imageRepository.find({ where: { deceasedId } });
 
     await this.cloudinaryService.deleteImagesByUrls(
@@ -71,6 +75,24 @@ export class ImageService {
     );
 
     await imageRepository.delete({ deceasedId });
+    return true;
+  }
+
+  async deleteImagesByTempleId(
+    templeId: number,
+    entityManager?: EntityManager,
+  ): Promise<boolean> {
+    const imageRepository = entityManager
+      ? entityManager.getRepository(Image)
+      : this.imageRepository;
+
+    const images = await imageRepository.find({ where: { templeId } });
+
+    await this.cloudinaryService.deleteImagesByUrls(
+      images.map((image) => image.image),
+    );
+
+    await imageRepository.delete({ templeId });
     return true;
   }
 }

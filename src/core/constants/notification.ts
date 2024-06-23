@@ -105,4 +105,39 @@ export const Notifications = {
       `${userName} đã khôi phục phần mộ và tro cốt của ${deceasedName}`,
     redirectTo: (id: number) => `/deceased${id}`,
   },
+  registerTemple: {
+    title: 'Có yêu cầu đăng ký chùa mới',
+    description: (userName: string, templeName: string) =>
+      `${userName} đã gửi yêu cầu đăng ký chùa ${templeName}`,
+    redirectTo: '/temple',
+  },
+  registerTemplesSent: {
+    title: 'Yêu cầu đăng ký chùa đã được gửi',
+    description: (templeName: string) =>
+      `Yêu cầu đăng ký chùa ${templeName} đã được gửi. Vui lòng chờ xác nhận từ hệ thống`,
+  },
+  approveTemple: {
+    title: 'Yêu cầu đăng ký chùa đã được chấp nhận',
+    description: (templeName: string) =>
+      `Yêu cầu đăng ký chùa ${templeName} đã được chấp nhận`,
+    redirectTo: (id: number) => `/temple/${id}`,
+  },
+  approveTempleUser: {
+    title: 'Yêu cầu đăng ký chùa đã được chấp nhận',
+    description: (templeName: string) =>
+      `Yêu cầu đăng ký chùa ${templeName} đã được chấp nhận. Vui lòng đăng nhập lại để sử dụng chức năng của chùa!`,
+    redirectTo: (id: number) => `/temple/${id}`,
+  },
+  rejectTemple: {
+    title: 'Yêu cầu đăng ký chùa đã bị từ chối',
+    description: (templeName: string) =>
+      `Yêu cầu đăng ký chùa ${templeName} đã bị từ chối`,
+    redirectTo: '/system/temple',
+  },
+  blockTemple: {
+    title: 'Chùa đã bị khóa',
+    description: (templeName: string) =>
+      `Chùa ${templeName} đã bị hệ thống khoá`,
+    redirectTo: '/system/temple',
+  },
 };

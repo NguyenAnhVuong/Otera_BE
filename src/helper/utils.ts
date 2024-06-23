@@ -74,8 +74,7 @@ export function getWinstonPathFile() {
 
 export const generateRandomCode = (length: number) => {
   let result = '';
-  const characters =
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const characters = '0123456789';
   const charactersLength = characters.length;
   for (let i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -530,6 +529,92 @@ export const getMailFormat = (type: EMailType) => {
                       </td>
                   </tr>
                 </table>`,
+      };
+
+    case EMailType.TEMPLE_REGISTER:
+      return {
+        title: '【Otera】Có yêu cầu đăng ký chùa mới',
+        content: `
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                  <tr>
+                      <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                          <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+              
+                          <p style="font-size: 16px; color: #333333;">{creatorName} đã gửi yêu cầu đăng ký chùa {templeName}.</p>
+              
+                          <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết yêu cầu.</p>
+              
+                          <p style="font-size: 16px; color: #333333;">
+                              <a href="{templeManagementUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Chi tiết yêu cầu</a>
+                          </p>
+              
+                          {footer}
+                      </td>
+                  </tr>
+                </table>`,
+      };
+
+    case EMailType.APPROVE_TEMPLE:
+      return {
+        title: '【Otera】Yêu cầu đăng ký chùa đã được chấp nhận',
+        content: `
+                <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                  <tr>
+                      <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                          <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+              
+                          <p style="font-size: 16px; color: #333333;">Yêu cầu đăng ký chùa {templeName} đã được chấp nhận.</p>
+              
+                          <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết thông tin.</p>
+              
+                          <p style="font-size: 16px; color: #333333;">
+                              <a href="{templeDetailUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">{templeName}</a>
+                          </p>
+              
+                          {footer}
+                      </td>
+                  </tr>
+                </table>`,
+      };
+
+    case EMailType.REJECT_TEMPLE:
+      return {
+        title: '【Otera】Yêu cầu đăng ký chùa đã bị từ chối',
+        content: `
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                <tr>
+                    <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                        <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+            
+                        <p style="font-size: 16px; color: #333333;">Yêu cầu đăng ký chùa {templeName} đã bị từ chối với lý do {rejectReason}.</p>
+            
+                        <p style="font-size: 16px; color: #333333;">
+                            Rất mong nhận được sự thông cảm của bạn.
+                        </p>           
+            
+                        {footer}
+                    </td>
+                </tr>
+              </table>`,
+      };
+
+    case EMailType.BLOCK_TEMPLE:
+      return {
+        title: '【Otera】Chùa đã bị hệ thống khoá',
+        content: `
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                <tr>
+                    <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                        <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+            
+                        <p style="font-size: 16px; color: #333333;">Chùa {templeName} đã hệ thống khoá với lý do {blockReason}.</p>
+            
+                        <p style="font-size: 16px; color: #333333;">Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.</p>
+            
+                        {footer}
+                    </td>
+                </tr>
+              </table>`,
       };
 
     default:

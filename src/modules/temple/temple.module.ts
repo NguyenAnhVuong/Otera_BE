@@ -7,6 +7,7 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { ImageModule } from '../image/image.module';
 import { UserModule } from '../user/user.module';
 import { TempleResolver } from './temple.resolver';
+import { NotificationModule } from '@modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TempleResolver } from './temple.resolver';
     CloudinaryModule,
     ImageModule,
     UserModule,
+    NotificationModule,
   ],
   controllers: [TempleController],
   providers: [TempleService, TempleResolver],

@@ -24,9 +24,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       );
     }
 
+    // The token will expire within 10 seconds after changing the password
     if (
       user.passwordChangedAt &&
-      payload.iat < user.passwordChangedAt.getTime() / 1000
+      payload.iat + 10000 < user.passwordChangedAt.getTime() / 1000
     ) {
       throw new HttpException(
         ErrorMessage.UNAUTHORIZED,

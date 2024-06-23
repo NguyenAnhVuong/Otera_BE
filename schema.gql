@@ -181,7 +181,7 @@ type User {
   family: Family
   reviews: [Review!]!
   deathAnniversaries: [DeathAnniversary!]!
-  followerTemples: FollowerTemple!
+  followerTemples: [FollowerTemple!]!
   events: [Event!]!
   eventParticipants: [EventParticipant!]!
   modifiedDeceaseds: [Deceased!]!
@@ -283,7 +283,7 @@ type Temple {
   name: String!
   avatar: String!
   address: String!
-  description: String!
+  description: String
   phone: String
   email: String!
   website: String
@@ -311,19 +311,51 @@ enum EPlan {
   PREMIUM
 }
 
+type Notification {
+  id: Int!
+  userId: Int
+  title: String!
+  description: String
+  type: ENotificationType!
+  inviteFamilyId: Int
+  redirectTo: String
+  isRead: Boolean!
+  isDeleted: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+enum ENotificationType {
+  INVITE_FAMILY
+  NEW_EVENT
+  UPDATE_EVENT
+  CANCEL_EVENT
+  APPROVE_EVENT_PARTICIPANT
+  REJECT_EVENT_PARTICIPANT
+  REQUEST_DEATH_ANNIVERSARY
+  APPROVE_DEATH_ANNIVERSARY
+  REJECT_DEATH_ANNIVERSARY
+  READY_DEATH_ANNIVERSARY
+  FINISH_DEATH_ANNIVERSARY
+  CONTRIBUTE_DECEASED_IMAGE
+  DECLARE_DECEASED
+  UPDATE_DECEASED
+  APPROVE_DECEASED
+  REJECT_DECEASED
+  DELETE_DECEASED
+  RESTORE_DECEASED
+  TEMPLE_REGISTER
+  TEMPLE_REGISTER_SENT
+  APPROVE_TEMPLE
+  REJECT_TEMPLE
+  BLOCK_TEMPLE
+}
+
 type GQLResponse {
   statusCode: Int!
   errorMessage: String
   errorCode: String
   timestamp: String!
-}
-
-type CreateRes {
-  statusCode: Int!
-  errorMessage: String
-  errorCode: String
-  timestamp: String!
-  data: Boolean!
 }
 
 type AffectedResult {
@@ -336,6 +368,14 @@ type UpdateRes {
   errorCode: String
   timestamp: String!
   data: AffectedResult
+}
+
+type CreateRes {
+  statusCode: Int!
+  errorMessage: String
+  errorCode: String
+  timestamp: String!
+  data: Boolean!
 }
 
 type UserRes {
@@ -359,7 +399,7 @@ type TempleWithAdmin {
   name: String!
   avatar: String!
   address: String!
-  description: String!
+  description: String
   phone: String
   email: String!
   website: String
@@ -413,41 +453,6 @@ type TempleMembersRes {
   errorCode: String
   timestamp: String!
   data: TempleMembersPagingData!
-}
-
-type Notification {
-  id: Int!
-  userId: Int
-  title: String!
-  description: String
-  type: ENotificationType!
-  inviteFamilyId: Int
-  redirectTo: String
-  isRead: Boolean!
-  isDeleted: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime
-}
-
-enum ENotificationType {
-  INVITE_FAMILY
-  NEW_EVENT
-  UPDATE_EVENT
-  CANCEL_EVENT
-  APPROVE_EVENT_PARTICIPANT
-  REJECT_EVENT_PARTICIPANT
-  REQUEST_DEATH_ANNIVERSARY
-  APPROVE_DEATH_ANNIVERSARY
-  REJECT_DEATH_ANNIVERSARY
-  READY_DEATH_ANNIVERSARY
-  FINISH_DEATH_ANNIVERSARY
-  CONTRIBUTE_DECEASED_IMAGE
-  DECLARE_DECEASED
-  UPDATE_DECEASED
-  APPROVE_DECEASED
-  REJECT_DECEASED
-  DELETE_DECEASED
-  RESTORE_DECEASED
 }
 
 type NotificationsPagingData {
@@ -748,7 +753,7 @@ type Query {
   getFamily(page: Int, take: Int, skip: Int, id: Int!): FamilyRes!
   getFamilyMembers(page: Int, take: Int, skip: Int, orderBy: [OrderBy!], id: Int!, name: String, address: String, email: String, phone: String, roleFilter: [ERole!]): FamilyMembersRes!
   templeGetDeceasedList(page: Int, take: Int, skip: Int, name: String, address: String, tombAddress: String, status: EStatus, isDeleted: Boolean, familyKeyword: String, orderBy: [OrderBy!]): DeceasedListRes!
-  familyGetListDeceased(page: Int, take: Int, skip: Int): DeceasedListRes!
+  familyGetListDeceased(page: Int, take: Int, skip: Int, keyword: String, orderBy: OrderBy): DeceasedListRes!
   getDeceased(id: Int!): DeceasedRes!
   familyGetDeathAnniversaries(page: Int, take: Int, skip: Int, name: String, tombAddress: String, requesterName: String, deathAnniversaryTypes: [EDeathAnniversaryType!], status: EDeathAnniversaryStatus, orderBy: [OrderBy!]): DeathAnniversariesRes!
   templeGetDeathAnniversaries(page: Int, take: Int, skip: Int, name: String, familyKeyword: String, tombAddress: String, requesterName: String, deathAnniversaryTypes: [EDeathAnniversaryType!], status: EDeathAnniversaryStatus, orderBy: [OrderBy!]): DeathAnniversariesRes!
@@ -778,9 +783,13 @@ type Mutation {
   removeFamilyMember(removeFamilyMemberInput: RemoveFamilyMemberInput!): UpdateRes!
   forgotPassword(forgotPasswordInput: VForgotPasswordInput!): CreateRes!
   resetPassword(resetPasswordInput: VResetPasswordInput!): UpdateRes!
+  changePassword(changePasswordInput: VChangePasswordInput!): UpdateRes!
+  updateUser(updateUserDetailInput: VUpdateUserDetailInput!): UpdateRes!
   updateStatusTemple(updateStatusTempleInput: VUpdateStatusTempleInput!): UpdateRes!
   addTempleMember(addTempleMemberInput: VAddTempleMemberInput!): UpdateRes!
   removeTempleMember(removeTempleMemberInput: VRemoveTempleMemberInput!): UpdateRes!
+  updateTemple(updateTempleInput: VUpdateTempleInput!): UpdateRes!
+  updateNotification(updateNotificationInput: UpdateNotificationInput!): UpdateRes!
   updateDeceased(updateDeceasedInput: VUpdateDeceasedInput!): UpdateRes!
   addDeceasedImage(addDeceasedImageInput: VAddDeceasedImageInput!): UpdateRes!
   deleteDeceased(id: Int!): UpdateRes!
@@ -799,7 +808,6 @@ type Mutation {
   updateEventParticipant(bookingEventInput: UpdateEventParticipantInput!): UpdateRes!
   eventParticipantCheckIn(eventParticipantCheckInInput: VEventParticipantCheckInInput!): UpdateRes!
   cancelBookingEvent(eventId: Int!): UpdateRes!
-  updateNotification(updateNotificationInput: UpdateNotificationInput!): UpdateRes!
   responseFamilyInvitation(responseInviteFamilyInput: ResponseInviteFamilyInput!): UpdateRes!
   inviteToFamily(inviteFamilyInput: InviteFamilyInput!): CreateRes!
   followTemple(followTempleInput: VFollowTempleInput!): CreateRes!
@@ -819,6 +827,20 @@ input VResetPasswordInput {
   password: String!
 }
 
+input VChangePasswordInput {
+  password: String!
+  newPassword: String!
+}
+
+input VUpdateUserDetailInput {
+  name: String
+  avatar: String
+  phone: String
+  address: String
+  birthday: String
+  gender: EGender
+}
+
 input VUpdateStatusTempleInput {
   id: Int!
   status: EStatus!
@@ -832,6 +854,24 @@ input VAddTempleMemberInput {
 
 input VRemoveTempleMemberInput {
   userId: Int!
+}
+
+input VUpdateTempleInput {
+  name: String
+  avatar: String
+  descriptionImages: [String!]
+  address: String
+  description: String
+  phone: String
+  email: String
+  website: String
+}
+
+input UpdateNotificationInput {
+  id: Int!
+  isRead: Boolean!
+  isDeleted: Boolean
+  createdAt: DateTime
 }
 
 input VUpdateDeceasedInput {
@@ -957,13 +997,6 @@ input UpdateEventParticipantInput {
 input VEventParticipantCheckInInput {
   eventId: Int!
   code: String!
-}
-
-input UpdateNotificationInput {
-  id: Int!
-  isRead: Boolean!
-  isDeleted: Boolean
-  createdAt: DateTime
 }
 
 input ResponseInviteFamilyInput {

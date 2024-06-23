@@ -31,6 +31,9 @@ import { ValidationTokenService } from '@modules/validation-token/validation-tok
 import { sendMail } from '@helper/mailtrap';
 import * as format from 'string-format';
 import { VResetPasswordInput } from './dto/reset-password.input';
+import * as dayjs from 'dayjs';
+import { FormatDate } from '@core/constants/formatDate';
+import { VChangePasswordInput } from './dto/change-password.input';
 
 @Injectable()
 export class UserService {
@@ -49,6 +52,10 @@ export class UserService {
 
     userRegister.password = hashPassword;
     userRegister.role = ERole.PUBLIC_USER;
+
+    userRegister.birthday = dayjs(userRegister.birthday).format(
+      FormatDate.YYYY_MM_DD,
+    );
 
     return await this.dataSource.transaction(
       async (entityManager: EntityManager) => {
@@ -272,13 +279,7 @@ export class UserService {
       where: {
         id: payload.id,
       },
-      relations: [
-        'userDetail',
-        'temple',
-        'templeMember',
-        'family',
-        'followerTemples',
-      ],
+      relations: ['userDetail', 'temple', 'family', 'followerTemples'],
     });
 
     if (!user) {
@@ -400,7 +401,7 @@ export class UserService {
       where: {
         id,
       },
-      relations: ['userDetail'],
+      relations: ['userDetail', 'followerTemples'],
     });
     return user;
   }
@@ -677,5 +678,72 @@ export class UserService {
       },
       relations: ['userDetail'],
     });
+  }
+
+  async getSystemUsers() {
+    return await this.userRepository.find({
+      where: {
+        role: ERole.SYSTEM,
+      },
+      relations: ['userDetail'],
+    });
+  }
+
+  async updateUserByTempleId(
+    templeId: number,
+    data: DeepPartial<User>,
+    entityManager?: EntityManager,
+  ) {
+    const userRepository = entityManager
+      ? entityManager.getRepository(User)
+      : this.userRepository;
+    return await userRepository.update(
+      {
+        templeId,
+      },
+      data,
+    );
+  }
+
+  async changePassword(
+    userData: IUserData,
+    changePasswordInput: VChangePasswordInput,
+  ) {
+    const { id } = userData;
+    const { password, newPassword } = changePasswordInput;
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id })
+      .addSelect('user.password')
+      .getOne();
+
+    if (!user) {
+      throw new HttpException(
+        ErrorMessage.ACCOUNT_NOT_EXISTS,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      throw new HttpException(
+        ErrorMessage.PASSWORD_INCORRECT,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hashPassword = await bcrypt.hash(newPassword, salt);
+
+    return await this.userRepository.update(
+      {
+        id,
+      },
+      {
+        password: hashPassword,
+        passwordChangedAt: new Date(),
+      },
+    );
   }
 }

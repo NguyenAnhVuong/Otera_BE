@@ -34,7 +34,7 @@ export class TempleController {
     images = images.slice(1);
 
     return await this.templeService.createTemple(
-      userData.id,
+      userData,
       newTemple,
       avatar,
       images,
