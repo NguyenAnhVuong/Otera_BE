@@ -26,6 +26,7 @@ import { VAddDeceasedImageInput } from './dto/add-deceased-image.input';
 import { QueueProcessorService } from '@core/global/queueProcessor/quequeProcessor.service';
 import { QUEUE_MODULE_OPTIONS } from '@core/global/queueProcessor/queueIdentity.constant';
 import { TempleService } from '@modules/temple/temple.service';
+import { FormatDate } from '@core/constants/formatDate';
 
 @Injectable()
 export class DeceasedService {
@@ -74,7 +75,7 @@ export class DeceasedService {
       const userDetailParams: DeepPartial<UserDetail> = {
         avatar: uploadedAvatar.url,
         name,
-        birthday: dayjs(birthday).format('YYYY-MM-DD'),
+        birthday: dayjs(birthday).format(FormatDate.YYYY_MM_DD),
         address,
         gender,
         ...(citizenNumber && { citizenNumber }),
@@ -95,7 +96,7 @@ export class DeceasedService {
       }
 
       const newDeceasedParams: DeepPartial<Deceased> = {
-        dateOfDeath: dayjs(dateOfDeath).format('YYYY-MM-DD'),
+        dateOfDeath: dayjs(dateOfDeath).format(FormatDate.YYYY_MM_DD),
         templeId,
         familyId: fid,
         userDetailId: userDetail.id,
@@ -188,21 +189,34 @@ export class DeceasedService {
 
   async getListDeceasedByFamilyId(
     familyId: number,
-    query: VFamilyGetListDeceasedArgs,
+    familyGetListDeceasedArgs: VFamilyGetListDeceasedArgs,
   ) {
-    const { skip, take } = query;
-    const [data, count] = await this.deceasedRepository.findAndCount({
-      where: {
+    const { skip, take, orderBy, keyword } = familyGetListDeceasedArgs;
+    const query = this.deceasedRepository
+      .createQueryBuilder('deceased')
+      .where({
         familyId,
         isDeleted: false,
         status: EStatus.APPROVED,
-      },
-      relations: ['images', 'userDetail'],
-      skip,
-      take,
-    });
+      })
+      .leftJoinAndSelect('deceased.images', 'images')
+      .leftJoinAndSelect('deceased.userDetail', 'userDetail')
+      .skip(skip)
+      .take(take)
+      .orderBy('deceased.createdAt', 'DESC');
 
-    return returnPagingData(data, count, query);
+    if (keyword) {
+      query.andWhere(
+        '(userDetail.name ILIKE :keyword OR userDetail.address ILIKE :keyword)',
+        {
+          keyword: `%${keyword}%`,
+        },
+      );
+    }
+
+    const [data, count] = await query.getManyAndCount();
+
+    return returnPagingData(data, count, familyGetListDeceasedArgs);
   }
 
   async getPendingDeceasedById(id: number) {

@@ -140,6 +140,7 @@ type AuthUser {
   email: String!
   role: ERole
   familyId: Int
+  templeIds: [Int]
 }
 
 type UserLoginOutput {

@@ -37,9 +37,9 @@ export class Temple {
   @Field(() => String)
   address: string;
 
-  @Column({ name: 'description', type: 'varchar', length: 5000 })
-  @Field(() => String)
-  description: string;
+  @Column({ name: 'description', type: 'text', nullable: true })
+  @Field(() => String, { nullable: true })
+  description?: string;
 
   @Column({ name: 'phone', type: 'varchar', length: 250 })
   @Field(() => String, { nullable: true })

@@ -53,8 +53,9 @@ export class EventService {
       .skip(skip)
       .take(take)
       .orderBy('event.priority', 'DESC')
+      .addOrderBy('event.createdAt', 'DESC')
       .addOrderBy('event.startDateEvent', 'ASC');
-    // TODO sort near by today
+
     if (templeId) {
       queryBuilder.andWhere('event.templeId = :templeId', { templeId });
     }
@@ -77,8 +78,12 @@ export class EventService {
             familyRoles: [ERole.FAMILY_MEMBER, ERole.FAMILY_ADMIN],
             userTempleIDs: userData.tid,
           },
-        )
-        .orWhere('event.isFreeOpen = :isFreeOpen', { isFreeOpen: true });
+        );
+      if (!templeId) {
+        queryBuilder.orWhere('event.isFreeOpen = :isFreeOpen', {
+          isFreeOpen: true,
+        });
+      }
     }
 
     const [events, count] = await queryBuilder.getManyAndCount();

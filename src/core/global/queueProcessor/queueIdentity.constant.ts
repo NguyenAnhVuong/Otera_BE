@@ -4,6 +4,7 @@
 const QUEUE_NAME_SEND_MAIL_EVENT = 'SendMailEvent';
 const QUEUE_NAME_SEND_MAIL_DEATH_ANNIVERSARY = 'SendMailDeathAnniversary';
 const QUEUE_NAME_SEND_MAIL_DECEASED = 'SendMailDeceased';
+const QUEUE_NAME_SEND_MAIL_SYSTEM = 'SendMailSystem';
 /**
  * job names
  */
@@ -25,6 +26,10 @@ const JOB_NAME_APPROVE_DECEASED = 'ApproveDeceased';
 const JOB_NAME_REJECT_DECEASED = 'RejectDeceased';
 const JOB_NAME_DELETE_DECEASED = 'DeleteDeceased';
 const JOB_NAME_RESTORE_DECEASED = 'RestoreDeceased';
+const JOB_NAME_REGISTER_TEMPLE = 'RegisterTemple';
+const JOB_NAME_APPROVE_TEMPLE = 'ApproveTemple';
+const JOB_NAME_REJECT_TEMPLE = 'RejectTemple';
+const JOB_NAME_BLOCK_TEMPLE = 'BlockTemple';
 
 export const QUEUE_MODULE_OPTIONS = {
   SEND_MAIL_EVENT: {
@@ -65,6 +70,15 @@ export const QUEUE_MODULE_OPTIONS = {
       RESTORE_DECEASED: JOB_NAME_RESTORE_DECEASED as TJobName,
     },
   },
+  SEND_MAIL_SYSTEM: {
+    NAME: QUEUE_NAME_SEND_MAIL_SYSTEM as TQueueName,
+    JOBS: {
+      REGISTER_TEMPLE: JOB_NAME_REGISTER_TEMPLE as TJobName,
+      APPROVE_TEMPLE: JOB_NAME_APPROVE_TEMPLE as TJobName,
+      REJECT_TEMPLE: JOB_NAME_REJECT_TEMPLE as TJobName,
+      BLOCK_TEMPLE: JOB_NAME_BLOCK_TEMPLE as TJobName,
+    },
+  },
 };
 
 /**
@@ -73,7 +87,8 @@ export const QUEUE_MODULE_OPTIONS = {
 export type TQueueName =
   | typeof QUEUE_NAME_SEND_MAIL_EVENT
   | typeof QUEUE_NAME_SEND_MAIL_DEATH_ANNIVERSARY
-  | typeof QUEUE_NAME_SEND_MAIL_DECEASED;
+  | typeof QUEUE_NAME_SEND_MAIL_DECEASED
+  | typeof QUEUE_NAME_SEND_MAIL_SYSTEM;
 
 /**
  * type job name
@@ -92,4 +107,7 @@ export type TJobName =
   | typeof JOB_NAME_APPROVE_DECEASED
   | typeof JOB_NAME_REJECT_DECEASED
   | typeof JOB_NAME_DELETE_DECEASED
-  | typeof JOB_NAME_RESTORE_DECEASED;
+  | typeof JOB_NAME_RESTORE_DECEASED
+  | typeof JOB_NAME_APPROVE_TEMPLE
+  | typeof JOB_NAME_REJECT_TEMPLE
+  | typeof JOB_NAME_BLOCK_TEMPLE;

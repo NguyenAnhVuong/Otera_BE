@@ -24,5 +24,6 @@
   "INVALID_TOKEN": "Invalid token",
   "CAN_NOTE_FIND_QUEUE": "Can not find queue",
   "DEATH_ANNIVERSARY_REQUEST_EXIST": "Death anniversary request exist",
-  "DECEASED_NOT_EXIST": "Deceased not exist"
+  "DECEASED_NOT_EXIST": "Deceased not exist",
+  "TEMPLE_REGISTER_EXIST": "Temple register exist"
 }

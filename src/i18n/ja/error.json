@@ -24,5 +24,6 @@
   "INVALID_TOKEN": "Token không hợp lệ",
   "CAN_NOTE_FIND_QUEUE": "Không tìm thấy hàng đợi",
   "DEATH_ANNIVERSARY_REQUEST_EXIST": "Yêu cầu đã tồn tại",
-  "DECEASED_NOT_EXIST": "Người thân đã khuất không tồn tại"
+  "DECEASED_NOT_EXIST": "Người thân đã khuất không tồn tại",
+  "TEMPLE_REGISTER_EXIST": "Tài khoản này đã gửi yêu cầu đăng ký chùa"
 }

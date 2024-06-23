@@ -121,7 +121,7 @@ export class User {
   deathAnniversaries: DeathAnniversary[];
 
   @OneToMany(() => FollowerTemple, (templeMember) => templeMember.user)
-  @Field(() => FollowerTemple)
+  @Field(() => [FollowerTemple])
   followerTemples: FollowerTemple[];
 
   @OneToMany(() => Event, (event) => event.user)

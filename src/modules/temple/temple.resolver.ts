@@ -17,6 +17,7 @@ import { TemplesRes } from './entities/templesRes.entity';
 import { TempleService } from './temple.service';
 import { TempleMembersRes } from './entities/templeMembersRes.entity';
 import { VGetTempleMembersArgs } from './dto/get-temple-members.args';
+import { VUpdateTempleInput } from './dto/update-temple-input';
 
 @Resolver(() => Temple)
 export class TempleResolver {
@@ -51,8 +52,12 @@ export class TempleResolver {
   updateStatusTemple(
     @Args('updateStatusTempleInput')
     updateStatusTempleInput: VUpdateStatusTempleInput,
+    @GQLUserData() userData: IUserData,
   ) {
-    return this.templeService.updateStatusTemple(updateStatusTempleInput);
+    return this.templeService.updateStatusTemple(
+      updateStatusTempleInput,
+      userData,
+    );
   }
 
   @GQLRoles([ERole.TEMPLE_ADMIN])
@@ -91,5 +96,14 @@ export class TempleResolver {
       userData.tid[0],
       removeTempleMemberInput,
     );
+  }
+
+  @GQLRoles([ERole.TEMPLE_ADMIN])
+  @Mutation(() => UpdateRes, { name: 'updateTemple' })
+  updateTemple(
+    @GQLUserData() userData: IUserData,
+    @Args('updateTempleInput') updateTempleInput: VUpdateTempleInput,
+  ) {
+    return this.templeService.updateTemple(userData.tid[0], updateTempleInput);
   }
 }

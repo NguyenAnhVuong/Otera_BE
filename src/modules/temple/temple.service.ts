@@ -2,8 +2,13 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Image } from 'src/core/database/entity/image.entity';
 import { Temple } from 'src/core/database/entity/temple.entity';
-import { ERole, EStatus } from 'src/core/enum/default.enum';
-import { returnPagingData } from 'src/helper/utils';
+import {
+  EMailType,
+  ENotificationType,
+  ERole,
+  EStatus,
+} from 'src/core/enum/default.enum';
+import { getMailFormat, returnPagingData } from 'src/helper/utils';
 import {
   DataSource,
   DeepPartial,
@@ -23,6 +28,15 @@ import { IUserData } from '@core/interface/default.interface';
 import { User } from '@core/database/entity/user.entity';
 import { VRemoveTempleMemberInput } from './dto/remove-temple-member.input';
 import { VGetTempleMembersArgs } from './dto/get-temple-members.args';
+import { sendMail } from '@helper/mailtrap';
+import { QueueProcessorService } from '@core/global/queueProcessor/quequeProcessor.service';
+import { QUEUE_MODULE_OPTIONS } from '@core/global/queueProcessor/queueIdentity.constant';
+import { NotificationService } from '@modules/notification/notification.service';
+import * as format from 'string-format';
+import { Notifications } from '@core/constants';
+import { ConfigService } from '@nestjs/config';
+import { EConfiguration } from '@core/config';
+import { VUpdateTempleInput } from './dto/update-temple-input';
 
 @Injectable()
 export class TempleService {
@@ -36,20 +50,39 @@ export class TempleService {
 
     private readonly userService: UserService,
 
+    private readonly notificationService: NotificationService,
+
+    private readonly queueProcessorService: QueueProcessorService,
+
+    private readonly configService: ConfigService,
+
     private readonly dataSource: DataSource,
   ) {}
 
   async createTemple(
-    adminId: number,
+    userData: IUserData,
     templeParams: VCreateTempleDto,
     avatar: Express.Multer.File,
     images?: Express.Multer.File[],
   ): Promise<Temple> {
+    const { id: adminId, name: userName } = userData;
     return await this.dataSource.transaction(async (manager: EntityManager) => {
+      const temple = await this.templeRepository.findOne({
+        where: { adminId, status: EStatus.PENDING },
+      });
+
+      if (temple) {
+        throw new HttpException(
+          ErrorMessage.TEMPLE_REGISTER_EXIST,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
       const templeRepository = manager.getRepository(Temple);
       const uploadedAvatar = await this.cloudinaryService.uploadImage(avatar);
       const newTemple = await templeRepository.save({
         ...templeParams,
+        name: templeParams.name.replace('Chùa', '').replace('chùa', '').trim(),
         avatar: uploadedAvatar.url,
         adminId,
       });
@@ -64,12 +97,24 @@ export class TempleService {
         await this.imageService.createImages(imagesUrl, manager);
       }
 
-      await this.userService.updateUserById(
-        adminId,
+      await this.notificationService.createNotification(
         {
-          role: ERole.TEMPLE_ADMIN,
+          title: Notifications.registerTemplesSent.title,
+          description: Notifications.registerTemplesSent.description(
+            newTemple.name,
+          ),
+          type: ENotificationType.TEMPLE_REGISTER_SENT,
         },
         manager,
+      );
+
+      await this.queueProcessorService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.JOBS.REGISTER_TEMPLE,
+        {
+          creatorName: userName,
+          templeName: templeParams.name,
+        },
       );
 
       return newTemple;
@@ -84,12 +129,12 @@ export class TempleService {
   }
 
   async getTempleDetail(id: number, userData?: IUserData): Promise<Temple> {
-    const { id: userId, role } = userData;
     return await this.templeRepository
       .createQueryBuilder('temple')
       .where({
         id,
-        ...(role !== ERole.SYSTEM && { status: EStatus.APPROVED }),
+        ...(userData &&
+          userData.role !== ERole.SYSTEM && { status: EStatus.APPROVED }),
       })
       .leftJoinAndSelect('temple.images', 'images')
       .leftJoinAndSelect(
@@ -97,7 +142,7 @@ export class TempleService {
         'followerTemples',
         'followerTemples.userId = :userId',
         {
-          userId,
+          ...(userData ? { userId: userData.userId } : { userId: -1 }),
         },
       )
       .getOne();
@@ -117,22 +162,28 @@ export class TempleService {
     return temple;
   }
 
-  async getTemples(query: VGetTemplesDto) {
-    const { skip, take, keyword } = query;
-    const [items, totalItems] = await this.templeRepository.findAndCount({
-      where: {
-        ...(keyword && { name: ILike(`%${keyword}%`) }),
+  async getTemples(getTemplesDto: VGetTemplesDto) {
+    const { skip, take, keyword } = getTemplesDto;
+    const query = this.templeRepository
+      .createQueryBuilder('temple')
+      .where({
         status: EStatus.APPROVED,
-      },
-      skip,
-      take,
-      order: {
-        priority: 'DESC',
-        createdAt: 'DESC',
-      },
-    });
+      })
+      .skip(skip)
+      .take(take)
+      .orderBy('temple.priority', 'DESC')
+      .addOrderBy('temple.createdAt', 'DESC');
 
-    return returnPagingData(items, totalItems, query);
+    if (keyword) {
+      query.andWhere(
+        '(temple.name ILIKE :keyword OR temple.address ILIKE :keyword)',
+        { keyword: `%${keyword}%` },
+      );
+    }
+
+    const [items, totalItems] = await query.getManyAndCount();
+
+    return returnPagingData(items, totalItems, getTemplesDto);
   }
 
   async systemGetTemples(systemGetTemplesQuery: VSystemGetTemplesDto) {
@@ -179,7 +230,10 @@ export class TempleService {
     return returnPagingData(data, count, systemGetTemplesQuery);
   }
 
-  async updateStatusTemple(updateStatusTemple: VUpdateStatusTempleInput) {
+  async updateStatusTemple(
+    updateStatusTemple: VUpdateStatusTempleInput,
+    userData: IUserData,
+  ) {
     const { id, status, rejectReason, blockReason } = updateStatusTemple;
     const temple = await this.templeRepository.findOne({
       where: { id },
@@ -192,10 +246,120 @@ export class TempleService {
       );
     }
 
-    return await this.templeRepository.update(id, {
-      status,
-      rejectReason,
-      blockReason,
+    return await this.dataSource.transaction(async (manager: EntityManager) => {
+      const user = await this.userService.getUserById(temple.adminId);
+
+      if (!user) {
+        throw new HttpException(
+          ErrorMessage.ACCOUNT_NOT_EXISTS,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (status === EStatus.APPROVED) {
+        await this.userService.updateUserById(
+          temple.adminId,
+          {
+            templeId: temple.id,
+            role: ERole.TEMPLE_ADMIN,
+            passwordChangedAt: new Date(),
+          },
+          manager,
+        );
+        await this.queueProcessorService.handleAddQueue(
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.NAME,
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.JOBS.APPROVE_TEMPLE,
+          {
+            userId: userData.id,
+            templeId: temple.id,
+            templeName: temple.name,
+          },
+        );
+
+        await this.notificationService.createNotification(
+          {
+            userId: temple.adminId,
+            title: Notifications.approveTempleUser.title,
+            description: Notifications.approveTempleUser.description(
+              temple.name,
+            ),
+            redirectTo: Notifications.approveTempleUser.redirectTo(temple.id),
+            type: ENotificationType.APPROVE_TEMPLE,
+          },
+          manager,
+        );
+
+        const mailFormat = getMailFormat(EMailType.APPROVE_TEMPLE);
+
+        await sendMail({
+          to: user.email,
+          title: mailFormat.title,
+          content: format(mailFormat.content, {
+            userName: user.userDetail.name,
+            templeName: temple.name,
+            templeDetailUrl:
+              this.configService.get<string>(EConfiguration.CLIENT_URL) +
+              `/temple/${temple.id}`,
+          }),
+        });
+      } else if (status === EStatus.REJECTED) {
+        await this.queueProcessorService.handleAddQueue(
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.NAME,
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.JOBS.REJECT_TEMPLE,
+          {
+            userId: userData.id,
+            templeName: temple.name,
+          },
+        );
+
+        await this.notificationService.createNotification(
+          {
+            userId: temple.adminId,
+            title: Notifications.rejectTemple.title,
+            description: Notifications.rejectTemple.description(temple.name),
+            type: ENotificationType.REJECT_TEMPLE,
+          },
+          manager,
+        );
+
+        const mailFormat = getMailFormat(EMailType.REJECT_TEMPLE);
+
+        await sendMail({
+          to: user.email,
+          title: mailFormat.title,
+          content: format(mailFormat.content, {
+            userName: user.userDetail.name,
+            templeName: temple.name,
+            rejectReason,
+          }),
+        });
+      } else if (status === EStatus.BLOCKED) {
+        await this.userService.updateUserByTempleId(
+          temple.id,
+          {
+            role: ERole.PUBLIC_USER,
+            passwordChangedAt: new Date(),
+          },
+          manager,
+        );
+
+        await this.queueProcessorService.handleAddQueue(
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.NAME,
+          QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.JOBS.BLOCK_TEMPLE,
+          {
+            userId: userData.id,
+            templeId: temple.id,
+            templeName: temple.name,
+            blockReason,
+          },
+        );
+      }
+
+      return await this.templeRepository.update(id, {
+        status,
+        rejectReason,
+        blockReason,
+      });
     });
   }
 
@@ -269,5 +433,43 @@ export class TempleService {
       .leftJoinAndSelect('temple.users', 'users')
       .leftJoinAndSelect('users.userDetail', 'userDetail')
       .getOne();
+  }
+
+  async updateTemple(templeId: number, updateTempleInput: VUpdateTempleInput) {
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const templeRepository = entityManager.getRepository(Temple);
+        const temple = await templeRepository.findOne({
+          where: { id: templeId },
+        });
+        if (updateTempleInput.name) {
+          updateTempleInput.name = updateTempleInput.name
+            .replace('Chùa', '')
+            .replace('chùa', '')
+            .trim();
+        }
+
+        const { descriptionImages, ...params } = updateTempleInput;
+
+        if (updateTempleInput.avatar) {
+          await this.cloudinaryService.deleteImagesByUrls([temple.avatar]);
+        }
+
+        if (descriptionImages && descriptionImages.length) {
+          await this.imageService.deleteImagesByTempleId(
+            templeId,
+            entityManager,
+          );
+
+          await this.imageService.createImages(
+            descriptionImages.map((descriptionImage) => ({
+              image: descriptionImage,
+              templeId,
+            })),
+          );
+        }
+        return await templeRepository.update(templeId, params);
+      },
+    );
   }
 }

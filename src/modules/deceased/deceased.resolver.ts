@@ -37,9 +37,14 @@ export class DeceasedResolver {
   @Query(() => DeceasedListRes, { name: 'familyGetListDeceased' })
   familyGetListDeceased(
     @GQLUserData() userData: IUserData,
-    @GQLArgsPaging() @Args() query: VFamilyGetListDeceasedArgs,
+    @GQLArgsPaging()
+    @Args()
+    familyGetListDeceasedArgs: VFamilyGetListDeceasedArgs,
   ) {
-    return this.deceasedService.getListDeceasedByFamilyId(userData.fid, query);
+    return this.deceasedService.getListDeceasedByFamilyId(
+      userData.fid,
+      familyGetListDeceasedArgs,
+    );
   }
 
   @GQLRoles([

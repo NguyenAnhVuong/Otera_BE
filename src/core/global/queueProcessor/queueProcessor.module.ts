@@ -11,6 +11,9 @@ import { UserModule } from '@modules/user/user.module';
 import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
 import { SendMailDeceasedConsumer } from './consumer/sendMailDeceased.processor';
 import { DeceasedModule } from '@modules/deceased/deceased.module';
+import { SendMailSystemConsumer } from './consumer/sendMailSystem.processor';
+
+// TODO Send mail when invite member to family and reminder when approaching the anniversary
 
 @Global()
 @Module({
@@ -25,6 +28,9 @@ import { DeceasedModule } from '@modules/deceased/deceased.module';
       {
         name: QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME,
       },
+      {
+        name: QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.NAME,
+      },
     ),
     TempleModule,
     NotificationModule,
@@ -38,6 +44,7 @@ import { DeceasedModule } from '@modules/deceased/deceased.module';
     SendMailDeathAnniversaryConsumer,
     SendMailDeceasedConsumer,
     QueueProcessorService,
+    SendMailSystemConsumer,
   ],
   exports: [QueueProcessorService],
 })
