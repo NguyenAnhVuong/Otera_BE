@@ -143,5 +143,5 @@ export class Deceased {
 
   @ManyToOne(() => User, (user) => user.modifiedDeceaseds)
   @Field(() => User, { nullable: true })
-  modifier: User;
+  modifier?: User;
 }

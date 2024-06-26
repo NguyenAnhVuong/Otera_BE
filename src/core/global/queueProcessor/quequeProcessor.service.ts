@@ -76,10 +76,10 @@ export class QueueProcessorService {
 
       case QUEUE_MODULE_OPTIONS.SEND_MAIL_DECEASED.NAME:
         queue = this.sendMailDeceasedQueue;
-
+        break;
       case QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.NAME:
         queue = this.sendMailSystemQueue;
-
+        break;
       default:
         break;
     }

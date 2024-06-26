@@ -26,7 +26,6 @@ export class InviteFamilyResolver {
     );
   }
 
-  // TODO add SUB_FAMILY_ADMIN role
   @GQLRoles([ERole.FAMILY_ADMIN])
   @Mutation(() => CreateRes, { name: 'inviteToFamily' })
   inviteToFamily(

@@ -1,5 +1,8 @@
+import { EConfiguration } from '@core/config';
 import { Notifications } from '@core/constants';
 import { EMailType, ENotificationType } from '@core/enum';
+import { sendMail } from '@helper/mailtrap';
+import { getMailFormat } from '@helper/utils';
 import { NotificationService } from '@modules/notification/notification.service';
 import { UserService } from '@modules/user/user.service';
 import {
@@ -12,12 +15,8 @@ import {
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Job } from 'bull';
-import { QUEUE_MODULE_OPTIONS } from '../queueIdentity.constant';
-import { getMailFormat } from '@helper/utils';
-import { sendMail } from '@helper/mailtrap';
 import * as format from 'string-format';
-import { DeceasedService } from '@modules/deceased/deceased.service';
-import { EConfiguration } from '@core/config';
+import { QUEUE_MODULE_OPTIONS } from '../queueIdentity.constant';
 
 @Processor(QUEUE_MODULE_OPTIONS.SEND_MAIL_SYSTEM.NAME)
 export class SendMailSystemConsumer {
@@ -28,7 +27,6 @@ export class SendMailSystemConsumer {
   constructor(
     private readonly userService: UserService,
     private readonly notificationService: NotificationService,
-    private readonly deceasedService: DeceasedService,
     private readonly configService: ConfigService,
   ) {}
 

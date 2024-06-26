@@ -33,6 +33,19 @@ export const Notifications = {
       `Bạn đã bị từ chối tham gia ${eventName}`,
     redirectTo: (eventId: number) => `/event/${eventId}`,
   },
+  deathAnniversaryComingAfterDays: {
+    title: 'Lễ giỗ sắp đến',
+    description: (deceasedName: string, days: number) =>
+      `Còn ${days} ngày nữa là đến ngày giỗ của ${deceasedName}`,
+    redirectTo: (id: number) => `/deceased/${id}`,
+  },
+  deathAnniversaryToday: {
+    title: 'Hôm nay là ngày giỗ',
+    description: (deceasedName: string) =>
+      `Hôm nay là ngày giỗ của ${deceasedName}`,
+    redirectTo: (id: number) => `/deceased/${id}`,
+  },
+
   requestDeathAnniversary: {
     title: 'Có yêu cầu tổ chức lễ giỗ mới',
     description: (deceasedName: string) =>

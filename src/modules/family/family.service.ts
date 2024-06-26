@@ -1,6 +1,5 @@
-import { ErrorMessage } from '@core/enum';
 import { IUserData } from '@core/interface/default.interface';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Family } from 'src/core/database/entity/family.entity';
 import { ERole } from 'src/core/enum/default.enum';
@@ -24,7 +23,6 @@ export class FamilyService {
     private readonly dataSource: DataSource,
   ) {}
 
-  // TODO approved by temple and generate family code
   async createFamily(
     familyParams: VCreateFamilyDto,
     avatar: Express.Multer.File,
@@ -35,10 +33,15 @@ export class FamilyService {
       const uploadedAvatar = await this.cloudinaryService.uploadImage(avatar);
       // get biggest family id
       const family = await familyRepository.findOne({
+        where: {},
         order: {
           id: 'DESC',
         },
       });
+      if (familyParams.description === 'undefined') {
+        familyParams.description = null;
+      }
+
       const newFamily = await familyRepository.save({
         ...familyParams,
         familyCode: `FM${family.id + 1}`,

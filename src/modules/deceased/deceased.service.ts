@@ -1,4 +1,9 @@
-import { ERole, EStatus, ErrorMessage } from '@core/enum';
+import {
+  EDeathAnniversaryStatus,
+  ERole,
+  EStatus,
+  ErrorMessage,
+} from '@core/enum';
 import { IUserData } from '@core/interface/default.interface';
 import { DeathAnniversaryService } from '@modules/death-anniversary/death-anniversary.service';
 import {
@@ -245,14 +250,15 @@ export class DeceasedService {
       .leftJoinAndSelect(
         'deceased.deathAnniversaries',
         'deathAnniversaries',
-        `deathAnniversaries.isDeleted = false AND deathAnniversaries.desiredStartTime > :now AND 
-        (deathAnniversaries.status = :pendingStatus OR deathAnniversaries.status = :approvedStatus OR
+        `deathAnniversaries.isDeleted = false AND deathAnniversaries.desiredStartTime > :now AND
+        (deathAnniversaries.status = :pendingStatus OR deathAnniversaries.status = :approvedStatus OR deathAnniversaries.status = :readyStatus OR
           (deathAnniversaries.status = :rejectStatus AND deathAnniversaries.enableUpdate = false))`,
         {
           now: new Date(),
-          pendingStatus: EStatus.PENDING,
-          rejectStatus: EStatus.REJECTED,
-          approvedStatus: EStatus.APPROVED,
+          pendingStatus: EDeathAnniversaryStatus.PENDING,
+          rejectStatus: EDeathAnniversaryStatus.REJECTED,
+          approvedStatus: EDeathAnniversaryStatus.APPROVED,
+          readyStatus: EDeathAnniversaryStatus.READY,
         },
       )
       .leftJoinAndSelect('deceased.temple', 'temple')
@@ -551,5 +557,33 @@ export class DeceasedService {
     );
 
     return await this.deceasedRepository.update({ id }, { isDeleted: false });
+  }
+
+  async getDeathAnniversaryNextDayDeceaseds(day?: number) {
+    let nextDay = dayjs();
+    console.log('nextDay: ', nextDay);
+    if (day) {
+      nextDay = dayjs().add(day, 'day');
+    }
+    console.log('nextDay: ', nextDay);
+    const nextWeekMonth = nextDay.month() + 1;
+    const nextWeekDay = nextDay.date();
+
+    return await this.deceasedRepository
+      .createQueryBuilder('deceased')
+      .where('deceased.status = :status', { status: EStatus.APPROVED })
+      .andWhere(
+        "EXTRACT(MONTH FROM TO_DATE(deceased.dateOfDeath, 'YYYY/MM/DD')) = :nextWeekMonth",
+        { nextWeekMonth },
+      )
+      .andWhere(
+        "EXTRACT(DAY FROM TO_DATE(deceased.dateOfDeath, 'YYYY/MM/DD')) = :nextWeekDay",
+        { nextWeekDay },
+      )
+      .leftJoinAndSelect('deceased.userDetail', 'userDetail')
+      .leftJoinAndSelect('deceased.family', 'family')
+      .leftJoinAndSelect('family.users', 'users')
+      .leftJoinAndSelect('users.userDetail', 'userDetail1')
+      .getMany();
   }
 }

@@ -142,7 +142,6 @@ export class EventParticipantService {
     return !!eventParticipant;
   }
 
-  // TODO add mail and notification when reject and notification when approve
   async updateEventParticipant(
     bookingEventInput: UpdateEventParticipantInput,
     userData: IUserData,

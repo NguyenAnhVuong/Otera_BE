@@ -24,6 +24,7 @@ export interface IJwtPayload {
   fid?: number;
   tid?: number[];
   iat?: number;
+  exp?: number;
 }
 
 export interface IResponseRefreshToken {
