@@ -1,7 +1,7 @@
 import { Notifications } from '@core/constants';
 import { EMailType, ENotificationType } from '@core/enum';
 import { sendMail } from '@helper/mailtrap';
-import { getMailFormat } from '@helper/utils';
+import { delay, getMailFormat } from '@helper/utils';
 import { NotificationService } from '@modules/notification/notification.service';
 import { TempleService } from '@modules/temple/temple.service';
 import {
@@ -19,11 +19,12 @@ import { ConfigService } from '@nestjs/config';
 import { EConfiguration } from '@core/config';
 import { UserService } from '@modules/user/user.service';
 import { DeathAnniversaryService } from '@modules/death-anniversary/death-anniversary.service';
+import { DeceasedService } from '@modules/deceased/deceased.service';
 
 @Processor(QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME)
 export class SendMailDeathAnniversaryConsumer {
   private readonly logger = new Logger(
-    QUEUE_MODULE_OPTIONS.SEND_MAIL_EVENT.NAME,
+    QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME,
   );
 
   constructor(
@@ -31,8 +32,13 @@ export class SendMailDeathAnniversaryConsumer {
     private readonly notificationService: NotificationService,
     private readonly userService: UserService,
     private readonly deathAnniversaryService: DeathAnniversaryService,
+    private readonly deceasedService: DeceasedService,
     private readonly configService: ConfigService,
   ) {}
+
+  private async delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
   @OnQueueActive()
   onQueueActive(job: Job) {
@@ -387,6 +393,145 @@ export class SendMailDeathAnniversaryConsumer {
               '/death-anniversary',
           }),
         });
+      }),
+    );
+  }
+
+  @Process(
+    QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
+      .NOTIFICATION_DEATH_ANNIVERSARY_COMING,
+  )
+  async handleSendMailDeathAnniversaryComing(job: Job) {
+    this.logger.log(`********OnQueueConsumer Job: ${JSON.stringify(job)}`);
+
+    const dateOfDeathNext7DaysDeceaseds =
+      await this.deceasedService.getDeathAnniversaryNextDayDeceaseds(7);
+
+    this.logger.log(
+      `********dateOfDeathNext7DaysDeceaseds: ${JSON.stringify(
+        dateOfDeathNext7DaysDeceaseds,
+      )}`,
+    );
+
+    const dateOfDeathNext3DaysDeceaseds =
+      await this.deceasedService.getDeathAnniversaryNextDayDeceaseds(3);
+
+    this.logger.log(
+      `********dateOfDeathNext3DaysDeceaseds: ${JSON.stringify(
+        dateOfDeathNext3DaysDeceaseds,
+      )}`,
+    );
+
+    const dateOfDeathTodayDeceaseds =
+      await this.deceasedService.getDeathAnniversaryNextDayDeceaseds();
+
+    const mailFormat = getMailFormat(
+      EMailType.DEATH_ANNIVERSARY_COMING_AFTER_DAYS,
+    );
+
+    const mailFormatToday = getMailFormat(EMailType.DEATH_ANNIVERSARY_TODAY);
+
+    await Promise.allSettled(
+      dateOfDeathNext7DaysDeceaseds.map(async (deceased) => {
+        return await Promise.allSettled(
+          deceased.family.users.map(async (user) => {
+            await this.notificationService.createNotification({
+              userId: user.id,
+              title: Notifications.deathAnniversaryComingAfterDays.title,
+              description:
+                Notifications.deathAnniversaryComingAfterDays.description(
+                  deceased.userDetail.name,
+                  7,
+                ),
+              redirectTo:
+                Notifications.deathAnniversaryComingAfterDays.redirectTo(
+                  deceased.id,
+                ),
+              type: ENotificationType.DEATH_ANNIVERSARY_COMING_AFTER_DAYS,
+            });
+            await delay(1000);
+            return await sendMail({
+              to: user.email,
+              title: mailFormat.title,
+              content: format(mailFormat.content, {
+                userName: user.userDetail.name,
+                deceasedName: deceased.userDetail.name,
+                days: 7,
+                requestDeathAnniversaryUrl:
+                  this.configService.get(EConfiguration.CLIENT_URL) +
+                  `/deceased/${deceased.id}`,
+              }),
+            });
+          }),
+        );
+      }),
+    );
+
+    await Promise.allSettled(
+      dateOfDeathNext3DaysDeceaseds.map(async (deceased) => {
+        return await Promise.allSettled(
+          deceased.family.users.map(async (user) => {
+            await this.notificationService.createNotification({
+              userId: user.id,
+              title: Notifications.deathAnniversaryComingAfterDays.title,
+              description:
+                Notifications.deathAnniversaryComingAfterDays.description(
+                  deceased.userDetail.name,
+                  3,
+                ),
+              redirectTo:
+                Notifications.deathAnniversaryComingAfterDays.redirectTo(
+                  deceased.id,
+                ),
+              type: ENotificationType.DEATH_ANNIVERSARY_COMING_AFTER_DAYS,
+            });
+            await delay(1000);
+            return await sendMail({
+              to: user.email,
+              title: mailFormat.title,
+              content: format(mailFormat.content, {
+                userName: user.userDetail.name,
+                deceasedName: deceased.userDetail.name,
+                days: 3,
+                requestDeathAnniversaryUrl:
+                  this.configService.get(EConfiguration.CLIENT_URL) +
+                  `/deceased/${deceased.id}`,
+              }),
+            });
+          }),
+        );
+      }),
+    );
+
+    return await Promise.allSettled(
+      dateOfDeathTodayDeceaseds.map(async (deceased) => {
+        return await Promise.allSettled(
+          deceased.family.users.map(async (user) => {
+            await this.notificationService.createNotification({
+              userId: user.id,
+              title: Notifications.deathAnniversaryToday.title,
+              description: Notifications.deathAnniversaryToday.description(
+                deceased.userDetail.name,
+              ),
+              redirectTo: Notifications.deathAnniversaryToday.redirectTo(
+                deceased.id,
+              ),
+              type: ENotificationType.DEATH_ANNIVERSARY_TODAY,
+            });
+            await delay(1000);
+            return await sendMail({
+              to: user.email,
+              title: mailFormatToday.title,
+              content: format(mailFormatToday.content, {
+                userName: user.userDetail.name,
+                deceasedName: deceased.userDetail.name,
+                deceasedUrl:
+                  this.configService.get(EConfiguration.CLIENT_URL) +
+                  `/deceased/${deceased.id}`,
+              }),
+            });
+          }),
+        );
       }),
     );
   }

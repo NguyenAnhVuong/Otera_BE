@@ -105,13 +105,18 @@ export class UserService {
                 },
               );
 
-            verifyToken = validationToken?.token;
-
-            if (!verifyToken) {
-              verifyToken = await this.jwtService.signAsync({
-                email: user.email,
-                type: EValidationTokenType.VERIFY_EMAIL,
-              });
+            if (!validationToken) {
+              verifyToken = await this.jwtService.signAsync(
+                {
+                  email: user.email,
+                  type: EValidationTokenType.VERIFY_EMAIL,
+                },
+                {
+                  expiresIn: this.configService.get<number>(
+                    EConfiguration.REGISTER_TOKEN_EXPIRES_IN,
+                  ),
+                },
+              );
 
               await this.validationTokenService.createValidationToken(
                 {
@@ -121,6 +126,33 @@ export class UserService {
                 },
                 entityManager,
               );
+            } else {
+              const decodeToken = this.jwtService.decode(
+                validationToken.token,
+              ) as IJwtPayload;
+
+              if (decodeToken.exp < new Date().getTime() / 1000) {
+                verifyToken = await this.jwtService.signAsync(
+                  {
+                    email: user.email,
+                    type: EValidationTokenType.VERIFY_EMAIL,
+                  },
+                  {
+                    expiresIn: this.configService.get<number>(
+                      EConfiguration.REGISTER_TOKEN_EXPIRES_IN,
+                    ),
+                  },
+                );
+                await this.validationTokenService.updateValidationToken(
+                  validationToken.id,
+                  {
+                    token: verifyToken,
+                  },
+                  entityManager,
+                );
+              } else {
+                verifyToken = validationToken.token;
+              }
             }
           }
         } else {
@@ -135,10 +167,26 @@ export class UserService {
             ...userRegister,
           });
 
-          verifyToken = await this.jwtService.signAsync({
-            email: userRegister.email,
-            type: EValidationTokenType.VERIFY_EMAIL,
-          });
+          verifyToken = await this.jwtService.signAsync(
+            {
+              email: userRegister.email,
+              type: EValidationTokenType.VERIFY_EMAIL,
+            },
+            {
+              expiresIn: this.configService.get<number>(
+                EConfiguration.REGISTER_TOKEN_EXPIRES_IN,
+              ),
+            },
+          );
+
+          await this.validationTokenService.createValidationToken(
+            {
+              email: user.email,
+              token: verifyToken,
+              type: EValidationTokenType.VERIFY_EMAIL,
+            },
+            entityManager,
+          );
         }
         const mailFormat = getMailFormat(EMailType.REGISTER);
 
@@ -214,7 +262,10 @@ export class UserService {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .addSelect('user.password')
-      .where('user.email = :email', { email: userLogin.email })
+      .where('user.email = :email AND user.status = :activeStatus', {
+        email: userLogin.email,
+        activeStatus: EAccountStatus.ACTIVE,
+      })
       .leftJoinAndSelect('user.userDetail', 'userDetail')
       .leftJoinAndSelect('user.temple', 'temple')
       .leftJoinAndSelect('user.followerTemples', 'followerTemples')

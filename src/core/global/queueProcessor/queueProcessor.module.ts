@@ -9,9 +9,9 @@ import { QUEUE_MODULE_OPTIONS } from './queueIdentity.constant';
 import { SendMailDeathAnniversaryConsumer } from './consumer/sendMailDeathAnniversary.processor';
 import { UserModule } from '@modules/user/user.module';
 import { DeathAnniversaryModule } from '@modules/death-anniversary/death-anniversary.module';
-import { SendMailDeceasedConsumer } from './consumer/sendMailDeceased.processor';
 import { DeceasedModule } from '@modules/deceased/deceased.module';
 import { SendMailSystemConsumer } from './consumer/sendMailSystem.processor';
+import { SendMailDeceasedConsumer } from './consumer/sendMailDeceased.processor';
 
 // TODO Send mail when invite member to family and reminder when approaching the anniversary
 
@@ -43,8 +43,8 @@ import { SendMailSystemConsumer } from './consumer/sendMailSystem.processor';
     SendMailEventConsumer,
     SendMailDeathAnniversaryConsumer,
     SendMailDeceasedConsumer,
-    QueueProcessorService,
     SendMailSystemConsumer,
+    QueueProcessorService,
   ],
   exports: [QueueProcessorService],
 })

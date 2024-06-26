@@ -29,8 +29,13 @@ export class Family {
   @Field(() => String)
   name: string;
 
-  @Column({ name: 'description', type: 'varchar', length: 1000 })
-  @Field(() => String)
+  @Column({
+    name: 'description',
+    type: 'varchar',
+    length: 5000,
+    nullable: true,
+  })
+  @Field(() => String, { nullable: true })
   description: string;
 
   @Column({ name: 'address', type: 'varchar', length: 250 })

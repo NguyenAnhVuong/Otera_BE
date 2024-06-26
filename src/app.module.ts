@@ -33,6 +33,7 @@ import { TempleModule } from './modules/temple/temple.module';
 import { UserModule } from './modules/user/user.module';
 import { OfferingModule } from '@modules/offering/offering.module';
 import { DeathAnniversaryOfferingModule } from '@modules/death-anniversary-offering/death-anniversary-offering.module';
+import { CronjobModule } from '@core/global/schedule/schedule.module';
 
 @Module({
   imports: [
@@ -93,6 +94,7 @@ import { DeathAnniversaryOfferingModule } from '@modules/death-anniversary-offer
     QueueProcessorModule,
     OfferingModule,
     DeathAnniversaryOfferingModule,
+    CronjobModule,
   ],
   controllers: [AppController],
   providers: [

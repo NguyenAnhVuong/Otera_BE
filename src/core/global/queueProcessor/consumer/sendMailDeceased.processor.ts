@@ -86,7 +86,7 @@ export class SendMailDeceasedConsumer {
 
     const mailFormat = getMailFormat(EMailType.DECLARE_DECEASED);
 
-    await Promise.allSettled(
+    return await Promise.allSettled(
       templeMembers.map(async (templeMember) => {
         await this.notificationService.createNotification({
           userId: templeMember.id,

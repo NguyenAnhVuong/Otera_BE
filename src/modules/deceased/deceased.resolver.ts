@@ -16,7 +16,7 @@ import { VUpdateDeceasedInput } from './dto/update-deceased.input';
 import { DeceasedListRes } from './entities/deceasedListRes.entity';
 import { DeceasedRes } from './entities/deceasedRes.entity';
 import { VAddDeceasedImageInput } from './dto/add-deceased-image.input';
-// TODO temple add deceased and redo deceased
+// TODO temple add deceased
 @Resolver(() => Deceased)
 export class DeceasedResolver {
   constructor(private readonly deceasedService: DeceasedService) {}

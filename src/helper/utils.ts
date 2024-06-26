@@ -1,6 +1,5 @@
 import { EMailType, EPriority } from '@core/enum';
 import * as bcrypt from 'bcrypt';
-import { title } from 'process';
 import { IPaginationResponse } from 'src/core/interface/default.interface';
 import * as winston from 'winston';
 
@@ -18,6 +17,10 @@ export async function handleBCRYPTHash(text: string, salt: string) {
 export async function handleBCRYPTCompare(text: string, hash: string) {
   return await bcrypt.compare(text, hash);
 }
+
+export const delay = async (ms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 export function returnPagingData(
   data: any,
@@ -416,6 +419,50 @@ export const getMailFormat = (type: EMailType) => {
                         </td>
                     </tr>
                   </table>`,
+      };
+
+    case EMailType.DEATH_ANNIVERSARY_COMING_AFTER_DAYS:
+      return {
+        title: '【Otera】Ngày giỗ sắp đến',
+        content: `
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+            <tr>
+                <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                    <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+        
+                    <p style="font-size: 16px; color: #333333;">Còn {days} ngày nữa giỗ tưởng nhớ {deceasedName}. 
+                    Hãy truy cập hệ thống dành chút thời gian để yêu cầu tổ chức lễ giỗ cho {deceasedName} nào.</p>
+        
+                    <p style="font-size: 16px; color: #333333;">
+                        <a href="{requestDeathAnniversaryUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Yêu cầu tổ chức lễ giỗ</a>
+                    </p>
+        
+                    {footer}
+                </td>
+            </tr>
+          </table>`,
+      };
+
+    case EMailType.DEATH_ANNIVERSARY_TODAY:
+      return {
+        title: '【Otera】Hôm nay là ngày giỗ',
+        content: `
+          <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+            <tr>
+                <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                    <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+        
+                    <p style="font-size: 16px; color: #333333;">Hôm nay là ngày giỗ của {deceasedName}. 
+                    Hãy dành chút thời gian để về {deceasedName}</p>
+        
+                    <p style="font-size: 16px; color: #333333;">
+                        <a href="{deceasedUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Tưởng nhớ {deceasedName}</a>
+                    </p>
+        
+                    {footer}
+                </td>
+            </tr>
+          </table>`,
       };
 
     case EMailType.DECLARE_DECEASED:
