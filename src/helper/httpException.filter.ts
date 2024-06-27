@@ -1,21 +1,17 @@
+import { EConfiguration } from '@core/config';
+import { EEnvironment, ErrorMessage } from '@core/enum';
+import { TLanguage } from '@core/global/i18nCustom/i18nCustom.service';
+import { UserService } from '@modules/user/user.service';
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
   HttpStatus,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { I18nService } from 'nestjs-i18n';
-import { EEnvironment, ErrorMessage } from '@core/enum';
-import {
-  I18nCustomService,
-  TLanguage,
-} from '@core/global/i18nCustom/i18nCustom.service';
-import { UserService } from '@modules/user/user.service';
 import { ConfigService } from '@nestjs/config';
-import { EConfiguration } from '@core/config';
 import { GqlArgumentsHost, GqlExceptionFilter } from '@nestjs/graphql';
 import { GraphQLResolveInfo } from 'graphql';
 
@@ -31,8 +27,8 @@ export class HttpExceptionFilter
 {
   private logger: Logger = new Logger('Exception');
   constructor(
-    private readonly i18n: I18nService,
-    private readonly i18nCustomService: I18nCustomService,
+    // private readonly i18n: I18nService,
+    // private readonly i18nCustomService: I18nCustomService,
     private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {}
@@ -64,7 +60,7 @@ export class HttpExceptionFilter
           ? exception.getStatus()
           : HttpStatus.INTERNAL_SERVER_ERROR;
 
-      let message =
+      const message =
         exception instanceof HttpException
           ? exception.getResponse()
           : HttpStatus.INTERNAL_SERVER_ERROR;
@@ -73,9 +69,9 @@ export class HttpExceptionFilter
 
       if (typeof message === 'string') {
         errorCode = message.replace('error.', '');
-        message = await this.i18n.translate(message, {
-          lang: language,
-        });
+        // message = await this.i18n.translate(message, {
+        //   lang: language,
+        // });
       }
 
       if (typeof message === 'object') {
@@ -88,9 +84,9 @@ export class HttpExceptionFilter
           this.configService.get(EConfiguration.ENVIRONMENT) !==
           EEnvironment.DEVELOPMENT
         ) {
-          message = await this.i18n.translate(ErrorMessage.INVALID_PARAM, {
-            lang: language,
-          });
+          // message = await this.i18n.translate(ErrorMessage.INVALID_PARAM, {
+          //   lang: language,
+          // });
         }
       }
 

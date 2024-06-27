@@ -1,6 +1,5 @@
 import { GQLRolesGuard } from '@core/global/auth/guards/gqlRoles.guard';
 import { ConstanceModule } from '@core/global/constance/constance.module';
-import { I18nCustomModule } from '@core/global/i18nCustom/i18nCustom.module';
 import { QueueProcessorModule } from '@core/global/queueProcessor/queueProcessor.module';
 import { HttpExceptionFilter } from '@helper/httpException.filter';
 import DatabaseMysqlLogger from '@helper/typeorm.logger';
@@ -75,7 +74,7 @@ import { CronjobModule } from '@core/global/schedule/schedule.module';
         },
       }),
     }),
-    I18nCustomModule,
+    // I18nCustomModule,
     ConstanceModule,
     UserModule,
     TempleModule,

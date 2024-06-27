@@ -1,17 +1,16 @@
 version: "3.6"
 services:
-  postgres:
-    image: postgres:15
-    container_name: postgres-database
-    ports:
-      - '${DB_POSTGRESQL_PORT}:5432'
+  nest-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest-api 
     restart: always
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    environment:
-      POSTGRESQL_DB: ${DB_POSTGRESQL_DB}
-      POSTGRESQL_USER: ${DB_POSTGRESQL_USER}
-      POSTGRES_PASSWORD: ${DB_POSTGRESQL_PASSWORD}
+    ports:
+      - 3008:3008
+    env_file:
+      - .env
+
   graphql-engine:
     image: hasura/graphql-engine:v2.35.0
     ports:
