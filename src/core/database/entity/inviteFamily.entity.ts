@@ -4,9 +4,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
+import { Family } from './family.entity';
 
 @Entity('inviteFamilies')
 @ObjectType()
@@ -63,4 +67,14 @@ export class InviteFamily {
   })
   @Field(() => Date, { nullable: true })
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.inviteFamilies)
+  @Field(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @ManyToOne(() => Family, (family) => family.inviteFamilies)
+  @Field(() => Family)
+  @JoinColumn({ name: 'familyId' })
+  family: Family;
 }

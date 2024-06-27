@@ -28,7 +28,7 @@ import { VUserRegisterDto } from './dto/user-register.dto';
 import { GetFamilyMembersArgs } from '../family/dto/get-family-members.dto';
 import { VGetTempleMembersArgs } from '@modules/temple/dto/get-temple-members.args';
 import { ValidationTokenService } from '@modules/validation-token/validation-token.service';
-import { sendMail } from '@helper/mailtrap';
+import { FooterMail, sendMail } from '@helper/mailtrap';
 import * as format from 'string-format';
 import { VResetPasswordInput } from './dto/reset-password.input';
 import * as dayjs from 'dayjs';
@@ -198,6 +198,7 @@ export class UserService {
             verifyUrl: `${this.configService.get<string>(
               EConfiguration.CLIENT_URL,
             )}/verify/register?token=${verifyToken}`,
+            footer: FooterMail.footer,
           }),
         });
 
@@ -502,7 +503,7 @@ export class UserService {
     return returnPagingData(data, count, getFamilyMembersArgs);
   }
 
-  removeFamilyMember(userData: IUserData, familyMemberId: number) {
+  async removeFamilyMember(userData: IUserData, familyMemberId: number) {
     return this.dataSource.transaction(async (entityManager: EntityManager) => {
       const userRepository = entityManager.getRepository(User);
 
@@ -640,6 +641,7 @@ export class UserService {
             resetPasswordUrl: `${this.configService.get<string>(
               EConfiguration.CLIENT_URL,
             )}/reset-password?token=${verifyToken}`,
+            footer: FooterMail.footer,
           }),
         });
 

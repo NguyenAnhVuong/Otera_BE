@@ -4,6 +4,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { DeathAnniversary } from './deathAnniversary.entity';
 import { Deceased } from './deceased.entity';
 import { User } from './user.entity';
+import { InviteFamily } from './inviteFamily.entity';
 
 @Entity('families')
 @ObjectType()
@@ -89,4 +90,8 @@ export class Family {
   )
   @Field(() => [DeathAnniversary])
   deathAnniversaries: DeathAnniversary[];
+
+  @OneToMany(() => InviteFamily, (inviteFamily) => inviteFamily.family)
+  @Field(() => [InviteFamily])
+  inviteFamilies: InviteFamily[];
 }

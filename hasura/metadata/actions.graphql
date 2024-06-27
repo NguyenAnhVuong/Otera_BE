@@ -219,10 +219,6 @@ type GetTempleByIdOutputData {
   phone: String
   email: String
   website: String
-  priority: EPriority!
-  priorityExpired: String
-  plan: EPlan!
-  planExpired: String
   status: EStatus!
   adminId: Int!
   createdAt: String!
@@ -255,10 +251,6 @@ type TempleAction {
   phone: String
   email: String
   website: String
-  priority: EPriority!
-  priorityExpired: String
-  plan: EPlan!
-  planExpired: String
   status: EStatus!
   adminId: Int!
   createdAt: String!

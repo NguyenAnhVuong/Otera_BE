@@ -95,18 +95,18 @@ export class Event {
   @Field(() => String, { nullable: true })
   email: string;
 
-  @Column({
-    name: 'priority',
-    type: 'enum',
-    enum: EPriority,
-    default: EPriority.MEDIUM,
-  })
-  @Field(() => EPriority, { defaultValue: EPriority.MEDIUM })
-  priority: EPriority;
+  // @Column({
+  //   name: 'priority',
+  //   type: 'enum',
+  //   enum: EPriority,
+  //   default: EPriority.MEDIUM,
+  // })
+  // @Field(() => EPriority, { defaultValue: EPriority.MEDIUM })
+  // priority: EPriority;
 
-  @Column({ name: 'priorityExpired', type: 'timestamptz', nullable: true })
-  @Field(() => Date, { nullable: true })
-  priorityExpired: Date | null;
+  // @Column({ name: 'priorityExpired', type: 'timestamptz', nullable: true })
+  // @Field(() => Date, { nullable: true })
+  // priorityExpired: Date | null;
 
   @Column({ name: 'isDeleted', type: 'boolean', default: false })
   @Field(() => Boolean)

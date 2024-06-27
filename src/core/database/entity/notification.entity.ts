@@ -4,9 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 registerEnumType(ENotificationType, {
   name: 'ENotificationType',
@@ -78,4 +81,10 @@ export class Notification {
   })
   @Field(() => Date, { nullable: true })
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.notifications)
+  @Field(() => User)
+  @JoinColumn({ name: 'userId' })
+  @Field(() => User, { nullable: true })
+  user: User;
 }

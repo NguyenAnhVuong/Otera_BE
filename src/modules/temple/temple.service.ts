@@ -1,4 +1,14 @@
+import { EConfiguration } from '@core/config';
+import { Notifications } from '@core/constants';
+import { User } from '@core/database/entity/user.entity';
+import { ErrorMessage } from '@core/enum';
+import { QueueProcessorService } from '@core/global/queueProcessor/quequeProcessor.service';
+import { QUEUE_MODULE_OPTIONS } from '@core/global/queueProcessor/queueIdentity.constant';
+import { IUserData } from '@core/interface/default.interface';
+import { FooterMail, sendMail } from '@helper/mailtrap';
+import { NotificationService } from '@modules/notification/notification.service';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Image } from 'src/core/database/entity/image.entity';
 import { Temple } from 'src/core/database/entity/temple.entity';
@@ -9,33 +19,17 @@ import {
   EStatus,
 } from 'src/core/enum/default.enum';
 import { getMailFormat, returnPagingData } from 'src/helper/utils';
-import {
-  DataSource,
-  DeepPartial,
-  EntityManager,
-  ILike,
-  Repository,
-} from 'typeorm';
+import * as format from 'string-format';
+import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { UserService } from '../user/user.service';
 import { ImageService } from './../image/image.service';
 import { VCreateTempleDto } from './dto/create-temple.dto';
+import { VGetTempleMembersArgs } from './dto/get-temple-members.args';
 import { VGetTemplesDto } from './dto/get-temples.dto';
-import { ErrorMessage } from '@core/enum';
+import { VRemoveTempleMemberInput } from './dto/remove-temple-member.input';
 import { VSystemGetTemplesDto } from './dto/system-get-temples.input';
 import { VUpdateStatusTempleInput } from './dto/update-status-temple.input';
-import { IUserData } from '@core/interface/default.interface';
-import { User } from '@core/database/entity/user.entity';
-import { VRemoveTempleMemberInput } from './dto/remove-temple-member.input';
-import { VGetTempleMembersArgs } from './dto/get-temple-members.args';
-import { sendMail } from '@helper/mailtrap';
-import { QueueProcessorService } from '@core/global/queueProcessor/quequeProcessor.service';
-import { QUEUE_MODULE_OPTIONS } from '@core/global/queueProcessor/queueIdentity.constant';
-import { NotificationService } from '@modules/notification/notification.service';
-import * as format from 'string-format';
-import { Notifications } from '@core/constants';
-import { ConfigService } from '@nestjs/config';
-import { EConfiguration } from '@core/config';
 import { VUpdateTempleInput } from './dto/update-temple-input';
 
 @Injectable()
@@ -129,23 +123,24 @@ export class TempleService {
   }
 
   async getTempleDetail(id: number, userData?: IUserData): Promise<Temple> {
-    return await this.templeRepository
+    const query = this.templeRepository
       .createQueryBuilder('temple')
-      .where({
-        id,
-        ...(userData &&
-          userData.role !== ERole.SYSTEM && { status: EStatus.APPROVED }),
-      })
+      .where('temple.id = :id', { id })
       .leftJoinAndSelect('temple.images', 'images')
       .leftJoinAndSelect(
         'temple.followerTemples',
         'followerTemples',
         'followerTemples.userId = :userId',
         {
-          ...(userData ? { userId: userData.userId } : { userId: -1 }),
+          ...(userData ? { userId: userData.id } : { userId: -1 }),
         },
-      )
-      .getOne();
+      );
+
+    if (userData && userData.role !== ERole.SYSTEM) {
+      query.andWhere('temple.status = :status', { status: EStatus.APPROVED });
+    }
+
+    return await query.getOne();
   }
 
   async getTempleByAdminId(adminId: number): Promise<Temple> {
@@ -171,8 +166,8 @@ export class TempleService {
       })
       .skip(skip)
       .take(take)
-      .orderBy('temple.priority', 'DESC')
-      .addOrderBy('temple.createdAt', 'DESC');
+      // .orderBy('temple.priority', 'DESC')
+      .orderBy('temple.createdAt', 'DESC');
 
     if (keyword) {
       query.andWhere(
@@ -300,6 +295,7 @@ export class TempleService {
             templeDetailUrl:
               this.configService.get<string>(EConfiguration.CLIENT_URL) +
               `/temple/${temple.id}`,
+            footer: FooterMail.footer,
           }),
         });
       } else if (status === EStatus.REJECTED) {
@@ -331,6 +327,7 @@ export class TempleService {
             userName: user.userDetail.name,
             templeName: temple.name,
             rejectReason,
+            footer: FooterMail.footer,
           }),
         });
       } else if (status === EStatus.BLOCKED) {

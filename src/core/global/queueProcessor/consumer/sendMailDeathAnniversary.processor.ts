@@ -1,6 +1,6 @@
 import { Notifications } from '@core/constants';
 import { EMailType, ENotificationType } from '@core/enum';
-import { sendMail } from '@helper/mailtrap';
+import { FooterMail, sendMail } from '@helper/mailtrap';
 import { delay, getMailFormat } from '@helper/utils';
 import { NotificationService } from '@modules/notification/notification.service';
 import { TempleService } from '@modules/temple/temple.service';
@@ -96,6 +96,7 @@ export class SendMailDeathAnniversaryConsumer {
             deathAnniversaryUrl:
               this.configService.get(EConfiguration.CLIENT_URL) +
               '/death-anniversary',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -125,6 +126,7 @@ export class SendMailDeathAnniversaryConsumer {
             deathAnniversaryUrl:
               this.configService.get(EConfiguration.CLIENT_URL) +
               '/death-anniversary',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -191,6 +193,7 @@ export class SendMailDeathAnniversaryConsumer {
             deathAnniversaryUrl:
               this.configService.get(EConfiguration.CLIENT_URL) +
               '/death-anniversary',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -259,6 +262,7 @@ export class SendMailDeathAnniversaryConsumer {
             deathAnniversaryUrl:
               this.configService.get(EConfiguration.CLIENT_URL) +
               '/death-anniversary',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -325,6 +329,7 @@ export class SendMailDeathAnniversaryConsumer {
             deathAnniversaryUrl:
               this.configService.get(EConfiguration.CLIENT_URL) +
               '/death-anniversary',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -391,6 +396,7 @@ export class SendMailDeathAnniversaryConsumer {
             deathAnniversaryUrl:
               this.configService.get(EConfiguration.CLIENT_URL) +
               '/death-anniversary',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -460,6 +466,7 @@ export class SendMailDeathAnniversaryConsumer {
                 requestDeathAnniversaryUrl:
                   this.configService.get(EConfiguration.CLIENT_URL) +
                   `/deceased/${deceased.id}`,
+                footer: FooterMail.footer,
               }),
             });
           }),
@@ -496,6 +503,7 @@ export class SendMailDeathAnniversaryConsumer {
                 requestDeathAnniversaryUrl:
                   this.configService.get(EConfiguration.CLIENT_URL) +
                   `/deceased/${deceased.id}`,
+                footer: FooterMail.footer,
               }),
             });
           }),
@@ -528,6 +536,7 @@ export class SendMailDeathAnniversaryConsumer {
                 deceasedUrl:
                   this.configService.get(EConfiguration.CLIENT_URL) +
                   `/deceased/${deceased.id}`,
+                footer: FooterMail.footer,
               }),
             });
           }),

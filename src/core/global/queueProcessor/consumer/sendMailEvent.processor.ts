@@ -11,7 +11,7 @@ import { QUEUE_MODULE_OPTIONS } from '../queueIdentity.constant';
 import { getMailFormat } from '@helper/utils';
 import { EMailType, ENotificationType } from '@core/enum';
 import { TempleService } from '@modules/temple/temple.service';
-import { sendMail } from '@helper/mailtrap';
+import { FooterMail, sendMail } from '@helper/mailtrap';
 import * as format from 'string-format';
 import { ConfigService } from '@nestjs/config';
 import { EConfiguration } from '@core/config';
@@ -95,6 +95,7 @@ export class SendMailEventConsumer {
             eventEmail: job.data.eventEmail
               ? 'Email: ' + job.data.eventEmail
               : '',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -149,6 +150,7 @@ export class SendMailEventConsumer {
             eventEmail: job.data.eventEmail
               ? 'Email: ' + job.data.eventEmail
               : '',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -193,6 +195,7 @@ export class SendMailEventConsumer {
             eventEmail: job.data.eventEmail
               ? 'Email: ' + job.data.eventEmail
               : '',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -241,6 +244,7 @@ export class SendMailEventConsumer {
             eventEmail: job.data.eventEmail
               ? 'Email: ' + job.data.eventEmail
               : '',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -280,6 +284,7 @@ export class SendMailEventConsumer {
             eventEmail: job.data.eventEmail
               ? 'Email: ' + job.data.eventEmail
               : '',
+            footer: FooterMail.footer,
           }),
         });
       }),

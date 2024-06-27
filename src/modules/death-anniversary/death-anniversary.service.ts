@@ -55,6 +55,7 @@ export class DeathAnniversaryService {
     return !!deathAnniversary;
   }
 
+  // TODO check if request exist
   async createDeathAnniversary(
     createDeathAnniversaryInput: CreateDeathAnniversaryInput,
     userData: IUserData,

@@ -561,11 +561,11 @@ export class DeceasedService {
 
   async getDeathAnniversaryNextDayDeceaseds(day?: number) {
     let nextDay = dayjs();
-    console.log('nextDay: ', nextDay);
+
     if (day) {
       nextDay = dayjs().add(day, 'day');
     }
-    console.log('nextDay: ', nextDay);
+
     const nextWeekMonth = nextDay.month() + 1;
     const nextWeekDay = nextDay.date();
 

@@ -14,7 +14,7 @@ import { ConfigService } from '@nestjs/config';
 import { Job } from 'bull';
 import { QUEUE_MODULE_OPTIONS } from '../queueIdentity.constant';
 import { getMailFormat } from '@helper/utils';
-import { sendMail } from '@helper/mailtrap';
+import { FooterMail, sendMail } from '@helper/mailtrap';
 import * as format from 'string-format';
 import { DeceasedService } from '@modules/deceased/deceased.service';
 import { EConfiguration } from '@core/config';
@@ -107,6 +107,7 @@ export class SendMailDeceasedConsumer {
             deceasedUrl:
               this.configService.get(EConfiguration.CLIENT_URL) +
               `/temple/deceased`,
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -198,6 +199,7 @@ export class SendMailDeceasedConsumer {
             deceasedUrl:
               this.configService.get(EConfiguration.CLIENT_URL) +
               `/deceased/${job.data.deceasedId}`,
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -251,6 +253,7 @@ export class SendMailDeceasedConsumer {
         userName: creator.userDetail.name,
         deceasedName: deceased.userDetail.name,
         rejectReason: job.data.rejectReason,
+        footer: FooterMail.footer,
       }),
     });
   }
@@ -309,6 +312,7 @@ export class SendMailDeceasedConsumer {
             deleterName: job.data.userName,
             userName: familyMember.userDetail.name,
             deceasedName: deceased.userDetail.name,
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -370,6 +374,7 @@ export class SendMailDeceasedConsumer {
             deceasedUrl:
               this.configService.get(EConfiguration.CLIENT_URL) +
               `/deceased/${job.data.deceasedId}`,
+            footer: FooterMail.footer,
           }),
         });
       }),

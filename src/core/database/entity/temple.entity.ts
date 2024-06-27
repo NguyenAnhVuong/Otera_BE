@@ -6,7 +6,6 @@ import { Deceased } from './deceased.entity';
 import { Event } from './event.entity';
 import { FollowerTemple } from './followerTemple.entity';
 import { Image } from './image.entity';
-import { Review } from './review.entity';
 import { User } from './user.entity';
 
 registerEnumType(EPriority, {
@@ -53,26 +52,26 @@ export class Temple {
   @Field(() => String, { nullable: true })
   website: string | null;
 
-  @Column({
-    name: 'priority',
-    type: 'enum',
-    enum: EPriority,
-    default: EPriority.MEDIUM,
-  })
-  @Field(() => EPriority, { defaultValue: EPriority.MEDIUM })
-  priority: EPriority;
+  // @Column({
+  //   name: 'priority',
+  //   type: 'enum',
+  //   enum: EPriority,
+  //   default: EPriority.MEDIUM,
+  // })
+  // @Field(() => EPriority, { defaultValue: EPriority.MEDIUM })
+  // priority: EPriority;
 
-  @Column({ name: 'priorityExpired', type: 'timestamptz', nullable: true })
-  @Field(() => Date, { nullable: true })
-  priorityExpired: Date | null;
+  // @Column({ name: 'priorityExpired', type: 'timestamptz', nullable: true })
+  // @Field(() => Date, { nullable: true })
+  // priorityExpired: Date | null;
 
-  @Column({ name: 'plan', type: 'enum', enum: EPlan, default: EPlan.FREE })
-  @Field(() => EPlan, { defaultValue: EPlan.FREE })
-  plan: EPlan;
+  // @Column({ name: 'plan', type: 'enum', enum: EPlan, default: EPlan.FREE })
+  // @Field(() => EPlan, { defaultValue: EPlan.FREE })
+  // plan: EPlan;
 
-  @Column({ name: 'planExpired', type: 'timestamptz', nullable: true })
-  @Field(() => Date, { nullable: true })
-  planExpired: Date | null;
+  // @Column({ name: 'planExpired', type: 'timestamptz', nullable: true })
+  // @Field(() => Date, { nullable: true })
+  // planExpired: Date | null;
 
   @Column({
     name: 'status',
@@ -132,10 +131,6 @@ export class Temple {
   @OneToMany(() => Image, (image) => image.temple)
   @Field(() => [Image])
   images: Image[];
-
-  @OneToMany(() => Review, (review) => review.temple)
-  @Field(() => [Review])
-  reviews: Review[];
 
   @OneToMany(
     () => DeathAnniversary,
