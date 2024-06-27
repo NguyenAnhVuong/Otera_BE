@@ -1,7 +1,7 @@
 import { EConfiguration } from '@core/config';
 import { Notifications } from '@core/constants';
 import { EMailType, ENotificationType } from '@core/enum';
-import { sendMail } from '@helper/mailtrap';
+import { FooterMail, sendMail } from '@helper/mailtrap';
 import { getMailFormat } from '@helper/utils';
 import { NotificationService } from '@modules/notification/notification.service';
 import { UserService } from '@modules/user/user.service';
@@ -75,6 +75,7 @@ export class SendMailSystemConsumer {
             templeManagementUrl:
               this.configService.get<string>(EConfiguration.CLIENT_URL) +
               '/system/temple',
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -111,6 +112,7 @@ export class SendMailSystemConsumer {
             templeManagementUrl:
               this.configService.get<string>(EConfiguration.CLIENT_URL) +
               `/temple/${job.data.templeId}`,
+            footer: FooterMail.footer,
           }),
         });
       }),
@@ -183,6 +185,7 @@ export class SendMailSystemConsumer {
             userName: user.userDetail.name,
             templeName: job.data.templeName,
             blockReason: job.data.blockReason,
+            footer: FooterMail.footer,
           }),
         });
       }),

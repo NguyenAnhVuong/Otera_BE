@@ -1,8 +1,4 @@
-import {
-  EDeathAnniversaryStatus,
-  EDeathAnniversaryType,
-  EStatus,
-} from '@core/enum';
+import { EDeathAnniversaryStatus, EDeathAnniversaryType } from '@core/enum';
 import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 import {
   Column,
@@ -14,11 +10,11 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { DeathAnniversaryOffering } from './deathAnniversaryOffering.entity';
 import { Deceased } from './deceased.entity';
+import { Family } from './family.entity';
 import { Temple } from './temple.entity';
 import { User } from './user.entity';
-import { Family } from './family.entity';
-import { DeathAnniversaryOffering } from './deathAnniversaryOffering.entity';
 
 registerEnumType(EDeathAnniversaryStatus, {
   name: 'EDeathAnniversaryStatus',

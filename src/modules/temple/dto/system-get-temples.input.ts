@@ -1,4 +1,4 @@
-import { EPriority, EStatus } from '@core/enum';
+import { EStatus } from '@core/enum';
 import { OrderBy } from '@core/global/entities/order.entity';
 import { GQLPaginationArgs } from '@core/global/entities/paginationQuery.entity';
 import { ArgsType, Field } from '@nestjs/graphql';

@@ -2,28 +2,13 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type EventParticipant {
+type Offering {
   id: Int!
-  eventId: Int!
-  userId: Int!
-  bookingStatus: EBookingStatus!
-  code: String
-  rejectReason: String
-  isDeleted: Boolean!
-  approverId: Int
-  checkInAt: DateTime
+  name: String!
+  image: String!
   createdAt: DateTime!
   updatedAt: DateTime
-  event: Event!
-  user: User!
-  approver: User
-}
-
-enum EBookingStatus {
-  BOOKING
-  REJECTED
-  APPROVED
-  CANCEL
+  deathAnniversaryOfferings: [DeathAnniversaryOffering!]!
 }
 
 """
@@ -31,70 +16,34 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type EventParticipantType {
+type DeathAnniversaryOffering {
   id: Int!
-  eventId: Int!
-  role: ERole!
+  deathAnniversaryId: Int!
+  offeringId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deathAnniversary: DeathAnniversary!
+  offering: Offering!
+}
+
+type InviteFamily {
+  id: Int!
+  familyId: Int!
+  userId: Int!
+  status: EStatus!
   isDeleted: Boolean!
+  expiredAt: DateTime!
   createdAt: DateTime!
   updatedAt: DateTime
-  event: Event!
-}
-
-enum ERole {
-  SYSTEM
-  FAMILY_ADMIN
-  FAMILY_MEMBER
-  TEMPLE_ADMIN
-  TEMPLE_MEMBER
-  PUBLIC_USER
-}
-
-type Image {
-  id: Int!
-  deceasedId: Int
-  templeId: Int
-  eventId: Int
-  image: String!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deceased: Deceased!
-  temple: Temple!
-  event: Event!
-}
-
-type Event {
-  id: Int!
-  templeId: Int
-  creatorId: Int!
-  name: String!
-  avatar: String!
-  description: String
-  startDateEvent: DateTime!
-  endDateEvent: DateTime!
-  startDateBooking: DateTime
-  endDateBooking: DateTime
-  address: String!
-  phone: String
-  email: String
-  priority: EPriority!
-  priorityExpired: DateTime
-  isDeleted: Boolean!
-  maxParticipant: Int
-  isFreeOpen: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  eventParticipants: [EventParticipant!]!
-  images: [Image!]!
-  eventParticipantTypes: [EventParticipantType!]!
   user: User!
-  temple: Temple!
+  family: Family!
 }
 
-enum EPriority {
-  LOW
-  MEDIUM
-  HIGH
+enum EStatus {
+  REJECTED
+  PENDING
+  APPROVED
+  BLOCKED
 }
 
 type Family {
@@ -112,126 +61,7 @@ type Family {
   users: [User!]!
   deceaseds: [Deceased!]!
   deathAnniversaries: [DeathAnniversary!]!
-}
-
-enum EStatus {
-  REJECTED
-  PENDING
-  APPROVED
-  BLOCKED
-}
-
-type Review {
-  id: Int!
-  userId: Int!
-  templeId: Int
-  eventId: Int
-  content: String!
-  rating: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  temple: Temple!
-  user: User!
-}
-
-type FollowerTemple {
-  id: Int!
-  templeId: Int!
-  userId: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  user: User!
-  temple: Temple!
-}
-
-type UserDetail {
-  id: Int!
-  avatar: String!
-  name: String!
-  phone: String
-  birthday: String!
-  address: String
-  gender: EGender!
-  citizenNumber: String
-  createdAt: DateTime!
-  updatedAt: DateTime
-  user: User!
-  deceased: Deceased!
-}
-
-enum EGender {
-  MALE
-  FEMALE
-  OTHER
-}
-
-type User {
-  id: Int!
-  email: String!
-  status: EAccountStatus!
-  role: ERole!
-  familyId: Int
-  templeId: Int
-  userDetailId: Int
-  passwordChangedAt: DateTime
-  createdAt: DateTime!
-  updatedAt: DateTime
-  temple: Temple!
-  userDetail: UserDetail!
-  family: Family
-  reviews: [Review!]!
-  deathAnniversaries: [DeathAnniversary!]!
-  followerTemples: [FollowerTemple!]!
-  events: [Event!]!
-  eventParticipants: [EventParticipant!]!
-  modifiedDeceaseds: [Deceased!]!
-}
-
-enum EAccountStatus {
-  INACTIVE
-  ACTIVE
-}
-
-type Deceased {
-  id: Int!
-  dateOfDeath: String!
-  tombAddress: String!
-  description: String
-  rejectReason: String
-  userDetailId: Int
-  templeId: Int!
-  familyId: Int
-  creatorId: Int!
-  modifierId: Int
-  isDeleted: Boolean!
-  status: EStatus!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  temple: Temple!
-  family: Family!
-  images: [Image!]!
-  userDetail: UserDetail!
-  deathAnniversaries: [DeathAnniversary!]!
-  modifier: User
-}
-
-type Offering {
-  id: Int!
-  name: String!
-  image: String!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deathAnniversaryOfferings: [DeathAnniversaryOffering!]!
-}
-
-type DeathAnniversaryOffering {
-  id: Int!
-  deathAnniversaryId: Int!
-  offeringId: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deathAnniversary: DeathAnniversary!
-  offering: Offering!
+  inviteFamilies: [InviteFamily!]!
 }
 
 type DeathAnniversary {
@@ -278,6 +108,85 @@ enum EDeathAnniversaryType {
   REGULAR_ANNIVERSARY
 }
 
+type EventParticipant {
+  id: Int!
+  eventId: Int!
+  userId: Int!
+  bookingStatus: EBookingStatus!
+  code: String
+  rejectReason: String
+  isDeleted: Boolean!
+  approverId: Int
+  checkInAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
+  event: Event!
+  user: User!
+  approver: User
+}
+
+enum EBookingStatus {
+  BOOKING
+  REJECTED
+  APPROVED
+  CANCEL
+}
+
+type EventParticipantType {
+  id: Int!
+  eventId: Int!
+  role: ERole!
+  isDeleted: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  event: Event!
+}
+
+enum ERole {
+  SYSTEM
+  FAMILY_ADMIN
+  FAMILY_MEMBER
+  TEMPLE_ADMIN
+  TEMPLE_MEMBER
+  PUBLIC_USER
+}
+
+type Event {
+  id: Int!
+  templeId: Int
+  creatorId: Int!
+  name: String!
+  avatar: String!
+  description: String
+  startDateEvent: DateTime!
+  endDateEvent: DateTime!
+  startDateBooking: DateTime
+  endDateBooking: DateTime
+  address: String!
+  phone: String
+  email: String
+  isDeleted: Boolean!
+  maxParticipant: Int
+  isFreeOpen: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  eventParticipants: [EventParticipant!]!
+  images: [Image!]!
+  eventParticipantTypes: [EventParticipantType!]!
+  user: User!
+  temple: Temple!
+}
+
+type FollowerTemple {
+  id: Int!
+  templeId: Int!
+  userId: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  user: User!
+  temple: Temple!
+}
+
 type Temple {
   id: Int!
   name: String!
@@ -287,10 +196,6 @@ type Temple {
   phone: String
   email: String!
   website: String
-  priority: EPriority!
-  priorityExpired: DateTime
-  plan: EPlan!
-  planExpired: DateTime
   status: EStatus!
   rejectReason: String
   blockReason: String
@@ -300,15 +205,66 @@ type Temple {
   users: [User!]!
   deceaseds: [Deceased!]!
   images: [Image!]!
-  reviews: [Review!]!
   deathAnniversaries: [DeathAnniversary!]!
   followerTemples: [FollowerTemple!]!
   events: [Event!]!
 }
 
-enum EPlan {
-  FREE
-  PREMIUM
+type Image {
+  id: Int!
+  deceasedId: Int
+  templeId: Int
+  eventId: Int
+  image: String!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deceased: Deceased!
+  temple: Temple!
+  event: Event!
+}
+
+type UserDetail {
+  id: Int!
+  avatar: String!
+  name: String!
+  phone: String
+  birthday: String!
+  address: String
+  gender: EGender!
+  citizenNumber: String
+  createdAt: DateTime!
+  updatedAt: DateTime
+  user: User!
+  deceased: Deceased!
+}
+
+enum EGender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+type Deceased {
+  id: Int!
+  dateOfDeath: String!
+  tombAddress: String!
+  description: String
+  rejectReason: String
+  userDetailId: Int
+  templeId: Int!
+  familyId: Int
+  creatorId: Int!
+  modifierId: Int
+  isDeleted: Boolean!
+  status: EStatus!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  temple: Temple!
+  family: Family!
+  images: [Image!]!
+  userDetail: UserDetail!
+  deathAnniversaries: [DeathAnniversary!]!
+  modifier: User
 }
 
 type Notification {
@@ -323,6 +279,7 @@ type Notification {
   isDeleted: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
+  user: User
 }
 
 enum ENotificationType {
@@ -351,6 +308,50 @@ enum ENotificationType {
   BLOCK_TEMPLE
   DEATH_ANNIVERSARY_COMING_AFTER_DAYS
   DEATH_ANNIVERSARY_TODAY
+}
+
+type ValidationToken {
+  id: Int!
+  token: String!
+  type: EValidationTokenType!
+  email: String!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  user: User!
+}
+
+enum EValidationTokenType {
+  RESET_PASSWORD
+  VERIFY_EMAIL
+}
+
+type User {
+  id: Int!
+  email: String!
+  status: EAccountStatus!
+  role: ERole!
+  familyId: Int
+  templeId: Int
+  userDetailId: Int
+  passwordChangedAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
+  temple: Temple!
+  userDetail: UserDetail!
+  family: Family
+  deathAnniversaries: [DeathAnniversary!]!
+  followerTemples: [FollowerTemple!]!
+  events: [Event!]!
+  eventParticipants: [EventParticipant!]!
+  modifiedDeceaseds: [Deceased!]!
+  notifications: [Notification!]!
+  validationTokens: [ValidationToken!]!
+  inviteFamilies: [InviteFamily!]!
+}
+
+enum EAccountStatus {
+  INACTIVE
+  ACTIVE
 }
 
 type GQLResponse {
@@ -405,10 +406,6 @@ type TempleWithAdmin {
   phone: String
   email: String!
   website: String
-  priority: EPriority!
-  priorityExpired: DateTime
-  plan: EPlan!
-  planExpired: DateTime
   status: EStatus!
   rejectReason: String
   blockReason: String
@@ -418,7 +415,6 @@ type TempleWithAdmin {
   users: [User!]!
   deceaseds: [Deceased!]!
   images: [Image!]!
-  reviews: [Review!]!
   deathAnniversaries: [DeathAnniversary!]!
   followerTemples: [FollowerTemple!]!
   events: [Event!]!
@@ -522,8 +518,6 @@ type EventDetail {
   address: String!
   phone: String
   email: String
-  priority: EPriority!
-  priorityExpired: DateTime
   isDeleted: Boolean!
   maxParticipant: Int
   isFreeOpen: Boolean!
@@ -560,8 +554,6 @@ type EventManagementInfo {
   address: String!
   phone: String
   email: String
-  priority: EPriority!
-  priorityExpired: DateTime
   isDeleted: Boolean!
   maxParticipant: Int
   isFreeOpen: Boolean!

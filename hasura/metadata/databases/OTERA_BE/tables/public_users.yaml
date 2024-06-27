@@ -54,10 +54,24 @@ array_relationships:
         table:
           name: followerTemples
           schema: public
-  - name: reviews
+  - name: inviteFamilies
     using:
       foreign_key_constraint_on:
         column: userId
         table:
-          name: reviews
+          name: inviteFamilies
+          schema: public
+  - name: notifications
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: notifications
+          schema: public
+  - name: validationTokens
+    using:
+      foreign_key_constraint_on:
+        column: userId
+        table:
+          name: validationTokens
           schema: public

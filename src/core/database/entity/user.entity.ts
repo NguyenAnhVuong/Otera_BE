@@ -16,10 +16,12 @@ import { DeathAnniversary } from './deathAnniversary.entity';
 import { Event } from './event.entity';
 import { EventParticipant } from './eventParticipant.entity';
 import { Family } from './family.entity';
-import { Review } from './review.entity';
 import { FollowerTemple } from './followerTemple.entity';
 import { Temple } from './temple.entity';
 import { UserDetail } from './userDetail.entity';
+import { Notification } from './notification.entity';
+import { ValidationToken } from './validationToken.entity';
+import { InviteFamily } from './inviteFamily.entity';
 
 registerEnumType(ERole, {
   name: 'ERole',
@@ -109,10 +111,6 @@ export class User {
   @Field(() => Family, { nullable: true })
   family: Family;
 
-  @OneToMany(() => Review, (review) => review.user)
-  @Field(() => [Review])
-  reviews: Review[];
-
   @OneToMany(
     () => DeathAnniversary,
     (deathAnniversary) => deathAnniversary.user,
@@ -135,4 +133,16 @@ export class User {
   @OneToMany(() => Deceased, (deceased) => deceased.modifier)
   @Field(() => [Deceased])
   modifiedDeceaseds: Deceased[];
+
+  @OneToMany(() => Notification, (notification) => notification.user)
+  @Field(() => [Notification])
+  notifications: Notification[];
+
+  @OneToMany(() => ValidationToken, (validationToken) => validationToken.user)
+  @Field(() => [ValidationToken])
+  validationTokens: ValidationToken[];
+
+  @OneToMany(() => InviteFamily, (inviteFamily) => inviteFamily.user)
+  @Field(() => [InviteFamily])
+  inviteFamilies: InviteFamily[];
 }

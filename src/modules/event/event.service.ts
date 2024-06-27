@@ -52,8 +52,8 @@ export class EventService {
       .where('event.isDeleted = :isDeleted', { isDeleted: false })
       .skip(skip)
       .take(take)
-      .orderBy('event.priority', 'DESC')
-      .addOrderBy('event.createdAt', 'DESC')
+      // .orderBy('event.priority', 'DESC')
+      .orderBy('event.createdAt', 'DESC')
       .addOrderBy('event.startDateEvent', 'ASC');
 
     if (templeId) {
@@ -68,7 +68,7 @@ export class EventService {
         })
         .andWhere(
           '(eventParticipantTypes.role = :publicUserRole OR ' +
-            (userData.tid
+            (userData.tid && userData.tid.length
               ? '(eventParticipantTypes.role IN (:...familyRoles) AND event.templeId IN (:...userTempleIDs)) OR '
               : 'eventParticipantTypes.role IN (:...familyRoles) OR ') +
             '(eventParticipantTypes.role = :role AND eventParticipantTypes.role NOT IN (:...familyRoles)))',
@@ -166,7 +166,7 @@ export class EventService {
     } else if (!(orderBy && orderBy.length)) {
       queryBuilder.addOrderBy('event.createdAt', 'DESC');
       // TODO add priority
-      queryBuilder.addOrderBy('event.priority', 'DESC');
+      // queryBuilder.addOrderBy('event.priority', 'DESC');
     }
 
     if (orderBy && orderBy.length) {

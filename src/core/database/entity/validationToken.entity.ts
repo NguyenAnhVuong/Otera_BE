@@ -4,9 +4,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 registerEnumType(EValidationTokenType, {
   name: 'EValidationTokenType',
@@ -47,4 +50,9 @@ export class ValidationToken {
   })
   @Field(() => Date, { nullable: true })
   updatedAt: Date;
+
+  @ManyToOne(() => User, (user) => user.validationTokens)
+  @Field(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }

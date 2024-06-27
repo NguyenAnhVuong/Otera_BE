@@ -27,7 +27,7 @@ import {
 } from '@helper/utils';
 import { EVENT_PARTICIPANT_CODE_LENGTH, Notifications } from '@core/constants';
 import { VEventParticipantCheckInInput } from './dto/event-participant-check-in.input';
-import { sendMail } from '@helper/mailtrap';
+import { FooterMail, sendMail } from '@helper/mailtrap';
 import * as format from 'string-format';
 import * as dayjs from 'dayjs';
 import { FormatDate } from '@core/constants/formatDate';
@@ -176,7 +176,7 @@ export class EventParticipantService {
         );
       }
 
-      if (event.maxParticipant >= event.eventParticipants.length) {
+      if (event.maxParticipant <= event.eventParticipants.length) {
         throw new HttpException(
           ErrorMessage.EVENT_PARTICIPANT_FULL,
           HttpStatus.BAD_REQUEST,
@@ -217,6 +217,7 @@ export class EventParticipantService {
             this.configService.get(EConfiguration.CLIENT_URL) +
             '/event/' +
             eventParticipant.event.id,
+          footer: FooterMail.footer,
         }),
       });
       while (await this.checkExistedCode(eventParticipantId, randomCode)) {
@@ -259,6 +260,7 @@ export class EventParticipantService {
             this.configService.get(EConfiguration.CLIENT_URL) +
             '/event/' +
             eventParticipant.event.id,
+          footer: FooterMail.footer,
         }),
       });
     }

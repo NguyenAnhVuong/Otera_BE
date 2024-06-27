@@ -60,7 +60,7 @@ import { CronjobModule } from '@core/global/schedule/schedule.module';
         entities: [__dirname + '/**/*.entity.{ts,js}'],
         synchronize: true,
         autoLoadEntities: true,
-        migrations: ['src/migration/**/*.ts'],
+        migrations: ['src/core/database/migrations/**/*.ts'],
         subscribers: ['src/subscriber/**/*.ts'],
         logger: new DatabaseMysqlLogger(),
       }),
