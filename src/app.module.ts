@@ -42,9 +42,13 @@ import { CronjobModule } from '@core/global/schedule/schedule.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
+      cors: {
+        credentials: true,
+        origin: true,
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

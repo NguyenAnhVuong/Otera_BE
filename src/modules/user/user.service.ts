@@ -49,7 +49,6 @@ export class UserService {
   async userRegister(userRegister: VUserRegisterDto) {
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(userRegister.password, salt);
-
     userRegister.password = hashPassword;
     userRegister.role = ERole.PUBLIC_USER;
 
@@ -421,18 +420,18 @@ export class UserService {
     }
 
     response.clearCookie('refreshToken', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
+      // httpOnly: true,
+      // secure: true,
+      sameSite: 'none',
     });
     return true;
   }
 
   async removeRefreshToken(response: Response) {
     response.clearCookie('refreshToken', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
+      // httpOnly: true,
+      // secure: true,
+      sameSite: 'none',
     });
     return true;
   }
