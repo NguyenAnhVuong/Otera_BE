@@ -181,7 +181,7 @@ export class UserService {
 
           await this.validationTokenService.createValidationToken(
             {
-              email: user.email,
+              email: userRegister.email,
               token: verifyToken,
               type: EValidationTokenType.VERIFY_EMAIL,
             },
