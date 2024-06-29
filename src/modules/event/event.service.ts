@@ -23,6 +23,7 @@ import { GetBookingEventsArgs } from './dto/get-booking-events.args';
 import { GetEventArgs } from './dto/get-event.args';
 import { TempleGetEventArgs } from './dto/temple-get-event.args';
 import { VUpdateEventInput } from './dto/update-event.input';
+import { EventParticipantType } from '@core/database/entity/eventParticipantType.entity';
 
 @Injectable()
 export class EventService {
@@ -47,43 +48,71 @@ export class EventService {
   async getEvents(userData: IUserData, args: GetEventArgs) {
     const { templeId, take, skip } = args;
 
+    const currentDate = new Date();
     const queryBuilder = this.eventRepository
       .createQueryBuilder('event')
-      .where('event.isDeleted = :isDeleted', { isDeleted: false })
+      .where(`event."isDeleted" = :isDeleted`, { isDeleted: false })
+      .leftJoinAndMapOne(
+        `event.event_participant_types`,
+        EventParticipantType,
+        'event_participant_types',
+        'event_participant_types.eventId = event.id AND event_participant_types.isDeleted = false',
+      )
       .skip(skip)
       .take(take)
-      // .orderBy('event.priority', 'DESC')
-      .orderBy('event.createdAt', 'DESC')
-      .addOrderBy('event.startDateEvent', 'ASC');
+      .addSelect(
+        `
+        CASE
+          WHEN event."startDateEvent" > :currentDate THEN 1
+          WHEN event."startDateEvent" <= :currentDate AND event."endDateEvent" >= :currentDate THEN 2
+          ELSE 3
+        END`,
+        'event_order',
+      )
+      .addSelect(
+        `
+        NULLIF(
+          CASE
+            WHEN event."startDateEvent" <= :currentDate AND event."endDateEvent" >= :currentDate THEN event."startDateEvent"::text
+            ELSE NULL
+          END,
+        '')`,
+        'current_event_order',
+      )
+      .addSelect(
+        `
+        NULLIF(
+          CASE
+            WHEN event."endDateEvent" <= :currentDate THEN event."endDateEvent"::text
+            ELSE NULL
+          END,
+        '')`,
+        'past_event_order',
+      )
+      .orderBy('event_order', 'ASC')
+      .addOrderBy('current_event_order', 'DESC')
+      .addOrderBy('past_event_order', 'DESC')
+      .setParameter('currentDate', currentDate);
 
     if (templeId) {
-      queryBuilder.andWhere('event.templeId = :templeId', { templeId });
+      queryBuilder.andWhere(`event."templeId" = :templeId`, { templeId });
     }
 
     if (userData) {
-      queryBuilder
-        .leftJoin('event.eventParticipantTypes', 'eventParticipantTypes')
-        .andWhere('eventParticipantTypes.isDeleted = :isDeleted', {
-          isDeleted: false,
-        })
-        .andWhere(
-          '(eventParticipantTypes.role = :publicUserRole OR ' +
-            (userData.tid && userData.tid.length
-              ? '(eventParticipantTypes.role IN (:...familyRoles) AND event.templeId IN (:...userTempleIDs)) OR '
-              : 'eventParticipantTypes.role IN (:...familyRoles) OR ') +
-            '(eventParticipantTypes.role = :role AND eventParticipantTypes.role NOT IN (:...familyRoles)))',
-          {
-            role: userData.role,
-            publicUserRole: ERole.PUBLIC_USER,
-            familyRoles: [ERole.FAMILY_MEMBER, ERole.FAMILY_ADMIN],
-            userTempleIDs: userData.tid,
-          },
-        );
-      if (!templeId) {
-        queryBuilder.orWhere('event.isFreeOpen = :isFreeOpen', {
-          isFreeOpen: true,
-        });
-      }
+      queryBuilder.andWhere(
+        `(event_participant_types."role" = :publicUserRole OR event_participant_types."role" = :role OR event."isFreeOpen" = true)`,
+        {
+          role: userData.role,
+          publicUserRole: ERole.PUBLIC_USER,
+        },
+      );
+    } else {
+      queryBuilder.andWhere(
+        `(event_participant_types."role" = :role OR event."isFreeOpen" = true)`,
+        {
+          role: ERole.PUBLIC_USER,
+        },
+      );
     }
 
     const [events, count] = await queryBuilder.getManyAndCount();
@@ -378,12 +407,22 @@ export class EventService {
       .createQueryBuilder('event')
       .where('event.id = :id', { id })
       .andWhere('event.isDeleted = :isDeleted', { isDeleted: false })
-      .leftJoinAndSelect('event.eventParticipantTypes', 'eventParticipantTypes')
+      .leftJoinAndSelect(
+        'event.eventParticipantTypes',
+        'eventParticipantTypes',
+        'eventParticipantTypes.isDeleted = :isDeleted',
+        {
+          isDeleted: false,
+        },
+      )
       .leftJoinAndSelect(
         'event.eventParticipants',
         'eventParticipants',
-        'eventParticipants.isDeleted = false AND eventParticipants.userId = :userId',
-        { userId: userData.id },
+        `eventParticipants.isDeleted = false ${
+          userData && userData.id
+            ? 'AND eventParticipants.userId = ' + userData.id
+            : ''
+        }`,
       )
       .leftJoinAndSelect('event.images', 'images')
       .getOne();
@@ -392,6 +431,8 @@ export class EventService {
       ...eventData,
       currentParticipant,
       isBooked:
+        !!userData &&
+        userData.id &&
         eventData?.eventParticipants &&
         eventData.eventParticipants.some(
           (participant) => participant.userId === userData.id,
