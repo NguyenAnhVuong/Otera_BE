@@ -20,13 +20,7 @@ export class EventParticipantResolver {
     private readonly eventParticipantService: EventParticipantService,
   ) {}
 
-  // TODO family to public user only, if the temple wants to participate, create a new account and register as a public user
-  @GQLRoles([
-    ERole.TEMPLE_ADMIN,
-    ERole.FAMILY_ADMIN,
-    ERole.FAMILY_MEMBER,
-    ERole.PUBLIC_USER,
-  ])
+  @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER, ERole.PUBLIC_USER])
   @Mutation(() => CreateRes, { name: 'bookingEvent' })
   bookingEvent(
     @Args('bookingEventInput') bookingEventInput: VBookingEventInput,

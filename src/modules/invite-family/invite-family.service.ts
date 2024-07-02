@@ -132,9 +132,11 @@ export class InviteFamilyService {
   }
 
   async responseFamilyInvitation(
-    userId: number,
+    userData: IUserData,
     responseInviteFamilyInput: ResponseInviteFamilyInput,
   ): Promise<UpdateResult> {
+    console.log('responseInviteFamilyInput: ', responseInviteFamilyInput);
+    const { id: userId, name: userName } = userData;
     return await this.dataSource.transaction(
       async (entityManager: EntityManager) => {
         const inviteFamilyRepository =
@@ -147,6 +149,7 @@ export class InviteFamilyService {
             isDeleted: false,
             status: EStatus.PENDING,
           },
+          relations: ['family'],
         });
 
         if (!inviteFamily) {
@@ -182,6 +185,22 @@ export class InviteFamilyService {
             },
             entityManager,
           );
+
+          await this.notificationService.createNotification({
+            userId: inviteFamily.family.adminId,
+            title: Notifications.approveInviteFamily.title,
+            description:
+              Notifications.approveInviteFamily.description(userName),
+            type: ENotificationType.APPROVE_INVITE_FAMILY,
+          });
+        } else {
+          await this.notificationService.createNotification({
+            userId: inviteFamily.family.adminId,
+            title: Notifications.rejectDeathAnniversary.title,
+            description:
+              Notifications.rejectDeathAnniversary.description(userName),
+            type: ENotificationType.APPROVE_INVITE_FAMILY,
+          });
         }
 
         return await inviteFamilyRepository.update(inviteFamily.id, {

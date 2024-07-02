@@ -11,7 +11,6 @@ import {
 } from 'typeorm';
 import { Event } from './event.entity';
 
-// TODO remove type temple. If the temple wants to participate, create a new account and register as a public user
 @Entity('eventParticipantTypes')
 @ObjectType()
 export class EventParticipantType {

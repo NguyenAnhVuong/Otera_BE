@@ -82,10 +82,12 @@ export class DeathAnniversaryResolver {
   @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
   @Mutation(() => GQLResponse, { name: 'familyUpdateDeathAnniversary' })
   familyUpdateDeathAnniversary(
+    @GQLUserData() userData: IUserData,
     @Args('updateDeathAnniversaryInput')
     updateDeathAnniversaryInput: UpdateDeathAnniversaryInput,
   ) {
     return this.deathAnniversaryService.familyUpdateDeathAnniversary(
+      userData,
       updateDeathAnniversaryInput,
     );
   }
@@ -93,10 +95,12 @@ export class DeathAnniversaryResolver {
   @GQLRoles([ERole.FAMILY_ADMIN, ERole.FAMILY_MEMBER])
   @Mutation(() => GQLResponse, { name: 'cancelDeathAnniversary' })
   cancelDeathAnniversary(
+    @GQLUserData() userData: IUserData,
     @Args('cancelDeathAnniversaryInput')
     cancelDeathAnniversaryInput: CancelDeathAnniversaryInput,
   ) {
     return this.deathAnniversaryService.deleteDeathAnniversaryById(
+      userData,
       cancelDeathAnniversaryInput.id,
     );
   }
