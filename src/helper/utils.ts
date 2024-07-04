@@ -421,6 +421,27 @@ export const getMailFormat = (type: EMailType) => {
                   </table>`,
       };
 
+    case EMailType.FAMILY_CANCEL_DEATH_ANNIVERSARY:
+      return {
+        title: '【Otera】Lễ giỗ đã bị hủy',
+        content: `
+                    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                      <tr>
+                          <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                              <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+                  
+                              <p style="font-size: 16px; color: #333333;">{cancelerName} đã huỷ yêu cầu tổ chức lễ giỗ tưởng nhớ {deceasedName}.</p>     
+                  
+                              <p style="font-size: 16px; color: #333333;">
+                                <a href="{deathAnniversaryUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Danh sách lễ giỗ</a>
+                              </p>
+                  
+                              {footer}
+                          </td>
+                      </tr>
+                    </table>`,
+      };
+
     case EMailType.DEATH_ANNIVERSARY_COMING_AFTER_DAYS:
       return {
         title: '【Otera】Ngày giỗ sắp đến',
@@ -657,6 +678,29 @@ export const getMailFormat = (type: EMailType) => {
                         <p style="font-size: 16px; color: #333333;">Chùa {templeName} đã hệ thống khoá với lý do {blockReason}.</p>
             
                         <p style="font-size: 16px; color: #333333;">Vui lòng liên hệ với quản trị viên để biết thêm chi tiết.</p>
+            
+                        {footer}
+                    </td>
+                </tr>
+              </table>`,
+      };
+
+    case EMailType.FAMILY_UPDATE_REJECTED_DEATH_ANNIVERSARY:
+      return {
+        title: '【Otera】Thông tin lễ giỗ đã được cập nhật',
+        content: `
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+                <tr>
+                    <td style="padding: 20px; background-color: #ffffff; border: 1px solid #dddddd; border-radius: 5px;">
+                        <p style="font-size: 16px; color: #333333;">Kính gửi {userName},</p>
+            
+                        <p style="font-size: 16px; color: #333333;">{updaterName} đã cập nhật thông tin lễ giỗ tưởng nhớ {deceasedName}.</p>
+            
+                        <p style="font-size: 16px; color: #333333;">Vui lòng truy cập vào hệ thống để xem chi tiết lễ giỗ.</p>
+          
+                        <p style="font-size: 16px; color: #333333;">
+                          <a href="{deathAnniversaryUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;">Chi tiết lễ giỗ</a>
+                        </p>          
             
                         {footer}
                     </td>

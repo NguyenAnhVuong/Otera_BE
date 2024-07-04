@@ -74,6 +74,7 @@ export class SendMailDeathAnniversaryConsumer {
 
     await Promise.allSettled(
       familyMembers.map(async (user) => {
+        if (user.id === job.data.creatorId) return;
         await this.notificationService.createNotification({
           userId: user.id,
           title: Notifications.requestDeathAnniversary.title,
@@ -541,6 +542,164 @@ export class SendMailDeathAnniversaryConsumer {
             });
           }),
         );
+      }),
+    );
+  }
+
+  @Process(
+    QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
+      .FAMILY_UPDATE_REJECTED_DEATH_ANNIVERSARY,
+  )
+  async handleFamilyUpdateRejectedDeathAnniversary(job: Job) {
+    this.logger.log(`********OnQueueConsumer Job: ${JSON.stringify(job)}`);
+
+    const familyMembers = await this.userService.getFamilyMembersByFamilyId(
+      job.data.familyId,
+    );
+
+    const templeMembers = await this.userService.getTempleMembersByTempleId(
+      job.data.templeId,
+    );
+
+    const mailFormat = getMailFormat(
+      EMailType.FAMILY_UPDATE_REJECTED_DEATH_ANNIVERSARY,
+    );
+
+    await Promise.allSettled(
+      templeMembers.map(async (user) => {
+        await this.notificationService.createNotification({
+          userId: user.id,
+          title: Notifications.familyUpdateRejectedDeathAnniversary.title,
+          description:
+            Notifications.familyUpdateRejectedDeathAnniversary.description(
+              job.data.updaterName,
+              job.data.deceasedName,
+            ),
+          redirectTo:
+            Notifications.familyUpdateRejectedDeathAnniversary.redirectTo,
+          type: ENotificationType.FAMILY_UPDATE_REJECTED_DEATH_ANNIVERSARY,
+        });
+
+        return await sendMail({
+          to: user.email,
+          title: mailFormat.title,
+          content: format(mailFormat.content, {
+            userName: user.userDetail.name,
+            updaterName: job.data.updaterName,
+            deceasedName: job.data.deceasedName,
+            deathAnniversaryUrl:
+              this.configService.get(EConfiguration.CLIENT_URL) +
+              '/death-anniversary',
+            footer: FooterMail.footer,
+          }),
+        });
+      }),
+    );
+
+    return await Promise.allSettled(
+      familyMembers.map(async (user) => {
+        if (user.id === job.data.updaterId) return;
+        await this.notificationService.createNotification({
+          userId: user.id,
+          title: Notifications.familyUpdateRejectedDeathAnniversary.title,
+          description:
+            Notifications.familyUpdateRejectedDeathAnniversary.description(
+              job.data.updaterName,
+              job.data.deceasedName,
+            ),
+          redirectTo:
+            Notifications.familyUpdateRejectedDeathAnniversary.redirectTo,
+          type: ENotificationType.FAMILY_UPDATE_REJECTED_DEATH_ANNIVERSARY,
+        });
+        return await sendMail({
+          to: user.email,
+          title: mailFormat.title,
+          content: format(mailFormat.content, {
+            userName: user.userDetail.name,
+            updaterName: job.data.updaterName,
+            deceasedName: job.data.deceasedName,
+            deathAnniversaryUrl:
+              this.configService.get(EConfiguration.CLIENT_URL) +
+              '/death-anniversary',
+            footer: FooterMail.footer,
+          }),
+        });
+      }),
+    );
+  }
+
+  @Process(
+    QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
+      .FAMILY_CANCEL_DEATH_ANNIVERSARY,
+  )
+  async handleFamilyCancelDeathAnniversary(job: Job) {
+    this.logger.log(`********OnQueueConsumer Job: ${JSON.stringify(job)}`);
+
+    const familyMembers = await this.userService.getFamilyMembersByFamilyId(
+      job.data.familyId,
+    );
+
+    const templeMembers = await this.userService.getTempleMembersByTempleId(
+      job.data.templeId,
+    );
+
+    const mailFormat = getMailFormat(EMailType.FAMILY_CANCEL_DEATH_ANNIVERSARY);
+
+    await Promise.allSettled(
+      templeMembers.map(async (user) => {
+        await this.notificationService.createNotification({
+          userId: user.id,
+          title: Notifications.familyCancelDeathAnniversary.title,
+          description: Notifications.familyCancelDeathAnniversary.description(
+            job.data.cancelerName,
+            job.data.deceasedName,
+          ),
+          redirectTo: Notifications.familyCancelDeathAnniversary.redirectTo,
+          type: ENotificationType.FAMILY_CANCEL_DEATH_ANNIVERSARY,
+        });
+
+        return await sendMail({
+          to: user.email,
+          title: mailFormat.title,
+          content: format(mailFormat.content, {
+            userName: user.userDetail.name,
+            cancelerName: job.data.cancelerName,
+            deceasedName: job.data.deceasedName,
+            deathAnniversaryUrl:
+              this.configService.get(EConfiguration.CLIENT_URL) +
+              '/death-anniversary',
+            footer: FooterMail.footer,
+          }),
+        });
+      }),
+    );
+
+    return await Promise.allSettled(
+      familyMembers.map(async (user) => {
+        if (user.id === job.data.updaterId) return;
+        await this.notificationService.createNotification({
+          userId: user.id,
+          title: Notifications.familyCancelDeathAnniversary.title,
+          description: Notifications.familyCancelDeathAnniversary.description(
+            job.data.cancelerName,
+            job.data.deceasedName,
+          ),
+          redirectTo: Notifications.familyCancelDeathAnniversary.redirectTo,
+          type: ENotificationType.FAMILY_CANCEL_DEATH_ANNIVERSARY,
+        });
+        return await sendMail({
+          to: user.email,
+          title: mailFormat.title,
+          content: format(mailFormat.content, {
+            userName: user.userDetail.name,
+            cancelerName: job.data.cancelerName,
+            deceasedName: job.data.deceasedName,
+            deathAnniversaryUrl:
+              this.configService.get(EConfiguration.CLIENT_URL) +
+              '/death-anniversary',
+            footer: FooterMail.footer,
+          }),
+        });
       }),
     );
   }

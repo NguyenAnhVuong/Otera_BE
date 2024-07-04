@@ -1,5 +1,5 @@
 import { DeathAnniversary } from '@core/database/entity/deathAnniversary.entity';
-import { EDeathAnniversaryStatus, EStatus } from '@core/enum';
+import { EDeathAnniversaryStatus, EStatus, ErrorMessage } from '@core/enum';
 import { QueueProcessorService } from '@core/global/queueProcessor/quequeProcessor.service';
 import { QUEUE_MODULE_OPTIONS } from '@core/global/queueProcessor/queueIdentity.constant';
 import { IUserData } from '@core/interface/default.interface';
@@ -7,14 +7,28 @@ import { returnPagingData } from '@helper/utils';
 import { DeathAnniversaryOfferingService } from '@modules/death-anniversary-offering/death-anniversary-offering.service';
 import { DeceasedService } from '@modules/deceased/deceased.service';
 import { TempleService } from '@modules/temple/temple.service';
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, DeepPartial, EntityManager, Repository } from 'typeorm';
+import {
+  DataSource,
+  DeepPartial,
+  EntityManager,
+  LessThan,
+  MoreThan,
+  Repository,
+} from 'typeorm';
 import { CreateDeathAnniversaryInput } from './dto/create-death-anniversary.input';
 import { VFamilyGetDeathAnniversariesInput } from './dto/family-get-death-anniversaries.args';
 import { TempleUpdateDeathAnniversaryInput } from './dto/temple-update-death-anniversary.input';
 import { UpdateDeathAnniversaryInput } from './dto/update-death-anniversary.input';
 import { VTempleGetDeathAnniversariesInput } from './dto/temple-get-death-anniversaries.args';
+import { sendMail } from '@helper/mailtrap';
 
 @Injectable()
 export class DeathAnniversaryService {
@@ -55,7 +69,6 @@ export class DeathAnniversaryService {
     return !!deathAnniversary;
   }
 
-  // TODO check if request exist
   async createDeathAnniversary(
     createDeathAnniversaryInput: CreateDeathAnniversaryInput,
     userData: IUserData,
@@ -67,6 +80,21 @@ export class DeathAnniversaryService {
       templeId,
       userDetail: { name },
     } = await this.deceasedService.checkDeceasedInFamily(deceasedId, familyId);
+
+    const deathAnniversary = await this.deathAnniversaryRepository.findOne({
+      where: {
+        deceasedId,
+        isDeleted: false,
+        desiredStartTime: MoreThan(new Date()),
+      },
+    });
+
+    if (deathAnniversary) {
+      throw new HttpException(
+        ErrorMessage.DEATH_ANNIVERSARY_REQUEST_EXIST,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
     // const isExistedDeathAnniversary = await this.checkIsExistedDeathAnniversary(
     //   deceasedId,
@@ -99,6 +127,7 @@ export class DeathAnniversaryService {
           templeId,
           requesterName,
           deceasedName: name,
+          creatorId,
         },
       );
 
@@ -280,6 +309,7 @@ export class DeathAnniversaryService {
   }
 
   async familyUpdateDeathAnniversary(
+    userData: IUserData,
     updateDeathAnniversaryInput: UpdateDeathAnniversaryInput,
   ) {
     const { id, offeringIds, ...newDeathAnniversaryData } =
@@ -287,6 +317,18 @@ export class DeathAnniversaryService {
     await this.dataSource.transaction(async (entityManager) => {
       const deathAnniversaryRepository =
         entityManager.getRepository(DeathAnniversary);
+
+      const deathAnniversary = await deathAnniversaryRepository.findOne({
+        where: { id },
+        relations: ['deceased', 'deceased.userDetail'],
+      });
+
+      if (!deathAnniversary) {
+        throw new HttpException(
+          ErrorMessage.DEATH_ANNIVERSARY_NOT_EXIST,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
       if (offeringIds && offeringIds.length) {
         await this.deathAnniversaryOfferingService.deleteDeathAnniversaryOfferingsByDeathAnniversaryId(
@@ -303,7 +345,18 @@ export class DeathAnniversaryService {
         );
       }
 
-      // TODO send mail to temple if enableUpdate is true
+      await this.queueProcessService.handleAddQueue(
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME,
+        QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
+          .FAMILY_UPDATE_REJECTED_DEATH_ANNIVERSARY,
+        {
+          templeId: deathAnniversary.templeId,
+          deceasedName: deathAnniversary.deceased.userDetail.name,
+          updaterName: userData.name,
+          updaterId: userData.id,
+          familyId: deathAnniversary.familyId,
+        },
+      );
 
       return await deathAnniversaryRepository.update(
         { id },
@@ -373,7 +426,31 @@ export class DeathAnniversaryService {
     );
   }
 
-  async deleteDeathAnniversaryById(id: number) {
+  async deleteDeathAnniversaryById(userData: IUserData, id: number) {
+    const deathAnniversary = await this.deathAnniversaryRepository.findOne({
+      where: { id },
+      relations: ['deceased', 'deceased.userDetail'],
+    });
+
+    await this.queueProcessService.handleAddQueue(
+      QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.NAME,
+      QUEUE_MODULE_OPTIONS.SEND_MAIL_DEATH_ANNIVERSARY.JOBS
+        .FAMILY_CANCEL_DEATH_ANNIVERSARY,
+      {
+        familyId: deathAnniversary.familyId,
+        templeId: deathAnniversary.templeId,
+        cancelerName: userData.name,
+        deceasedName: deathAnniversary.deceased.userDetail.name,
+      },
+    );
+
+    if (!deathAnniversary) {
+      throw new HttpException(
+        ErrorMessage.DEATH_ANNIVERSARY_NOT_EXIST,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     return await this.deathAnniversaryRepository.update(
       { id },
       { isDeleted: true },

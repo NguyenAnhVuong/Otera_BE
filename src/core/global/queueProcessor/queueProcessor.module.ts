@@ -13,8 +13,6 @@ import { DeceasedModule } from '@modules/deceased/deceased.module';
 import { SendMailSystemConsumer } from './consumer/sendMailSystem.processor';
 import { SendMailDeceasedConsumer } from './consumer/sendMailDeceased.processor';
 
-// TODO Send mail when invite member to family and reminder when approaching the anniversary
-
 @Global()
 @Module({
   imports: [

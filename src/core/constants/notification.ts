@@ -4,6 +4,14 @@ export const Notifications = {
     description: (from: string, familyName: string) =>
       `${from} mời bạn tham gia gia đình ${familyName}`,
   },
+  approveInviteFamily: {
+    title: 'Lời mời gia đình đã được chấp nhận',
+    description: (from: string) => `${from} đã chấp nhận lời mời gia đình`,
+  },
+  rejectInviteFamily: {
+    title: 'Lời mời gia đình đã bị từ chối',
+    description: (from: string) => `${from} đã từ chối lời mời gia đình`,
+  },
   newEvent: {
     title: (templeName: string) => `Chùa ${templeName} đã tạo sự kiện mới`,
     description: (templeName: string, eventName: string) =>
@@ -74,6 +82,18 @@ export const Notifications = {
     title: 'Lễ giỗ đã hoàn thành',
     description: (deceasedName: string) =>
       `Lễ giỗ tưởng nhớ ${deceasedName} đã hoàn thành`,
+    redirectTo: '/death-anniversary',
+  },
+  familyUpdateRejectedDeathAnniversary: {
+    title: 'Thông tin lễ giỗ đã được cập nhật',
+    description: (updateterName: string, deceasedName: string) =>
+      `${updateterName} đã cập nhật thông tin lễ giỗ tưởng nhớ ${deceasedName}`,
+    redirectTo: '/death-anniversary',
+  },
+  familyCancelDeathAnniversary: {
+    title: 'Lễ giỗ đã bị hủy',
+    description: (cancelerName: string, deceasedName: string) =>
+      `${cancelerName} đã huỷ yêu cầu tổ chức lễ giỗ tưởng nhớ ${deceasedName}`,
     redirectTo: '/death-anniversary',
   },
   contributeImage: {
@@ -152,5 +172,10 @@ export const Notifications = {
     description: (templeName: string) =>
       `Chùa ${templeName} đã bị hệ thống khoá`,
     redirectTo: '/system/temple',
+  },
+  addTempleMember: {
+    title: 'Bạn đã được thêm vào chùa',
+    description: (templeName: string) =>
+      `Bạn đã được thêm vào chùa ${templeName}. Vui lòng đăng nhập lại để sử dụng chức năng của chùa!`,
   },
 };

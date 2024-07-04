@@ -377,9 +377,21 @@ export class TempleService {
       );
     }
 
+    const temple = await this.templeRepository.findOne({
+      where: { id: templeId },
+    });
+
+    await this.notificationService.createNotification({
+      userId: user.id,
+      title: Notifications.addTempleMember.title,
+      description: Notifications.addTempleMember.description(temple.name),
+      type: ENotificationType.ADD_TEMPLE_MEMBER,
+    });
+
     return await this.userService.updateUserById(user.id, {
       templeId,
       role: ERole.TEMPLE_MEMBER,
+      passwordChangedAt: new Date(),
     });
   }
 

@@ -21,7 +21,7 @@ export class InviteFamilyResolver {
     responseInviteFamilyInput: ResponseInviteFamilyInput,
   ) {
     return this.inviteFamilyService.responseFamilyInvitation(
-      userData.id,
+      userData,
       responseInviteFamilyInput,
     );
   }

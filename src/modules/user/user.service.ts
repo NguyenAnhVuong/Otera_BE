@@ -69,6 +69,7 @@ export class UserService {
           name: userRegister.name,
           birthday: userRegister.birthday,
           gender: userRegister.gender,
+          address: userRegister.address,
         };
 
         let verifyToken = null;

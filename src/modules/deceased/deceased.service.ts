@@ -234,13 +234,15 @@ export class DeceasedService {
   }
 
   async getDeceasedDetail(id: number, userData: IUserData) {
-    const { fid: familyId, role } = userData;
+    const { fid: familyId, role, tid } = userData;
     return await this.deceasedRepository
       .createQueryBuilder('deceased')
       .where({
         id,
         ...(role === ERole.TEMPLE_ADMIN || role === ERole.TEMPLE_MEMBER
-          ? {}
+          ? {
+              templeId: tid[0],
+            }
           : { familyId, status: EStatus.APPROVED, isDeleted: false }),
       })
       .leftJoinAndSelect('deceased.images', 'images')

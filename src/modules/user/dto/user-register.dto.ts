@@ -22,6 +22,10 @@ export class VUserRegisterDto {
   @Type(() => String)
   birthday: string;
 
+  @IsString()
+  @IsNotEmpty()
+  address: string;
+
   @IsEmail()
   @IsNotEmpty()
   email: string;

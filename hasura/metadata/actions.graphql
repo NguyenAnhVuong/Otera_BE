@@ -67,6 +67,7 @@ input UserRegisterInput {
   name: String!
   gender: EGender!
   birthday: String!
+  address: String!
   email: String!
   password: String!
   role: ERole
