@@ -154,6 +154,7 @@ type UserLoginOutput {
 
 type UserLoginOutputData {
   accessToken: String!
+  refreshToken: String!
   user: AuthUser!
 }
 
@@ -167,6 +168,7 @@ type RefreshTokenOutput {
 
 type RefreshTokenOutputData {
   accessToken: String!
+  refreshToken: String!
 }
 
 type PaginationFormat {

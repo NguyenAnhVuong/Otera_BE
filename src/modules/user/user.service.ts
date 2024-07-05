@@ -257,10 +257,7 @@ export class UserService {
     });
   }
 
-  async userLogin(
-    userLogin: VUserLoginDto,
-    response: Response,
-  ): Promise<IResponseAuth> {
+  async userLogin(userLogin: VUserLoginDto): Promise<IResponseAuth> {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .addSelect('user.password')
@@ -310,13 +307,10 @@ export class UserService {
       templeIds,
     };
 
-    return await this.returnResponseAuthUser(authUserData, response);
+    return await this.returnResponseAuthUser(authUserData);
   }
 
-  async refreshToken(
-    refreshToken: string,
-    response: Response,
-  ): Promise<IResponseRefreshToken> {
+  async refreshToken(refreshToken: string): Promise<IResponseRefreshToken> {
     if (!refreshToken) {
       throw new HttpException(
         ErrorMessage.REFRESH_TOKEN_NOT_EXISTS,
@@ -354,16 +348,16 @@ export class UserService {
         : user.followerTemples.map((temple) => temple.templeId),
     };
 
-    const data = await this.returnResponseAuthUser(authUserData, response);
+    const data = await this.returnResponseAuthUser(authUserData);
 
     return {
       accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
     };
   }
 
   async returnResponseAuthUser(
     authUserData: IResponseAuthUser,
-    response: Response,
   ): Promise<IResponseAuth> {
     const payload: IJwtPayload = {
       id: authUserData.id,
@@ -381,17 +375,9 @@ export class UserService {
       ),
     });
 
-    response.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: true,
-      maxAge: this.configService.get<number>(
-        EConfiguration.REFRESH_TOKEN_EXPIRES_IN,
-      ),
-    });
-
     return {
       accessToken: await this.jwtService.signAsync(payload),
+      refreshToken,
       user: authUserData,
     };
   }
