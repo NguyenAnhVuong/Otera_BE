@@ -22,21 +22,15 @@ export class UserController {
 
   @Public()
   @Post('/login')
-  userLogin(
-    @HasuraBody('input') userLogin: VUserLoginDto,
-    @Res({ passthrough: true }) response: Response,
-  ) {
-    return this.userService.userLogin(userLogin, response);
+  userLogin(@HasuraBody('input') userLogin: VUserLoginDto) {
+    return this.userService.userLogin(userLogin);
   }
 
   @Public()
   @Post('/refresh-token')
-  refreshToken(
-    @Req() request: Request,
-    @Res({ passthrough: true }) response: Response,
-  ) {
+  refreshToken(@Req() request: Request) {
     const { refreshToken } = request.cookies;
-    return this.userService.refreshToken(refreshToken, response);
+    return this.userService.refreshToken(refreshToken);
   }
 
   @Roles(Object.values(ERole))
