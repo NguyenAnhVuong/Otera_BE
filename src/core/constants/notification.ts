@@ -118,7 +118,7 @@ export const Notifications = {
     title: 'Yêu cầu khai báo phần mộ và tro cốt đã được chấp nhận',
     description: (deceasedName: string) =>
       `Yêu cầu khai báo thông tin cho ${deceasedName} đã được chấp nhận`,
-    redirectTo: (id: number) => `/deceased${id}`,
+    redirectTo: (id: number) => `/deceased/${id}`,
   },
   rejectDeceased: {
     title: 'Yêu cầu khai báo phần mộ và tro cốt đã bị từ chối',
@@ -136,7 +136,7 @@ export const Notifications = {
     title: 'Phần mộ và tro cốt đã được khôi phục',
     description: (userName: string, deceasedName: string) =>
       `${userName} đã khôi phục phần mộ và tro cốt của ${deceasedName}`,
-    redirectTo: (id: number) => `/deceased${id}`,
+    redirectTo: (id: number) => `/deceased/${id}`,
   },
   registerTemple: {
     title: 'Có yêu cầu đăng ký chùa mới',
