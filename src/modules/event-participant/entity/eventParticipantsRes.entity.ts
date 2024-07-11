@@ -10,6 +10,9 @@ export class EventParticipantRes extends EventParticipant {
 
   @Field(() => String, { nullable: true })
   familyName?: string;
+
+  @Field(() => String, { nullable: true })
+  familyCode?: string;
 }
 
 @ObjectType()

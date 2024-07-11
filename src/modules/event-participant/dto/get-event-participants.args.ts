@@ -38,7 +38,7 @@ export class VGetEventParticipantsArgs extends GQLPaginationArgs {
   @Field(() => String, { nullable: true })
   @IsString()
   @IsOptional()
-  familyName?: string;
+  familyKeyword?: string;
 
   @Field(() => EBookingStatus)
   @IsEnum(EBookingStatus)

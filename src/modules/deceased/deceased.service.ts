@@ -350,6 +350,8 @@ export class DeceasedService {
             images.map((image) => ({ image, deceasedId: id })),
             entityManager,
           );
+        } else {
+          await this.imageService.deleteImagesByDeceasedId(id, entityManager);
         }
 
         await this.queueProcessorService.handleAddQueue(

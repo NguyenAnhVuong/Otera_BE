@@ -290,7 +290,7 @@ export class EventParticipantService {
       name,
       email,
       address,
-      familyName,
+      familyKeyword,
       isFollowing,
       orderBy,
     } = getEventParticipantsArgs;
@@ -331,13 +331,16 @@ export class EventParticipantService {
         address: `%${address}%`,
       });
     }
-    if (familyName) {
-      query
-        .leftJoin('user.family', 'family')
-        .andWhere('family.name ILIKE :familyName', {
-          familyName: `%${familyName}%`,
-        });
+
+    if (familyKeyword) {
+      query.andWhere(
+        '(family.name ILIKE :familyKeyword OR family.familyCode ILIKE :familyKeyword)',
+        {
+          familyKeyword: `%${familyKeyword}%`,
+        },
+      );
     }
+
     if (orderBy && orderBy.length > 0) {
       orderBy.forEach((order) => {
         query.addOrderBy(`eventParticipant.${order.column}`, order.sortOrder);
@@ -350,6 +353,7 @@ export class EventParticipantService {
       data.map(async (eventParticipant) => {
         return {
           familyName: eventParticipant.user.family?.name,
+          familyCode: eventParticipant.user.family?.familyCode,
           isFollowing: !!eventParticipant.user.followerTemples.length,
           ...eventParticipant,
         };
@@ -370,7 +374,6 @@ export class EventParticipantService {
         isDeleted: false,
         event: {
           templeId: userData.tid[0],
-          startDateEvent: LessThanOrEqual(new Date()),
           endDateEvent: MoreThanOrEqual(new Date()),
         },
       },

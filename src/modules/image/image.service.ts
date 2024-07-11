@@ -34,7 +34,12 @@ export class ImageService {
     const images = await imageRepository.find({ where: { eventId } });
 
     await this.cloudinaryService.deleteImagesByUrls(
-      images.map((image) => image.image),
+      images
+        .map((image) => image.image)
+        .filter(
+          (image) =>
+            !imageParams.some((imageParam) => imageParam.image === image),
+        ),
     );
 
     await imageRepository.delete({ eventId });
@@ -53,7 +58,12 @@ export class ImageService {
     const images = await imageRepository.find({ where: { deceasedId } });
 
     await this.cloudinaryService.deleteImagesByUrls(
-      images.map((image) => image.image),
+      images
+        .map((image) => image.image)
+        .filter(
+          (image) =>
+            !imageParams.some((imageParam) => imageParam.image === image),
+        ),
     );
 
     await imageRepository.delete({ deceasedId });
