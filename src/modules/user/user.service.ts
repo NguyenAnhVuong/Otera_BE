@@ -231,30 +231,32 @@ export class UserService {
       );
     }
 
-    await this.dataSource.transaction(async (entityManager: EntityManager) => {
-      const userRepository = entityManager.getRepository(User);
-      const isValidToken = await this.jwtService.verifyAsync(token);
+    return await this.dataSource.transaction(
+      async (entityManager: EntityManager) => {
+        const userRepository = entityManager.getRepository(User);
+        const isValidToken = await this.jwtService.verifyAsync(token);
 
-      if (!isValidToken) {
-        throw new HttpException(
-          ErrorMessage.INVALID_TOKEN,
-          HttpStatus.BAD_REQUEST,
+        if (!isValidToken) {
+          throw new HttpException(
+            ErrorMessage.INVALID_TOKEN,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        await this.validationTokenService.deleteValidationTokenByToken(
+          token,
+          entityManager,
         );
-      }
-
-      await this.validationTokenService.deleteValidationTokenByToken(
-        token,
-        entityManager,
-      );
-      return await userRepository.update(
-        {
-          id: user.id,
-        },
-        {
-          status: EAccountStatus.ACTIVE,
-        },
-      );
-    });
+        return await userRepository.update(
+          {
+            id: user.id,
+          },
+          {
+            status: EAccountStatus.ACTIVE,
+          },
+        );
+      },
+    );
   }
 
   async userLogin(userLogin: VUserLoginDto): Promise<IResponseAuth> {

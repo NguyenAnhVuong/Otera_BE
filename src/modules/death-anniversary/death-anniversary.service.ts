@@ -179,8 +179,7 @@ export class DeathAnniversaryService {
       .leftJoinAndSelect('deathAnniversary.user', 'requester')
       .leftJoinAndSelect('requester.userDetail', 'requesterDetail')
       .skip(skip)
-      .take(take)
-      .orderBy('deathAnniversary.createdAt', 'DESC');
+      .take(take);
 
     if (status) {
       query.andWhere('deathAnniversary.status = :status', { status });
@@ -215,6 +214,8 @@ export class DeathAnniversaryService {
       orderBy.forEach((order) => {
         query.addOrderBy(`deathAnniversary.${order.column}`, order.sortOrder);
       });
+    } else {
+      query.orderBy('deathAnniversary.createdAt', 'DESC');
     }
 
     const [data, count] = await query.getManyAndCount();
@@ -256,8 +257,7 @@ export class DeathAnniversaryService {
       .leftJoinAndSelect('requester.userDetail', 'requesterDetail')
       .leftJoinAndSelect('deathAnniversary.family', 'family')
       .skip(skip)
-      .take(take)
-      .orderBy('deathAnniversary.createdAt', 'DESC');
+      .take(take);
 
     if (status) {
       query.andWhere('deathAnniversary.status = :status', { status });
@@ -290,7 +290,7 @@ export class DeathAnniversaryService {
 
     if (familyKeyword) {
       query.andWhere(
-        'family.name ILIKE :familyKeyword OR family.familyCode ILIKE :familyKeyword',
+        '(family.name ILIKE :familyKeyword OR family.familyCode ILIKE :familyKeyword)',
         {
           familyKeyword: `%${familyKeyword}%`,
         },
@@ -301,6 +301,8 @@ export class DeathAnniversaryService {
       orderBy.forEach((order) => {
         query.addOrderBy(`deathAnniversary.${order.column}`, order.sortOrder);
       });
+    } else {
+      query.orderBy('deathAnniversary.createdAt', 'DESC');
     }
 
     const [data, count] = await query.getManyAndCount();

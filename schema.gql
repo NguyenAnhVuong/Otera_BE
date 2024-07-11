@@ -491,6 +491,7 @@ type EventParticipantRes {
   approver: User
   isFollowing: Boolean!
   familyName: String
+  familyCode: String
 }
 
 type ListEventParticipant {
@@ -762,7 +763,7 @@ type Query {
   getEvents(page: Int, take: Int, skip: Int, templeId: Int): EventsRes!
   getBookingEvents(page: Int, take: Int, skip: Int, name: String, address: String, orderBy: [OrderBy!], bookingStatus: EBookingStatus): BookingEventsRes!
   getEventById(id: Int!): EventRes!
-  getEventParticipants(page: Int, take: Int, skip: Int, eventId: Int!, name: String, email: String, address: String, familyName: String, bookingStatus: EBookingStatus!, isFollowing: Boolean, orderBy: [OrderBy!]): EventParticipantsRes!
+  getEventParticipants(page: Int, take: Int, skip: Int, eventId: Int!, name: String, email: String, address: String, familyKeyword: String, bookingStatus: EBookingStatus!, isFollowing: Boolean, orderBy: [OrderBy!]): EventParticipantsRes!
   templeGetFollowers(page: Int, take: Int, skip: Int, name: String, email: String, phone: String, address: String, familyName: String, orderBy: [OrderBy!], isInFamily: Boolean): FollowerTemplesRes!
   getOfferings(page: Int, take: Int, skip: Int): OfferingsRes!
 }

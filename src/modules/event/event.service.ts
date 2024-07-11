@@ -73,6 +73,16 @@ export class EventService {
         `
         NULLIF(
           CASE
+            WHEN event."startDateEvent" > :currentDate THEN event."startDateEvent"::text
+            ELSE NULL
+          END,
+        '')`,
+        'upcoming_event_order',
+      )
+      .addSelect(
+        `
+        NULLIF(
+          CASE
             WHEN event."startDateEvent" <= :currentDate AND event."endDateEvent" >= :currentDate THEN event."startDateEvent"::text
             ELSE NULL
           END,
@@ -90,6 +100,7 @@ export class EventService {
         'past_event_order',
       )
       .orderBy('event_order', 'ASC')
+      .addOrderBy('upcoming_event_order', 'ASC')
       .addOrderBy('current_event_order', 'DESC')
       .addOrderBy('past_event_order', 'DESC')
       .setParameter('currentDate', currentDate);
