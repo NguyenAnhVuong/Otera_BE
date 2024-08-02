@@ -293,14 +293,13 @@ export class EventParticipantService {
       familyKeyword,
       isFollowing,
       orderBy,
+      isCheckIn,
     } = getEventParticipantsArgs;
     const query = this.eventParticipantRepository
       .createQueryBuilder('eventParticipant')
       .where('eventParticipant.eventId = :eventId', { eventId })
       .andWhere('eventParticipant.isDeleted = false')
-      .andWhere('eventParticipant.bookingStatus = :bookingStatus', {
-        bookingStatus,
-      })
+
       .leftJoinAndSelect('eventParticipant.event', 'event')
       .andWhere('event.templeId = :templeId', { templeId })
       .leftJoinAndSelect('eventParticipant.user', 'user')
@@ -316,6 +315,16 @@ export class EventParticipantService {
       )
       .skip(skip)
       .take(take);
+
+    if (bookingStatus) {
+      query.andWhere('eventParticipant.bookingStatus = :bookingStatus', {
+        bookingStatus,
+      });
+    }
+
+    if (isCheckIn) {
+      query.andWhere('eventParticipant.checkInAt IS NOT NULL');
+    }
 
     if (isFollowing) {
       query.andWhere('followerTemples.templeId = :templeId', { templeId });

@@ -40,10 +40,14 @@ export class VGetEventParticipantsArgs extends GQLPaginationArgs {
   @IsOptional()
   familyKeyword?: string;
 
-  @Field(() => EBookingStatus)
+  @Field(() => EBookingStatus, { nullable: true })
   @IsEnum(EBookingStatus)
-  @IsNotEmpty()
-  bookingStatus: EBookingStatus;
+  @IsOptional()
+  bookingStatus?: EBookingStatus;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  isCheckIn?: boolean;
 
   @Field(() => Boolean, { nullable: true })
   @IsOptional()
